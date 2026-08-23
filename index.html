@@ -96,6 +96,21 @@
       .brief { border: 1px dashed var(--moss); border-radius: 10px; background: #fafbf7; padding: 14px 16px; margin-top: 12px; font-size: 13px; white-space: pre-wrap; }
       .foot { margin-top: 30px; border-top: 1px solid var(--line); padding-top: 14px; font-size: 12px; color: var(--muted); }
       .human-boundary { border: 1px solid var(--line); border-left: 4px solid var(--forest); background: #fff; border-radius: 10px; padding: 12px 14px; margin-top: 10px; font-size: 13.5px; }
+      .glance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
+      @media (max-width: 640px) { .glance-grid { grid-template-columns: 1fr; } }
+      .glance-col { border: 1px solid var(--line); border-radius: 10px; background: #fafbf7; padding: 12px 14px; font-size: 13px; }
+      .glance-col h4 { margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+      .glance-col ul { margin: 0; padding-left: 16px; }
+      .glance-col li { margin: 4px 0; }
+      .glance-rec { display: flex; align-items: center; gap: 10px; }
+      .glance-rec .rec-tag { font-weight: 800; letter-spacing: 0.04em; }
+      .glance-rec .rec-tag.esc { color: var(--bad); }
+      .glance-rec .rec-tag.now { color: var(--ok); }
+      .glance-rec .rec-tag.cond { color: var(--amber); }
+      .glance-rec .rec-tag.hold { color: var(--unk); }
+      .glance-rec .rec-tag.drop { color: var(--bad); }
+      .glance-note { margin-top: 10px; font-size: 12px; color: var(--muted); }
+      .glance-hr { border: 0; border-top: 1px solid var(--line); margin: 10px 0 0; }
     </style>
   </head>
   <body>
@@ -113,10 +128,15 @@
         <div class="card" id="opp-card"></div>
       </section>
 
+      <section id="glance">
+        <h2><span class="eyebrow">Decision at a glance</span></h2>
+        <div class="card glance" id="glance-panel"></div>
+      </section>
+
       <section id="evidence">
         <h2><span class="eyebrow">02 · Evidence Qualification</span></h2>
-        <details open>
-          <summary>Evidence by dimension (expand)</summary>
+        <details>
+          <summary>Full evidence by dimension (expand)</summary>
           <div class="details-body" id="evidence-body"></div>
           <div class="details-body">
             <div class="flag-box" id="contradiction-box"></div>

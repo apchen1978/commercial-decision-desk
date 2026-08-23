@@ -57,13 +57,14 @@ export const opportunity = {
         "The procurement notice states payment at 90 days after delivery. The referral call note records a verbal indication of a 30% advance. These cannot both be true as stated.",
       material: true,
       status: "UNRESOLVED",
+      resolveWith: "Written confirmation of binding payment terms (resolves CTR-1 / UNK-2)",
     },
   ],
   unknowns: [
-    { id: "UNK-1", label: "Actual order volume", detail: "Indicative volumes are unverified (VERIFICATION_REQUIRED tier). Volume remains UNKNOWN until confirmed.", blocksPursue: true },
-    { id: "UNK-2", label: "Final payment terms", detail: "Contradictory sources (CTR-1); the binding terms are UNKNOWN until confirmed in writing.", blocksPursue: true },
-    { id: "UNK-3", label: "Installation liability", detail: "Whether installation + customs liability is negotiable is UNKNOWN.", blocksPursue: false },
-    { id: "UNK-4", label: "Buyer payment history", detail: "No public payment-history data exists for this buyer. Payment behavior is UNKNOWN — no credit score is invented.", blocksPursue: false },
+    { id: "UNK-1", label: "Actual order volume", detail: "Indicative volumes are unverified (VERIFICATION_REQUIRED tier). Volume remains UNKNOWN until confirmed.", blocksPursue: true, resolveWith: "Verified order volume from the buyer" },
+    { id: "UNK-2", label: "Final payment terms", detail: "Contradictory sources (CTR-1); the binding terms are UNKNOWN until confirmed in writing.", blocksPursue: true, resolveWith: "Written confirmation of binding payment terms" },
+    { id: "UNK-3", label: "Installation liability", detail: "Whether installation + customs liability is negotiable is UNKNOWN.", blocksPursue: false, resolveWith: "Clarify installation/customs liability scope" },
+    { id: "UNK-4", label: "Buyer payment history", detail: "No public payment-history data exists for this buyer. Payment behavior is UNKNOWN — no credit score is invented.", blocksPursue: false, resolveWith: "Payment-history data, or accept as UNKNOWN" },
   ],
   whyNot: [
     "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
@@ -80,6 +81,7 @@ export const opportunity = {
     status: "INCOMPLETE",
     detail:
       "Payment mode and schedule are referenced but contradictory (CTR-1); delivery window is conditional on sample approval. Terms are INCOMPLETE — missing items remain UNKNOWN.",
+    resolveWith: "Binding commercial terms in writing (payment schedule + delivery conditions)",
   },
   quotes: [
     {

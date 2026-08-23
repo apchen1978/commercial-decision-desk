@@ -21,6 +21,36 @@ $("opp-card").innerHTML = `
   <p class="muted" style="margin-top:6px">Source: ${opportunity.source}</p>
 `;
 
+// --- Decision at a glance (compact; derived from the engine + fixture data) ---
+function renderGlance() {
+  const blockers = [];
+  engine.materialContradictions.forEach((c) => blockers.push(`Material contradiction ${c.id} (${c.label}) — unresolved`));
+  if (engine.termsIncomplete) blockers.push("Commercial terms incomplete");
+  if (engine.blockingUnknowns.length > 0) blockers.push(`Blocking UNKNOWN: ${engine.blockingUnknowns.map((u) => `${u.id} ${u.label}`).join(", ")}`);
+  if (engine.weakEvidence || engine.strongEvidence === false) blockers.push(engine.weakEvidence ? "Evidence Quality LOW" : "Evidence Quality not strong");
+
+  const next = [];
+  engine.materialContradictions.forEach((c) => c.resolveWith && next.push(c.resolveWith));
+  engine.blockingUnknowns.forEach((u) => u.resolveWith && next.push(u.resolveWith));
+  if (engine.termsIncomplete && opportunity.commercialTerms.resolveWith) next.push(opportunity.commercialTerms.resolveWith);
+  if (engine.weakEvidence) next.push("Upgrade evidence to PRIMARY sources (spec review / site visit)");
+
+  const tagClass = { ESCALATE: "esc", PURSUE_NOW: "now", PURSUE_CONDITIONALLY: "cond", HOLD_FOR_EVIDENCE: "hold", DO_NOT_PURSUE: "drop" }[engine.recommended] || "";
+  $("glance-panel").innerHTML = `
+    <div class="glance-rec">
+      <span class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.08em">Recommended state</span>
+      <span class="rec-tag ${tagClass}">${engine.recommended}</span>
+      <span class="muted" style="font-size:12px">· deterministic rules, no score</span>
+    </div>
+    <hr class="glance-hr">
+    <div class="glance-grid">
+      <div class="glance-col"><h4>Top blockers</h4>${blockers.length ? `<ul>${blockers.map((b) => `<li>${b}</li>`).join("")}</ul>` : `<span class="muted">None — all gates are clear.</span>`}</div>
+      <div class="glance-col"><h4>Next evidence needed</h4>${next.length ? `<ul>${next.map((n) => `<li>${n}</li>`).join("")}</ul>` : `<span class="muted">No further evidence required by the desk.</span>`}</div>
+    </div>
+    <p class="glance-note">The decision belongs to the human. The desk only narrows the options with evidence and deterministic rules.</p>
+  `;
+}
+
 // --- 02 evidence ---
 $("evidence-body").innerHTML = dimensions
   .map(
@@ -97,6 +127,7 @@ let humanDecision = null;
 
 function renderEngine() {
   engine = evaluateDecision(opportunity);
+  renderGlance();
   $("engine-reasoning").innerHTML = `
     <div class="rec-box"><b>Desk recommendation: ${engine.recommended}</b><br>${engine.reasons.map((r) => `· ${r}`).join("<br>")}</div>
   `;

@@ -1,8 +1,10 @@
 # Domain Validation — Channel Price Discipline Gate（bounded phase）
 
-> **STATUS**: PROTOCOL + RECORD — 訪談待 owner 安排受訪者後填寫。**目前尚無
-> domain consensus**（僅單一來源 D）。
-> **Owner authorization (2026-08-23)**: 選項② bounded domain-validation phase。
+> **STATUS: NOT EXECUTED / PENDING REAL HUMAN INPUT.** 訪談未執行——不等待、不尋找、
+> 不虛構任何受訪者或訪談答案。Part D 記錄表維持空白。**不得以模擬資料宣稱 domain
+> consensus。**
+> **Owner authorization (2026-08-23)**: 選項② bounded domain-validation phase；
+> 後續指令明確：標記「未執行／待真人輸入」，維持 Verdict B。
 > **Limits**: 不修改 production engine · 不新增 channelPrice field · 不接 production
 > data · 不宣稱 Level 3 · 只產出 interview/evidence record 與更新後 verdict。
 > **Verdict rule**: 若仍無 domain consensus → 維持 B 或降為 C 並停止。
@@ -13,6 +15,9 @@
 ---
 
 ## A. 待驗證 Claims（從實驗 + 案例 D 推導，逐項需 domain 輸入）
+
+> **狀態：所有 claims 均 UNKNOWN — 未經真人 domain 證實。** 下列僅為待驗證項目，
+> 非已確認事實。
 
 | ID | Claim | 來源 | 需驗證的面向 |
 |---|---|---|---|
@@ -60,6 +65,8 @@
 
 ## D. 記錄表（每名受訪者一行）
 
+> **NOT EXECUTED — 待 owner 安排真實受訪者後填寫。禁止虛構。**
+
 | ID | 角色 | C1 同意 veto？ | C2 偵測方式 | C3 例外 | C4 優先序 | C5 分工接受？ | 其他候選 | 原話摘錄 |
 |---|---|---|---|---|---|---|---|---|
 | (pending) | | | | | | | | |
@@ -73,8 +80,10 @@
    嚴重性降為 C（INCONCLUSIVE）並 **STOP — 不進入 production 實作**。
 3. **任何階段**：不修改 engine、不新增 field、不接 production data。
 
-## F. 現況 Verdict（訪談前，2026-08-23）
+## F. 現況 Verdict（2026-08-23，訪談未執行）
 
 **B — EVIDENCE_FOUND_FIX_RECOMMENDED**（實驗 10/10 支持可表示性與優先序；
 但僅單一來源 D，production authorization = NO）。
-**下一步：owner 安排 ≥3 名受訪者 → 填 Part D → 套用 Part E 判定 → 更新 verdict。**
+**Domain validation: NOT EXECUTED — PENDING REAL HUMAN INPUT.**
+**下一步：owner 安排 ≥3 名受訪者 → 填 Part D → 套用 Part E 判定 → 更新 verdict。
+在此之前：不得以模擬資料宣稱 domain consensus。**

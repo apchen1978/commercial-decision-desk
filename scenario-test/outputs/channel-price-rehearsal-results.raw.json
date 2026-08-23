@@ -1,0 +1,352 @@
+[
+  {
+    "id": "R-01",
+    "label": "dumping risk → veto fires (trigger semantics)",
+    "expected": "DO_NOT_PURSUE",
+    "actual": {
+      "recommended": "DO_NOT_PURSUE",
+      "channelPriceGate": "DUMPING_RISK_VETO",
+      "vetoSource": "CHANNEL_PRICE",
+      "kycGate": "ABSENT",
+      "marginGate": "ABSENT",
+      "reasons": [
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available.",
+        "CHANNEL-PRICE GATE: price-dumping risk under policy \"PRICE_FLOOR\" — one-vote veto (D-domain); DO_NOT_PURSUE regardless of other commercial signals."
+      ],
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR",
+      "exceptions": []
+    },
+    "kyc": null,
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "R-02",
+    "label": "clear → pass-through",
+    "expected": "PURSUE_NOW",
+    "actual": {
+      "recommended": "PURSUE_NOW",
+      "channelPriceGate": "CLEAR",
+      "kycGate": "ABSENT",
+      "marginGate": "ABSENT",
+      "reasons": [
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available."
+      ],
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "CLEAR",
+      "dumpingRisk": false,
+      "policy": "PRICE_FLOOR",
+      "exceptions": []
+    },
+    "kyc": null,
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "R-03",
+    "label": "EXCEPTION: new market (caller-declared) → veto suppressed, risk surfaced",
+    "expected": "PURSUE_NOW",
+    "actual": {
+      "recommended": "PURSUE_NOW",
+      "channelPriceGate": "EXCEPTION_APPLIES",
+      "vetoSource": "EXCEPTION_OVERRIDE",
+      "kycGate": "ABSENT",
+      "marginGate": "ABSENT",
+      "reasons": [
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available.",
+        "CHANNEL-PRICE GATE: dumping risk present BUT caller-declared exception(s) [NEW_MARKET] — veto suppressed; risk surfaced for human decision."
+      ],
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR",
+      "exceptions": [
+        "NEW_MARKET"
+      ]
+    },
+    "kyc": null,
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "R-04",
+    "label": "EXCEPTION: clearance / one-off sale → veto suppressed",
+    "expected": "PURSUE_NOW",
+    "actual": {
+      "recommended": "PURSUE_NOW",
+      "channelPriceGate": "EXCEPTION_APPLIES",
+      "vetoSource": "EXCEPTION_OVERRIDE",
+      "kycGate": "ABSENT",
+      "marginGate": "ABSENT",
+      "reasons": [
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available.",
+        "CHANNEL-PRICE GATE: dumping risk present BUT caller-declared exception(s) [CLEARANCE] — veto suppressed; risk surfaced for human decision."
+      ],
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR",
+      "exceptions": [
+        "CLEARANCE"
+      ]
+    },
+    "kyc": null,
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "R-05",
+    "label": "EXCEPTION: end-customer self-use (non-resale) → veto suppressed",
+    "expected": "PURSUE_NOW",
+    "actual": {
+      "recommended": "PURSUE_NOW",
+      "channelPriceGate": "EXCEPTION_APPLIES",
+      "vetoSource": "EXCEPTION_OVERRIDE",
+      "kycGate": "ABSENT",
+      "marginGate": "ABSENT",
+      "reasons": [
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available.",
+        "CHANNEL-PRICE GATE: dumping risk present BUT caller-declared exception(s) [END_USER_SELF_USE] — veto suppressed; risk surfaced for human decision."
+      ],
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR",
+      "exceptions": [
+        "END_USER_SELF_USE"
+      ]
+    },
+    "kyc": null,
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "R-06",
+    "label": "CONFLICT: dumping + sanctions → sanctions outranks (source=SANCTIONS)",
+    "expected": "DO_NOT_PURSUE",
+    "actual": {
+      "recommended": "DO_NOT_PURSUE",
+      "channelPriceGate": "DUMPING_RISK_LOWER_PRIORITY",
+      "vetoSource": "SANCTIONS",
+      "kycGate": "SANCTIONS_VETO",
+      "marginGate": "ABSENT",
+      "reasons": [
+        "KYC GATE: sanctions/adverse finding — one-vote veto; DO_NOT_PURSUE regardless of margin or commercial signals.",
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available."
+      ],
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR",
+      "exceptions": []
+    },
+    "kyc": {
+      "status": "ADVERSE",
+      "sanctionsHit": true,
+      "adverseFinding": true,
+      "beneficialOwnerVerified": true
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "R-07",
+    "label": "CONFLICT: dumping + margin-below → margin outranks (source=MARGIN)",
+    "expected": "DO_NOT_PURSUE",
+    "actual": {
+      "recommended": "DO_NOT_PURSUE",
+      "channelPriceGate": "DUMPING_RISK_LOWER_PRIORITY",
+      "vetoSource": "MARGIN",
+      "kycGate": "ABSENT",
+      "marginGate": "BELOW_THRESHOLD",
+      "reasons": [
+        "MARGIN GATE: gross margin 300 bps is below the declared threshold 800 bps — commercial-viability veto; DO_NOT_PURSUE.",
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available."
+      ],
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR",
+      "exceptions": []
+    },
+    "kyc": null,
+    "margin": {
+      "bps": 300,
+      "thresholdBps": 800
+    },
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "R-08",
+    "label": "CONFLICT: dumping + KYC-incomplete → channel-price outranks KYC (HOLD→DNP)",
+    "expected": "DO_NOT_PURSUE",
+    "actual": {
+      "recommended": "DO_NOT_PURSUE",
+      "channelPriceGate": "DUMPING_RISK_VETO",
+      "vetoSource": "CHANNEL_PRICE",
+      "kycGate": "KYC_INCOMPLETE",
+      "marginGate": "ABSENT",
+      "reasons": [
+        "KYC GATE: beneficial-owner verification incomplete — evidence-required; HOLD_FOR_EVIDENCE. Insurance availability does not clear this gate.",
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available.",
+        "CHANNEL-PRICE GATE: price-dumping risk under policy \"PRICE_FLOOR\" — one-vote veto (D-domain); DO_NOT_PURSUE regardless of other commercial signals."
+      ],
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR",
+      "exceptions": []
+    },
+    "kyc": {
+      "status": "INCOMPLETE",
+      "beneficialOwnerVerified": false,
+      "sanctionsHit": false
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "R-09",
+    "label": "CONFLICT: dumping + weak evidence → channel-price outranks rules (HOLD→DNP)",
+    "expected": "DO_NOT_PURSUE",
+    "actual": {
+      "recommended": "DO_NOT_PURSUE",
+      "channelPriceGate": "DUMPING_RISK_VETO",
+      "vetoSource": "CHANNEL_PRICE",
+      "kycGate": "ABSENT",
+      "marginGate": "ABSENT",
+      "reasons": [
+        "Rule: Evidence Quality is LOW or UNKNOWN — strong pursuit is not recommended; HOLD_FOR_EVIDENCE is preferred.",
+        "CHANNEL-PRICE GATE: price-dumping risk under policy \"PRICE_FLOOR\" — one-vote veto (D-domain); DO_NOT_PURSUE regardless of other commercial signals."
+      ],
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR",
+      "exceptions": []
+    },
+    "kyc": null,
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "R-10",
+    "label": "EXCEPTION + KYC-incomplete (exception suppresses veto; KYC still HOLDs)",
+    "expected": "HOLD_FOR_EVIDENCE",
+    "actual": {
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "channelPriceGate": "EXCEPTION_APPLIES",
+      "vetoSource": "EXCEPTION_OVERRIDE",
+      "kycGate": "KYC_INCOMPLETE",
+      "marginGate": "ABSENT",
+      "reasons": [
+        "KYC GATE: beneficial-owner verification incomplete — evidence-required; HOLD_FOR_EVIDENCE. Insurance availability does not clear this gate.",
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available.",
+        "CHANNEL-PRICE GATE: dumping risk present BUT caller-declared exception(s) [CLEARANCE] — veto suppressed; risk surfaced for human decision."
+      ],
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR",
+      "exceptions": [
+        "CLEARANCE"
+      ]
+    },
+    "kyc": {
+      "status": "INCOMPLETE",
+      "beneficialOwnerVerified": false,
+      "sanctionsHit": false
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "R-11",
+    "label": "reason output: veto reason present + gate source=CHANNEL_PRICE",
+    "expected": "DO_NOT_PURSUE",
+    "actual": {
+      "recommended": "DO_NOT_PURSUE",
+      "channelPriceGate": "DUMPING_RISK_VETO",
+      "vetoSource": "CHANNEL_PRICE",
+      "kycGate": "ABSENT",
+      "marginGate": "ABSENT",
+      "reasons": [
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available.",
+        "CHANNEL-PRICE GATE: price-dumping risk under policy \"PRICE_FLOOR\" — one-vote veto (D-domain); DO_NOT_PURSUE regardless of other commercial signals."
+      ],
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR",
+      "exceptions": []
+    },
+    "kyc": null,
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "R-12",
+    "label": "reason output: exception suppressed → EXCEPTION_OVERRIDE + reason",
+    "expected": "PURSUE_NOW",
+    "actual": {
+      "recommended": "PURSUE_NOW",
+      "channelPriceGate": "EXCEPTION_APPLIES",
+      "vetoSource": "EXCEPTION_OVERRIDE",
+      "kycGate": "ABSENT",
+      "marginGate": "ABSENT",
+      "reasons": [
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available.",
+        "CHANNEL-PRICE GATE: dumping risk present BUT caller-declared exception(s) [NEW_MARKET] — veto suppressed; risk surfaced for human decision."
+      ],
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR",
+      "exceptions": [
+        "NEW_MARKET"
+      ]
+    },
+    "kyc": null,
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  }
+]

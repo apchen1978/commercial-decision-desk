@@ -1,0 +1,14 @@
+[PASS] R-01 dumping risk → veto fires (trigger semantics) | DO_NOT_PURSUE (gate=DUMPING_RISK_VETO src=CHANNEL_PRICE)
+[PASS] R-02 clear → pass-through | PURSUE_NOW (gate=CLEAR src=-)
+[PASS] R-03 EXCEPTION: new market (caller-declared) → veto suppressed, risk surfaced | PURSUE_NOW (gate=EXCEPTION_APPLIES src=EXCEPTION_OVERRIDE)
+[PASS] R-04 EXCEPTION: clearance / one-off sale → veto suppressed | PURSUE_NOW (gate=EXCEPTION_APPLIES src=EXCEPTION_OVERRIDE)
+[PASS] R-05 EXCEPTION: end-customer self-use (non-resale) → veto suppressed | PURSUE_NOW (gate=EXCEPTION_APPLIES src=EXCEPTION_OVERRIDE)
+[PASS] R-06 CONFLICT: dumping + sanctions → sanctions outranks (source=SANCTIONS) | DO_NOT_PURSUE (gate=DUMPING_RISK_LOWER_PRIORITY src=SANCTIONS)
+[PASS] R-07 CONFLICT: dumping + margin-below → margin outranks (source=MARGIN) | DO_NOT_PURSUE (gate=DUMPING_RISK_LOWER_PRIORITY src=MARGIN)
+[PASS] R-08 CONFLICT: dumping + KYC-incomplete → channel-price outranks KYC (HOLD→DNP) | DO_NOT_PURSUE (gate=DUMPING_RISK_VETO src=CHANNEL_PRICE)
+[PASS] R-09 CONFLICT: dumping + weak evidence → channel-price outranks rules (HOLD→DNP) | DO_NOT_PURSUE (gate=DUMPING_RISK_VETO src=CHANNEL_PRICE)
+[PASS] R-10 EXCEPTION + KYC-incomplete (exception suppresses veto; KYC still HOLDs) | HOLD_FOR_EVIDENCE (gate=EXCEPTION_APPLIES src=EXCEPTION_OVERRIDE)
+[PASS] R-11 reason output: veto reason present + gate source=CHANNEL_PRICE | DO_NOT_PURSUE (gate=DUMPING_RISK_VETO src=CHANNEL_PRICE)
+[PASS] R-12 reason output: exception suppressed → EXCEPTION_OVERRIDE + reason | PURSUE_NOW (gate=EXCEPTION_APPLIES src=EXCEPTION_OVERRIDE)
+
+CASES: 12 | PASS 12 | FAIL 0

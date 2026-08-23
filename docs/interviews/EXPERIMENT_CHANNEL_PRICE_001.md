@@ -97,18 +97,30 @@ channel-price gate.
 
 **DOMAIN-VALIDATION STATUS (owner decision ②, 2026-08-23):** production
 implementation is NOT authorized. A bounded domain-validation phase is in progress
-(`DOMAIN_VALIDATION_CHANNEL_PRICE_001.md`): ≥3 different-role D-type interviewees
-pending owner scheduling. Verdict stays B (single domain source D); if no domain
-consensus emerges, verdict stays B or drops to C and the work stops. Level 3 is
-not claimed.
+(`DOMAIN_VALIDATION_CHANNEL_PRICE_001.md`): **NOT EXECUTED / PENDING REAL HUMAN
+INPUT** — ≥3 different-role D-type interviewees pending owner scheduling; no
+fabricated responses; no synthetic-as-consensus. Verdict stays B (single domain
+source D); if no domain consensus emerges, verdict stays B or drops to C and the
+work stops. Level 3 is not claimed.
+
+**SYNTHETIC IMPLEMENTATION REHEARSAL (owner instruction, 2026-08-23):** an
+isolated test-only overlay rehearsed the exact proposed production gate logic —
+12/12 PASS (`channel-price-rehearsal.mjs`), covering dumping trigger, exceptions
+(new market / clearance / end-user self-use), conflicts (sanctions / margin /
+KYC-incomplete / rules), and reasons + gate-source output. Production plan +
+minimal-diff preview + rollback plan in `PLAN_CHANNEL_PRICE_IMPLEMENTATION.md`.
+**Rehearsal is SYNTHETIC evidence only** — it proves the logic behaves as
+intended IF implemented; it does NOT prove domain acceptance, detection method,
+or exception-list correctness.
 
 **FIX PROPOSAL (NOT applied — 另案授權 required per charter §4/§5):**
 Smallest production change: add a structured `channelPrice` field
-(`status: CLEAR|DUMPING_RISK`, `dumpingRisk`, `policy`) and a gate check at the
-top of `evaluateDecision` — dumping risk → `DO_NOT_PURSUE` (after sanctions and
-margin checks, before KYC-incomplete). No scoring, no new states, no new
-dependencies; clean-input behavior unchanged. **Requires owner/Codex review AND
-domain validation — NOT authorized by this experiment.**
+(`status: CLEAR|DUMPING_RISK`, `dumpingRisk`, `policy`, `exceptions[]`) and a gate
+check at the top of `evaluateDecision` — dumping risk → `DO_NOT_PURSUE` (after
+sanctions and margin checks, before KYC-incomplete); caller-declared exceptions
+suppress the veto. No scoring, no new states, no new dependencies; clean-input
+behavior unchanged. **Requires owner/Codex review AND domain validation — NOT
+authorized by this experiment or rehearsal.**
 
 ## 7. Maturity & status
 

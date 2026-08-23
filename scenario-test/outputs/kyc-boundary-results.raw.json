@@ -1,0 +1,282 @@
+[
+  {
+    "id": "KYC-E1",
+    "label": "KYC confirmed clear",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW",
+      "gatedGate": "CLEAR",
+      "briefHumanBoundary": true
+    },
+    "kyc": {
+      "status": "CLEAR",
+      "beneficialOwnerVerified": true,
+      "sanctionsHit": false,
+      "adverseFinding": false
+    },
+    "margin": {
+      "bps": 0,
+      "thresholdBps": null,
+      "costPayer": "BUYER",
+      "note": ""
+    },
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "KYC-E2",
+    "label": "KYC incomplete / beneficial owner unknown",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "HOLD_FOR_EVIDENCE"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "HOLD_FOR_EVIDENCE",
+      "gatedGate": "KYC_INCOMPLETE",
+      "briefHumanBoundary": true
+    },
+    "kyc": {
+      "status": "INCOMPLETE",
+      "beneficialOwnerVerified": false,
+      "sanctionsHit": false,
+      "adverseFinding": false
+    },
+    "margin": {
+      "bps": 0,
+      "thresholdBps": null,
+      "costPayer": "BUYER",
+      "note": ""
+    },
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "KYC-E3",
+    "label": "sanctions hit / adverse finding",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "DO_NOT_PURSUE"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "DO_NOT_PURSUE",
+      "gatedGate": "SANCTIONS_VETO",
+      "briefHumanBoundary": true
+    },
+    "kyc": {
+      "status": "ADVERSE",
+      "beneficialOwnerVerified": true,
+      "sanctionsHit": true,
+      "adverseFinding": true
+    },
+    "margin": {
+      "bps": 0,
+      "thresholdBps": null,
+      "costPayer": "BUYER",
+      "note": ""
+    },
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "KYC-E4",
+    "label": "insurance available but KYC unresolved",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "HOLD_FOR_EVIDENCE"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "HOLD_FOR_EVIDENCE",
+      "gatedGate": "KYC_INCOMPLETE",
+      "briefHumanBoundary": true
+    },
+    "kyc": {
+      "status": "INCOMPLETE",
+      "beneficialOwnerVerified": false,
+      "sanctionsHit": false,
+      "adverseFinding": false
+    },
+    "margin": {
+      "bps": 0,
+      "thresholdBps": null,
+      "costPayer": "BUYER",
+      "note": "insurable (中信保) but KYC unresolved"
+    },
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "KYC-E5",
+    "label": "HIGH-MARGIN deal with failed KYC (margin × KYC interaction)",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "DO_NOT_PURSUE"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "DO_NOT_PURSUE",
+      "gatedGate": "SANCTIONS_VETO",
+      "briefHumanBoundary": true
+    },
+    "kyc": {
+      "status": "ADVERSE",
+      "beneficialOwnerVerified": true,
+      "sanctionsHit": true,
+      "adverseFinding": true
+    },
+    "margin": {
+      "bps": 2000,
+      "thresholdBps": null,
+      "costPayer": "BUYER",
+      "note": "high-margin label (structured bps=2000); sanctions veto must win"
+    },
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "KYC-E6",
+    "label": "LOW-MARGIN deal with clear KYC (margin alone is not a veto here)",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW",
+      "gatedGate": "CLEAR",
+      "briefHumanBoundary": true
+    },
+    "kyc": {
+      "status": "CLEAR",
+      "beneficialOwnerVerified": true,
+      "sanctionsHit": false,
+      "adverseFinding": false
+    },
+    "margin": {
+      "bps": 300,
+      "thresholdBps": null,
+      "costPayer": "SUPPLIER",
+      "note": "low margin; margin-as-gate is interview 001, not this experiment"
+    },
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "KYC-E7",
+    "label": "sanctions hit + high margin + insurance available (all three)",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "DO_NOT_PURSUE"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "DO_NOT_PURSUE",
+      "gatedGate": "SANCTIONS_VETO",
+      "briefHumanBoundary": true
+    },
+    "kyc": {
+      "status": "ADVERSE",
+      "beneficialOwnerVerified": true,
+      "sanctionsHit": true,
+      "adverseFinding": true
+    },
+    "margin": {
+      "bps": 2500,
+      "thresholdBps": null,
+      "costPayer": "BUYER",
+      "note": "insurance + high margin cannot rescue sanctions veto"
+    },
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "KYC-E8",
+    "label": "KYC incomplete + strong referral + high margin (evidence-required wins)",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "HOLD_FOR_EVIDENCE"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "HOLD_FOR_EVIDENCE",
+      "gatedGate": "KYC_INCOMPLETE",
+      "briefHumanBoundary": true
+    },
+    "kyc": {
+      "status": "INCOMPLETE",
+      "beneficialOwnerVerified": false,
+      "sanctionsHit": false,
+      "adverseFinding": false
+    },
+    "margin": {
+      "bps": 1800,
+      "thresholdBps": null,
+      "costPayer": "BUYER",
+      "note": "referral/margin cannot clear KYC gate"
+    },
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "KYC-E9",
+    "label": "clear KYC + clear base → gate passes through unchanged",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW",
+      "gatedGate": "CLEAR",
+      "briefHumanBoundary": true
+    },
+    "kyc": {
+      "status": "CLEAR",
+      "beneficialOwnerVerified": true,
+      "sanctionsHit": false,
+      "adverseFinding": false
+    },
+    "margin": {
+      "bps": 0,
+      "thresholdBps": null,
+      "costPayer": "BUYER",
+      "note": ""
+    },
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "KYC-E10",
+    "label": "KYC incomplete + weak evidence (HOLD either way — gate and base agree)",
+    "expected": {
+      "base": "HOLD_FOR_EVIDENCE",
+      "gated": "HOLD_FOR_EVIDENCE"
+    },
+    "actual": {
+      "base": "HOLD_FOR_EVIDENCE",
+      "gated": "HOLD_FOR_EVIDENCE",
+      "gatedGate": "KYC_INCOMPLETE",
+      "briefHumanBoundary": true
+    },
+    "kyc": {
+      "status": "INCOMPLETE",
+      "beneficialOwnerVerified": false,
+      "sanctionsHit": false,
+      "adverseFinding": false
+    },
+    "margin": {
+      "bps": 0,
+      "thresholdBps": null,
+      "costPayer": "BUYER",
+      "note": ""
+    },
+    "PASS": true,
+    "mismatch": []
+  }
+]

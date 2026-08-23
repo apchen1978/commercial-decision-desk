@@ -4,6 +4,7 @@ import { opportunity, dimensions, SYNTHETIC_LABEL } from "./fixtures.js";
 import {
   DECISION_STATES,
   PAYMENT_DISCLOSURE,
+  dedupePreserveOrder,
   paymentExposure,
   evaluateDecision,
   buildBrief,
@@ -30,10 +31,12 @@ function renderGlance() {
   if (engine.weakEvidence || engine.strongEvidence === false) blockers.push(engine.weakEvidence ? "Evidence Quality LOW" : "Evidence Quality not strong");
 
   const next = [];
-  engine.materialContradictions.forEach((c) => c.resolveWith && next.push(c.resolveWith));
-  engine.blockingUnknowns.forEach((u) => u.resolveWith && next.push(u.resolveWith));
-  if (engine.termsIncomplete && opportunity.commercialTerms.resolveWith) next.push(opportunity.commercialTerms.resolveWith);
-  if (engine.weakEvidence) next.push("Upgrade evidence to PRIMARY sources (spec review / site visit)");
+  const pushUnique = (v) => { if (v) next.push(v); };
+  engine.materialContradictions.forEach((c) => pushUnique(c.resolveWith));
+  engine.blockingUnknowns.forEach((u) => pushUnique(u.resolveWith));
+  if (engine.termsIncomplete && opportunity.commercialTerms.resolveWith) pushUnique(opportunity.commercialTerms.resolveWith);
+  if (engine.weakEvidence) pushUnique("Upgrade evidence to PRIMARY sources (spec review / site visit)");
+  const nextDeduped = dedupePreserveOrder(next);
 
   const tagClass = { ESCALATE: "esc", PURSUE_NOW: "now", PURSUE_CONDITIONALLY: "cond", HOLD_FOR_EVIDENCE: "hold", DO_NOT_PURSUE: "drop" }[engine.recommended] || "";
   $("glance-panel").innerHTML = `
@@ -45,7 +48,7 @@ function renderGlance() {
     <hr class="glance-hr">
     <div class="glance-grid">
       <div class="glance-col"><h4>Top blockers</h4>${blockers.length ? `<ul>${blockers.map((b) => `<li>${b}</li>`).join("")}</ul>` : `<span class="muted">None — all gates are clear.</span>`}</div>
-      <div class="glance-col"><h4>Next evidence needed</h4>${next.length ? `<ul>${next.map((n) => `<li>${n}</li>`).join("")}</ul>` : `<span class="muted">No further evidence required by the desk.</span>`}</div>
+      <div class="glance-col"><h4>Next evidence needed</h4>${nextDeduped.length ? `<ul>${nextDeduped.map((n) => `<li>${n}</li>`).join("")}</ul>` : `<span class="muted">No further evidence required by the desk.</span>`}</div>
     </div>
     <p class="glance-note">The decision belongs to the human. The desk only narrows the options with evidence and deterministic rules.</p>
   `;

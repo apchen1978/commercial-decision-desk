@@ -99,6 +99,28 @@ check("R4 quote bases not comparable", opportunity.quoteBasesComparable === fals
 }
 
 // ---------------------------------------------------------------------------
+// Next-evidence dedup (final polish): identical requests appear only once,
+// first-occurrence order preserved, no text rewriting.
+// ---------------------------------------------------------------------------
+{
+  const { dedupePreserveOrder } = await import("./decision-engine.js");
+  check("dedupe preserves first-occurrence order", JSON.stringify(dedupePreserveOrder(["a", "b", "a", "c", "b"])) === JSON.stringify(["a", "b", "c"]));
+  check("dedupe drops empty entries", dedupePreserveOrder(["x", "", "x", null, "y"]).length === 2);
+
+  // Compose the same raw next-evidence list the UI builds from the fixture,
+  // then dedupe — the final list must be duplicate-free.
+  const raw = [];
+  opportunity.contradictions.forEach((c) => c.resolveWith && raw.push(c.resolveWith));
+  opportunity.unknowns.filter((u) => u.blocksPursue === true).forEach((u) => u.resolveWith && raw.push(u.resolveWith));
+  if (opportunity.commercialTerms.resolveWith) raw.push(opportunity.commercialTerms.resolveWith);
+  const final = dedupePreserveOrder(raw);
+  check("next-evidence list duplicate-free", new Set(final).size === final.length, JSON.stringify(final));
+  const expected = [];
+  for (const v of raw) if (v && !expected.includes(v)) expected.push(v);
+  check("next-evidence order preserved (first occurrence)", JSON.stringify(final) === JSON.stringify(expected));
+}
+
+// ---------------------------------------------------------------------------
 // Audit-fix regression tests (positive evidence consulted, PURSUE_NOW path,
 // blocking UNKNOWN, synthetic data flag, no weighted score).
 // ---------------------------------------------------------------------------

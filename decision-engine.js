@@ -8,6 +8,22 @@ export const PAYMENT_DISCLOSURE =
   "Payment exposure = committed payment events only. Not cash balance, liquidity, affordability, cash shortfall, or credit capacity. Concentration = payment commitments only.";
 
 // ---------------------------------------------------------------------------
+// Small pure helper: dedupe while preserving first-occurrence order.
+// No text rewriting. Used by the UI for the "Next evidence needed" list.
+// ---------------------------------------------------------------------------
+export function dedupePreserveOrder(items) {
+  const seen = new Set();
+  const out = [];
+  for (const item of items || []) {
+    if (item && !seen.has(item)) {
+      seen.add(item);
+      out.push(item);
+    }
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
 // Deterministic payment exposure — only from COMPLETE events (hard rule 5).
 // ---------------------------------------------------------------------------
 export function paymentExposure(events, opts = {}) {

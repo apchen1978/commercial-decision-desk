@@ -50,13 +50,14 @@
 - **Future decision question**: is insurability a proxy for, or independent of, KYC clearance? Requires interview 002.
 
 ### KYC-5 — high-margin deal with failed KYC
-- **Input signal**: 5%-plus margin (attractive), but sanctions/adverse finding present (synthetic).
+- **Input signal**: "high margin" label (attractive) + sanctions/adverse finding present (synthetic). **NOTE — the high-margin label is descriptive only**: no structured margin field exists in the fixture; the margin claim lives only in the contradiction's `detail` text.
 - **Current contract representation**: margin invisible (no field); adverse finding as material contradiction.
-- **Current engine behavior**: `ESCALATE` (availableNow false) — margin does not rescue it, but the state is escalation, not veto.
-- **Commercial interpretation**: direction matches E ("利潤再高都沒用") — the deal is not pursued — but the terminal state (ESCALATE vs DO_NOT_PURSUE) does not express a hard veto.
-- **Limitation**: the engine arrives at "not pursued" by accident of the contradiction rule; there is no margin field at all, so the "high margin still rejected" lesson is not representable as a gate.
+- **Current engine behavior**: `ESCALATE` (availableNow false).
+- **Evidence wording (narrow, per review)**: Margin is NOT structurally represented; the high-margin label is descriptive only. The observed `ESCALATE` is caused by the registered sanctions contradiction, NOT by an evaluated interaction between margin and KYC. This case does NOT prove "high margin fails to rescue KYC" — it proves only that the engine has no margin field and does not semanticize margin from text.
+- **Commercial interpretation**: the direction (not pursued) coincides with E's veto intuition, but the mechanism is the contradiction rule, not a margin-aware gate.
+- **Limitation**: no margin×KYC interaction was actually tested — the margin input was never structural; a real margin gate experiment would need a structured margin field first.
 - **UNKNOWN**: correct terminal state for margin+failed-KYC; whether margin should even be an input.
-- **Future decision question**: should KYC veto be DO_NOT_PURSUE regardless of margin? Requires interview 002 + 001 priority ruling.
+- **Future decision question**: should KYC veto be DO_NOT_PURSUE regardless of margin? Requires interview 002 + 001 priority ruling. Whether margin×KYC interaction matters requires a structured margin test (not yet authorized).
 
 ### KYC-6 — low-margin deal with clear KYC
 - **Input signal**: margin low (economically thin) but compliance clear (synthetic).
@@ -135,7 +136,7 @@
 | KYC-2 owner unknown | HOLD | as generic blocking UNKNOWN | correct direction, no KYC-specific rule |
 | KYC-3 sanctions hit | ESCALATE | as generic contradiction | direction ok; **terminal state wrong for a veto** |
 | KYC-4 insurable but KYC gap | HOLD | KYC as unknown; insurance invisible | insurability not representable |
-| KYC-5 high margin + failed KYC | ESCALATE | margin invisible | **rejects by accident, not by gate** |
+| KYC-5 high margin + failed KYC | ESCALATE | margin not structural; label descriptive only | **ESCALATE from sanctions contradiction; margin×KYC interaction NOT tested** |
 | KYC-6 low margin + clear KYC | PURSUE_NOW | margin invisible | **blind spot: thin margin sails through** |
 | U-1 verified switch | PURSUE_NOW | switch reason invisible | benign case green |
 | U-2 unknown switch reason | **PURSUE_NOW** | NOT semanticized | **F's red flag = engine green** |
@@ -148,8 +149,11 @@
 1. KYC/sanctions signals *can* be forced through existing primitives (unknowns/contradictions),
    but the engine then answers with the *wrong terminal state* for a veto (ESCALATE, not
    DO_NOT_PURSUE) and gives no KYC-specific reason.
-2. Margin is invisible on both axes — high margin does not rescue, low margin does not veto
-   (mirrors S15/L3 finding; now confirmed on the KYC axis too).
+2. Margin is not structurally represented on either axis: KYC-6 shows a LOW
+   `commercialFeasibility` is not consumed by the decision logic (PURSUE_NOW), and
+   KYC-5's high-margin label is descriptive only — the observed ESCALATE is caused
+   by the sanctions contradiction, not by a tested margin×KYC interaction. A real
+   margin test would require a structured margin field (not authorized).
 3. Urgency direction, supplier-switch reason, prior-vendor history are NOT semanticized:
    suspicious urgent cases (U-2/U-3) are indistinguishable from benign ones (U-1/U-6) at
    the engine level. F's red-flag claim cannot be represented without a contract change —

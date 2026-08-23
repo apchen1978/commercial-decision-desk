@@ -304,7 +304,34 @@ const SCENARIOS = [
     },
     expected: { recommended: "ESCALATE", availableNow: false, invariant: "authority contradiction -> ESCALATE under current contract; margin/cost information is received but not semanticized into an independent, explainable go/no-go gate (PRE-MARGIN-GATE)" },
     tags: ["SYNTHETIC", "PRE-MARGIN-GATE"],
-    futureFlipNote: "After Margin gate: expected state must become DO_NOT_PURSUE (the commercial killer becomes visible). This flip is the measured evidence of decision evolution.",
+    futureFlipNote: "REALIZED: after the Margin gate landed (owner-authorized building phase), S19 proves the same L3 case flips ESCALATE -> DO_NOT_PURSUE when the structured margin field declares bps below threshold. This flip is the measured evidence of decision evolution.",
+  },
+  {
+    id: "S19",
+    claim: "INBOUND L3 + MARGIN GATE (post-gate): the same L3 case with a structured margin field declaring bps below the caller threshold -> DO_NOT_PURSUE. THE S15 FUTURE FLIP, REALIZED: the commercial killer (5% margin + certification-cost shift) becomes visible as an independent gate.",
+    build: () => {
+      const c = base();
+      c.id = "LEAD-CUST-EQ-MARGIN";
+      c.name = "End-customer custom-equipment inquiry + margin gate (anonymized synthetic)";
+      c.contradictions = [
+        { id: "CTR-1", label: "Authority vs commitment", detail: "Contact says decision rests with client HQ committee while requesting a quote — no authority at the contact point.", material: true, status: "UNRESOLVED", resolveWith: "Confirm decision authority / commitment level" },
+      ];
+      c.quoteBasesComparable = false;
+      c.paymentEvents = [];
+      c.unknowns = [
+        { id: "UNK-1", label: "Specification", detail: "Still being confirmed with end user — the object is UNKNOWN.", blocksPursue: true, resolveWith: "Final spec from end user" },
+        { id: "UNK-2", label: "Budget / commitment", detail: "'Budget tight', committee decides — price-discovery risk.", blocksPursue: true, resolveWith: "Budget band + decision authority" },
+      ];
+      c.dimensions.buyerFit.value = "LOW";
+      c.dimensions.categoryFit.value = "MEDIUM";
+      c.dimensions.evidenceQuality.value = "LOW";
+      c.dimensions.commercialFeasibility.value = "LOW";
+      c.commercialTerms = { status: "INCOMPLETE", detail: "5% margin, certification costs on supplier, budget tight — economically marginal." };
+      c.margin = { bps: 500, thresholdBps: 800, costPayer: "SUPPLIER", costType: "CERTIFICATION", note: "5% margin (500bps) below caller-declared 8% (800bps) threshold; certification costs shifted to supplier" };
+      return c;
+    },
+    expected: { recommended: "DO_NOT_PURSUE", availableNow: false, availableConditionally: false, invariant: "margin gate: bps below declared threshold -> commercial-viability veto (S15 flip realized); cost-shift is additional signal" },
+    tags: ["SYNTHETIC", "MARGIN-GATE"],
   },
 
   // =========================================================================

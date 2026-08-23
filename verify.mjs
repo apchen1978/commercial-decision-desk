@@ -220,6 +220,34 @@ function cleanScenario() {
   check("KYC clear passes through unchanged", e1.recommended === "PURSUE_NOW" && e1.kycGate === "CLEAR", e1.recommended + " gate=" + e1.kycGate);
 }
 
+// ---------------------------------------------------------------------------
+// Margin gate regression (owner-authorized building phase; provisional semantics —
+// engine does NOT invent a threshold; caller-declared thresholdBps decides).
+// ---------------------------------------------------------------------------
+{
+  const marg = (mut) => {
+    const c = cleanScenario();
+    mut(c);
+    return c;
+  };
+  // below declared threshold -> DO_NOT_PURSUE (commercial-viability veto; S15 flip)
+  const low = evaluateDecision(marg((c) => { c.margin = { bps: 500, thresholdBps: 800 }; }));
+  check("MARGIN below declared threshold -> DO_NOT_PURSUE veto", low.recommended === "DO_NOT_PURSUE" && low.marginGate === "BELOW_THRESHOLD" && low.available.PURSUE_NOW === false && low.available.PURSUE_CONDITIONALLY === false, low.recommended + " gate=" + low.marginGate);
+  // at/above threshold -> no veto
+  const ok = evaluateDecision(marg((c) => { c.margin = { bps: 900, thresholdBps: 800 }; }));
+  check("MARGIN at/above threshold -> no veto", ok.recommended === "PURSUE_NOW" && ok.marginGate === "CLEAR", ok.recommended + " gate=" + ok.marginGate);
+  // no declared threshold -> gate ABSENT, engine does not invent one (S08 lesson)
+  const noThr = evaluateDecision(marg((c) => { c.margin = { bps: 300 }; }));
+  check("MARGIN no declared threshold -> no gate (engine invents nothing)", noThr.marginGate === "ABSENT" && noThr.recommended === "PURSUE_NOW", noThr.recommended + " gate=" + noThr.marginGate);
+  // cost shift to supplier alone -> risk signal, NOT a veto
+  const shift = evaluateDecision(marg((c) => { c.margin = { bps: 900, thresholdBps: 800, costPayer: "SUPPLIER", costType: "CERTIFICATION" }; }));
+  check("MARGIN cost-shift alone is signal, not veto", shift.recommended === "PURSUE_NOW" && shift.marginGate === "COST_SHIFT" && shift.reasons.some((r) => r.includes("MARGIN GATE")), shift.recommended + " gate=" + shift.marginGate);
+  // absent margin field -> gate ABSENT, clean path unchanged
+  const cleanM = cleanScenario();
+  const eAbsentM = evaluateDecision(cleanM);
+  check("MARGIN absent field -> no gate, clean path unchanged", eAbsentM.marginGate === "ABSENT" && eAbsentM.recommended === "PURSUE_NOW", eAbsentM.recommended + " gate=" + eAbsentM.marginGate);
+}
+
 const failed = results.filter(([, ok]) => !ok);
 console.log(`\nRESULT: ${results.length - failed.length}/${results.length} PASS`);
 process.exitCode = failed.length ? 1 : 0;

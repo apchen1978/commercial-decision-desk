@@ -157,22 +157,50 @@ The `kycGate` result field reports `SANCTIONS_VETO` / `KYC_INCOMPLETE` /
 KYC gate semantics remain **provisional** (single domain source so far —
 interview 002 pending) but the engine behavior is deterministic and tested.
 
+### Margin gate (owner-authorized building phase, 2026-08-23)
+
+`evaluateDecision()` reads an optional structured `margin` field:
+
+- `margin.bps` — gross margin in basis points (e.g. 500 = 5%)
+- `margin.thresholdBps` — the **caller-declared** minimum viable margin. The engine
+  does NOT invent a universal threshold (same discipline as S08 expiry: no
+  threshold input, no gate).
+- `margin.costPayer` / `margin.costType` — cost-shift signal (e.g.
+  `costPayer:"SUPPLIER", costType:"CERTIFICATION"`).
+
+Gate semantics (verified by verify.mjs + S19):
+
+- **`bps < thresholdBps` → `DO_NOT_PURSUE`** — commercial-viability veto; the
+  margin/cost killer becomes an independent, explainable gate. This is the
+  **realized S15 future flip** (L3 lead: 5% margin + certification-cost shift was
+  previously only `ESCALATE` on the authority contradiction; S19 proves it now
+  vetoes with structured margin input).
+- **Cost-shift to supplier alone → risk signal, not a veto** (the declared
+  threshold comparison decides).
+- **Absent `margin` field, or no declared threshold → gate transparent** — clean
+  behavior unchanged.
+
+The `marginGate` result field reports `BELOW_THRESHOLD` / `COST_SHIFT` / `CLEAR` /
+`ABSENT`. Margin gate semantics are **provisional** (interview 001 deferred) —
+the threshold is a caller decision, never engine-invented.
+
 ## Scenario evidence
 
-`scenario-test/` holds the owner-approved evidence-depth experiment: a **20-scenario
+`scenario-test/` holds the owner-approved evidence-depth experiment: a **21-scenario
 matrix** (5/5 decision states, 8 adversarial types, 3 inbound-lead scans S13–S15,
-3 KYC-gate regressions S16–S18) with pre-declared expectations, raw deterministic
-output, and a limitation/classification record. Run it with:
+3 KYC-gate regressions S16–S18, 1 margin-gate flip S19) with pre-declared
+expectations, raw deterministic output, and a limitation/classification record.
+Run it with:
 
 ```bash
 node scenario-test/run-scenarios.mjs
 ```
 
 S13–S15 are tagged `SYNTHETIC` + `PRE-MARGIN-GATE`: S15 (a 5%-margin custom-equipment
-lead with certification costs shifted to the supplier) is the key edge case — the
-system receives the margin/cost descriptions but has no independent margin gate yet;
-see `docs/interviews/001_MARGIN_AND_COST_GATE.md` for the pending domain review.
-S16–S18 are tagged `SYNTHETIC` + `KYC-GATE` (sanctions veto / KYC-incomplete HOLD /
-clear pass-through — the owner-authorized KYC gate, see "Documented boundaries").
-Current matrix: **20 scenarios — 18 PASS, 2 BASELINE_FIX_CONFIRMED, 0 FAIL,
+lead with certification costs shifted to the supplier) is the key edge case; S19
+(`MARGIN-GATE` tag) proves the same case now vetoes (`DO_NOT_PURSUE`) once the
+structured margin field declares bps below the caller threshold — the realized
+S15 future flip. S16–S18 are tagged `SYNTHETIC` + `KYC-GATE` (sanctions veto /
+KYC-incomplete HOLD / clear pass-through). See "Documented boundaries".
+Current matrix: **21 scenarios — 19 PASS, 2 BASELINE_FIX_CONFIRMED, 0 FAIL,
 deterministic** (see `scenario-test/outputs/run-log.txt`).

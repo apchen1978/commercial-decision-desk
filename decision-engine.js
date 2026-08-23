@@ -109,6 +109,27 @@ export function evaluateDecision(opp) {
   const kycPresent = Object.keys(k).length > 0;
   const kycGate = !kycPresent ? "ABSENT" : sanctionsHit ? "SANCTIONS_VETO" : kycIncomplete ? "KYC_INCOMPLETE" : "CLEAR";
 
+  // Margin gate (owner-authorized 2026-08-23, building phase; provisional
+  // semantics — interview 001 deferred). Structured margin field:
+  //   margin.bps          — gross margin in basis points
+  //   margin.thresholdBps — caller-DECLARED minimum viable margin (engine does
+  //                         NOT invent a universal threshold — S08 lesson)
+  //   margin.costPayer    — "SUPPLIER" | "BUYER" | ... (cost-shift signal)
+  //   margin.costType     — e.g. "CERTIFICATION"
+  // Gate: bps < thresholdBps (both provided) => DO_NOT_PURSUE — the commercial
+  // killer becomes visible (S15 future flip: ESCALATE -> DO_NOT_PURSUE).
+  // Cost-shift to supplier alone is a risk signal, NOT a veto (threshold decides).
+  const m = opp.margin || {};
+  const marginBps = Number.isFinite(m.bps) ? m.bps : null;
+  const marginThreshold = Number.isFinite(m.thresholdBps) ? m.thresholdBps : null;
+  const marginBelowThreshold = marginBps !== null && marginThreshold !== null && marginBps < marginThreshold;
+  const costShiftToSupplier = String(m.costPayer || "").toUpperCase() === "SUPPLIER";
+  const marginPresent = Object.keys(m).length > 0;
+  // ABSENT when no margin input, or when bps exists but NO declared threshold
+  // (engine invents no threshold — S08 lesson). CLEAR only when a threshold is
+  // declared AND the margin meets it.
+  const marginGate = !marginPresent ? "ABSENT" : marginBelowThreshold ? "BELOW_THRESHOLD" : costShiftToSupplier ? "COST_SHIFT" : marginThreshold !== null ? "CLEAR" : "ABSENT";
+
   // S10 fix: fail closed on invalid enum values. A value outside the accepted
   // vocabulary (HIGH/STRONG/MEDIUM/LOW/WEAK/UNKNOWN/NONE/IRRELEVANT, or empty)
   // is NOT silently treated as a meaningful level — it is surfaced and the
@@ -132,6 +153,13 @@ export function evaluateDecision(opp) {
     reasons.push("KYC GATE: sanctions/adverse finding — one-vote veto; DO_NOT_PURSUE regardless of margin or commercial signals.");
   } else if (kycIncomplete) {
     reasons.push("KYC GATE: beneficial-owner verification incomplete — evidence-required; HOLD_FOR_EVIDENCE. Insurance availability does not clear this gate.");
+  }
+
+  // Margin gate — surfaced reasons.
+  if (marginBelowThreshold) {
+    reasons.push(`MARGIN GATE: gross margin ${marginBps} bps is below the declared threshold ${marginThreshold} bps — commercial-viability veto; DO_NOT_PURSUE.`);
+  } else if (costShiftToSupplier) {
+    reasons.push("MARGIN GATE: compliance/certification costs shifted to supplier — margin-risk signal; not a veto by itself (declared-threshold comparison decides).");
   }
 
   // S10 — invalid enum surfaced, not silently consumed.
@@ -186,6 +214,8 @@ export function evaluateDecision(opp) {
   let recommended = "HOLD_FOR_EVIDENCE";
   if (sanctionsHit) {
     recommended = "DO_NOT_PURSUE"; // KYC gate: one-vote veto (highest priority)
+  } else if (marginBelowThreshold) {
+    recommended = "DO_NOT_PURSUE"; // margin gate: commercial-viability veto (2nd priority)
   } else if (kycIncomplete) {
     recommended = "HOLD_FOR_EVIDENCE"; // KYC gate: evidence-required
   } else if (hasInvalidDim) {
@@ -212,6 +242,7 @@ export function evaluateDecision(opp) {
   const available = {
     PURSUE_NOW:
       !sanctionsHit &&
+      !marginBelowThreshold &&
       !kycIncomplete &&
       !hasInvalidDim &&
       !categoryWeak &&
@@ -223,13 +254,13 @@ export function evaluateDecision(opp) {
       strongEvidence &&
       !weakEvidence &&
       !evidenceMissing,
-    PURSUE_CONDITIONALLY: !sanctionsHit && !kycIncomplete && !hasInvalidDim && !categoryWeak && !weakEvidence && !evidenceMissing,
+    PURSUE_CONDITIONALLY: !sanctionsHit && !marginBelowThreshold && !kycIncomplete && !hasInvalidDim && !categoryWeak && !weakEvidence && !evidenceMissing,
     HOLD_FOR_EVIDENCE: true,
     ESCALATE: true,
     DO_NOT_PURSUE: true,
   };
 
-  return { recommended, available, reasons, categoryWeak, materialContradictions, termsIncomplete, quoteBasesComparable, exposure, blockingUnknowns, strongBuyerFit, strongEvidence, invalidDimensions, kycGate };
+  return { recommended, available, reasons, categoryWeak, materialContradictions, termsIncomplete, quoteBasesComparable, exposure, blockingUnknowns, strongBuyerFit, strongEvidence, invalidDimensions, kycGate, marginGate };
 }
 
 // ---------------------------------------------------------------------------

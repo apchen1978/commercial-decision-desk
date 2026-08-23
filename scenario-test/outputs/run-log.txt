@@ -23,7 +23,9 @@
         tags: SYNTHETIC, PRE-MARGIN-GATE
 [PASS] S15 INBOUND L3 (end-customer custom equipment, 5% margin, certification costs on supplier, HQ committee decides): no decision authority at the contact point -> material contradiction -> ESCALATE. KEY EDGE CASE: the system RECEIVES the margin/cost descriptions (commercialFeasibility LOW, '5% margin', 'certification costs on supplier') but the current contract does NOT convert them into an independent, explainable go/no-go gate — it fires on the registered authority contradiction instead. PRE-MARGIN-GATE baseline: ESCALATE expected; after a Margin gate lands this must flip to DO_NOT_PURSUE.
         tags: SYNTHETIC, PRE-MARGIN-GATE
-        FUTURE FLIP: After Margin gate: expected state must become DO_NOT_PURSUE (the commercial killer becomes visible). This flip is the measured evidence of decision evolution.
+        FUTURE FLIP: REALIZED: after the Margin gate landed (owner-authorized building phase), S19 proves the same L3 case flips ESCALATE -> DO_NOT_PURSUE when the structured margin field declares bps below threshold. This flip is the measured evidence of decision evolution.
+[PASS] S19 INBOUND L3 + MARGIN GATE (post-gate): the same L3 case with a structured margin field declaring bps below the caller threshold -> DO_NOT_PURSUE. THE S15 FUTURE FLIP, REALIZED: the commercial killer (5% margin + certification-cost shift) becomes visible as an independent gate.
+        tags: SYNTHETIC, MARGIN-GATE
 [PASS] S16 KYC GATE: sanctions hit / adverse finding -> DO_NOT_PURSUE one-vote veto regardless of other signals (margin cannot rescue).
         tags: SYNTHETIC, KYC-GATE
 [PASS] S17 KYC GATE: KYC incomplete / beneficial owner unknown -> HOLD_FOR_EVIDENCE (evidence-required), even with strong referral + high margin; insurance does not clear it.
@@ -32,4 +34,4 @@
         tags: SYNTHETIC, KYC-GATE
 
 DETERMINISM: identical across independent runs
-SCENARIOS: 20 | PASS 18 | BASELINE_FIX_CONFIRMED 2 | FAIL 0 | BASELINE_FIX_ABSENT 0
+SCENARIOS: 21 | PASS 19 | BASELINE_FIX_CONFIRMED 2 | FAIL 0 | BASELINE_FIX_ABSENT 0

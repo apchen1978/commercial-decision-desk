@@ -1,0 +1,103 @@
+// verify.mjs — automated hard-rule + determinism checks for Commercial Decision Desk.
+// Node-only; exercises the pure modules exactly as the browser does.
+import { readFileSync } from "node:fs";
+import { opportunity, dimensions } from "./fixtures.js";
+import { DECISION_STATES, paymentExposure, evaluateDecision, buildBrief } from "./decision-engine.js";
+
+const results = [];
+const check = (name, cond, detail = "") => {
+  results.push([name, !!cond]);
+  console.log((cond ? "PASS " : "FAIL ") + name + (cond ? "" : "  | " + detail));
+};
+
+// Hard rule 1 — weak Category Fit can never produce PURSUE_NOW.
+{
+  const weak = { ...opportunity, dimensions: { ...opportunity.dimensions, categoryFit: { value: "WEAK" } } };
+  const e = evaluateDecision(weak);
+  check("R1 weak category fit cannot PURSUE_NOW", e.available.PURSUE_NOW === false && e.recommended === "DO_NOT_PURSUE");
+}
+
+// Hard rule 2 — material contradiction surfaced + blocks PURSUE_NOW, recommends ESCALATE.
+{
+  const e = evaluateDecision(opportunity);
+  check("R2 contradiction visible", e.materialContradictions.length >= 1);
+  check("R2 contradiction blocks PURSUE_NOW", e.available.PURSUE_NOW === false);
+  check("R2 recommendation is ESCALATE", e.recommended === "ESCALATE");
+}
+
+// Hard rule 3 — incomplete terms → HOLD_FOR_EVIDENCE available; UNKNOWN stays.
+{
+  const e = evaluateDecision(opportunity);
+  check("R3 terms incomplete flag", e.termsIncomplete === true);
+  check("R3 HOLD_FOR_EVIDENCE available", e.available.HOLD_FOR_EVIDENCE === true);
+  const unk = opportunity.unknowns.map((u) => u.label);
+  check("R3 UNKNOWN not converted", unk.includes("Final payment terms") && unk.includes("Actual order volume"));
+}
+
+// Hard rule 4 — non-comparable quote bases never ranked.
+check("R4 quote bases not comparable", opportunity.quoteBasesComparable === false);
+{
+  const cmp = { ...opportunity, quoteBasesComparable: true };
+  const e = evaluateDecision(cmp);
+  check("R4 comparable bases allow ranking context", e.quoteBasesComparable === true);
+}
+
+// Hard rule 5 — payment exposure only from complete events; incomplete → UNKNOWN.
+{
+  const e1 = paymentExposure(opportunity.paymentEvents);
+  check("R5 exposure computed from complete events", e1.computed === true && e1.totalCommittedCny === 25200 + 58800);
+  check("R5 incomplete events reported as UNKNOWN", e1.incompleteCount === 1 && e1.incompleteLabels.includes("Conditional performance bond"));
+  const onlyIncomplete = paymentExposure([{ status: "INCOMPLETE" }]);
+  check("R5 no complete events → not computed", onlyIncomplete.computed === false && onlyIncomplete.reason.includes("UNKNOWN"));
+}
+
+// Hard rule 6 — concentration = commitments only (single buyer share).
+{
+  const e = paymentExposure(opportunity.paymentEvents);
+  check("R6 concentration from commitments only", e.byEvent.reduce((a, x) => a + x.share, 0).toFixed(6) === "1.000000");
+}
+
+// Hard rule 7 — disclosure present as NEGATED form; exposure never described AS those.
+{
+  const forbidden = ["cash balance", "liquidity", "affordability", "cash shortfall", "credit capacity"];
+  check("R7 disclosure present", opportunity.paymentDisclosure.includes("committed payment events"));
+  const sentence = opportunity.paymentDisclosure.split(".").find((s) => forbidden.some((f) => s.toLowerCase().includes(f)));
+  check("R7 forbidden terms only in negated sentence", Boolean(sentence && /\bis not\b/i.test(sentence)));
+  check("R7 never described as forbidden terms", !/exposure (is|means|equals) (cash balance|liquidity|affordability|cash shortfall|credit capacity)/i.test(opportunity.paymentDisclosure));
+}
+
+// Hard rule 8 — human decision required; brief requires human selection.
+{
+  const e = evaluateDecision(opportunity);
+  const brief = buildBrief(opportunity, "PURSUE_CONDITIONALLY", e);
+  check("R8 brief carries human decision + boundary note", brief.humanDecision === "PURSUE_CONDITIONALLY" && brief.boundaryNote.includes("Human approval is always required"));
+  check("R8 five decision states exist", DECISION_STATES.length === 5);
+}
+
+// Determinism — two runs produce identical results.
+{
+  const a = JSON.stringify(paymentExposure(opportunity.paymentEvents));
+  const b = JSON.stringify(paymentExposure(opportunity.paymentEvents));
+  check("determinism payment identical across runs", a === b);
+  const e1 = JSON.stringify(evaluateDecision(opportunity));
+  const e2 = JSON.stringify(evaluateDecision(opportunity));
+  check("determinism recommendation identical across runs", e1 === e2);
+}
+
+// Fixture hygiene — no real-looking data, synthetic label present.
+{
+  const src = readFileSync(new URL("./fixtures.js", import.meta.url), "utf8") + readFileSync(new URL("./README.md", import.meta.url), "utf8");
+  check("fixture clearly labeled synthetic", opportunity.id === "OPP-2026-008" && src.includes("SYNTHETIC") && src.includes("fabricated"));
+  const emailLike = (readFileSync(new URL("./fixtures.js", import.meta.url), "utf8").match(/[\w.+-]+@[\w-]+\.[\w.]+/g) || []).length;
+  check("no emails/contacts in fixture", emailLike === 0);
+}
+
+// No persistence / network in engine.
+{
+  const engineSrc = readFileSync(new URL("./decision-engine.js", import.meta.url), "utf8");
+  check("engine has no network/persistence calls", !/fetch\(|localStorage|XMLHttpRequest|WebSocket/.test(engineSrc));
+}
+
+const failed = results.filter(([, ok]) => !ok);
+console.log(`\nRESULT: ${results.length - failed.length}/${results.length} PASS`);
+process.exitCode = failed.length ? 1 : 0;

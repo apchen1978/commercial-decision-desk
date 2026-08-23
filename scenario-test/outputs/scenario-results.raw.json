@@ -1,0 +1,1965 @@
+[
+  {
+    "id": "S01",
+    "claimUnderTest": "All gates clear + strong Buyer Fit + strong Evidence Quality => PURSUE_NOW available and recommended.",
+    "inputCondition": {
+      "id": "OPP-2026-008",
+      "synthetic": true,
+      "name": "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product specification document reviewed (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice + referral note (synthetic)."
+            },
+            {
+              "tier": "VERIFICATION_REQUIRED",
+              "note": "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "CONDITIONAL",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [],
+      "unknowns": [],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "COMPLETE",
+        "detail": ""
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB — ex-works plus freight to port",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "CIF + installation + customs liability",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-3",
+          "basis": "DDP with penalty clauses",
+          "status": "INCOMPLETE"
+        }
+      ],
+      "quoteBasesComparable": true,
+      "paymentEvents": [
+        {
+          "id": "PE-1",
+          "label": "Deposit (30%)",
+          "amountCny": 25200,
+          "daysFromSign": 0,
+          "status": "COMPLETE"
+        },
+        {
+          "id": "PE-2",
+          "label": "Balance (70%)",
+          "amountCny": 58800,
+          "daysFromSign": 45,
+          "status": "COMPLETE"
+        }
+      ],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "PURSUE_NOW",
+      "availableNow": true,
+      "invariant": "positive pursuit path is reachable"
+    },
+    "actualState": {
+      "recommended": "PURSUE_NOW",
+      "availableNow": true,
+      "availableConditionally": true,
+      "exposureComputed": true,
+      "exposureTotalCny": 84000,
+      "exposurePeakCny": 58800,
+      "materialContradictions": 0,
+      "blockingUnknowns": 0,
+      "reasons": [
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available."
+      ],
+      "exposureReason": null,
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "PASS": true,
+    "mismatchReasons": [],
+    "boundaryVariant": null
+  },
+  {
+    "id": "S02",
+    "claimUnderTest": "Strong evidence but MEDIUM (not strong) Buyer Fit => only conditional pursuit; PURSUE_NOW unavailable.",
+    "inputCondition": {
+      "id": "OPP-2026-008",
+      "synthetic": true,
+      "name": "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "MEDIUM",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product specification document reviewed (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice + referral note (synthetic)."
+            },
+            {
+              "tier": "VERIFICATION_REQUIRED",
+              "note": "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "CONDITIONAL",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [],
+      "unknowns": [],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "COMPLETE",
+        "detail": ""
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB — ex-works plus freight to port",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "CIF + installation + customs liability",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-3",
+          "basis": "DDP with penalty clauses",
+          "status": "INCOMPLETE"
+        }
+      ],
+      "quoteBasesComparable": true,
+      "paymentEvents": [
+        {
+          "id": "PE-1",
+          "label": "Deposit (30%)",
+          "amountCny": 25200,
+          "daysFromSign": 0,
+          "status": "COMPLETE"
+        },
+        {
+          "id": "PE-2",
+          "label": "Balance (70%)",
+          "amountCny": 58800,
+          "daysFromSign": 45,
+          "status": "COMPLETE"
+        }
+      ],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "PURSUE_CONDITIONALLY",
+      "availableNow": false,
+      "invariant": "no forced pursuit without strong fit"
+    },
+    "actualState": {
+      "recommended": "PURSUE_CONDITIONALLY",
+      "availableNow": false,
+      "availableConditionally": true,
+      "exposureComputed": true,
+      "exposureTotalCny": 84000,
+      "exposurePeakCny": 58800,
+      "materialContradictions": 0,
+      "blockingUnknowns": 0,
+      "reasons": [],
+      "exposureReason": null,
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "PASS": true,
+    "mismatchReasons": [],
+    "boundaryVariant": null
+  },
+  {
+    "id": "S03",
+    "claimUnderTest": "LOW Evidence Quality (with everything else positive) => HOLD_FOR_EVIDENCE, NOT DO_NOT_PURSUE. Missing/weak evidence != negative evidence.",
+    "inputCondition": {
+      "id": "OPP-2026-008",
+      "synthetic": true,
+      "name": "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "LOW",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product specification document reviewed (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice + referral note (synthetic)."
+            },
+            {
+              "tier": "VERIFICATION_REQUIRED",
+              "note": "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "CONDITIONAL",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [],
+      "unknowns": [],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "COMPLETE",
+        "detail": ""
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB — ex-works plus freight to port",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "CIF + installation + customs liability",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-3",
+          "basis": "DDP with penalty clauses",
+          "status": "INCOMPLETE"
+        }
+      ],
+      "quoteBasesComparable": true,
+      "paymentEvents": [
+        {
+          "id": "PE-1",
+          "label": "Deposit (30%)",
+          "amountCny": 25200,
+          "daysFromSign": 0,
+          "status": "COMPLETE"
+        },
+        {
+          "id": "PE-2",
+          "label": "Balance (70%)",
+          "amountCny": 58800,
+          "daysFromSign": 45,
+          "status": "COMPLETE"
+        }
+      ],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "availableNow": false,
+      "invariant": "missing evidence is not negative evidence"
+    },
+    "actualState": {
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "availableNow": false,
+      "availableConditionally": false,
+      "exposureComputed": true,
+      "exposureTotalCny": 84000,
+      "exposurePeakCny": 58800,
+      "materialContradictions": 0,
+      "blockingUnknowns": 0,
+      "reasons": [
+        "Rule: Evidence Quality is LOW or UNKNOWN — strong pursuit is not recommended; HOLD_FOR_EVIDENCE is preferred."
+      ],
+      "exposureReason": null,
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "PASS": true,
+    "mismatchReasons": [],
+    "boundaryVariant": null
+  },
+  {
+    "id": "S04",
+    "claimUnderTest": "Evidence Quality UNKNOWN => HOLD_FOR_EVIDENCE and UNKNOWN stays UNKNOWN (not converted to fact, not treated as negative).",
+    "inputCondition": {
+      "id": "OPP-2026-008",
+      "synthetic": true,
+      "name": "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "UNKNOWN",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product specification document reviewed (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice + referral note (synthetic)."
+            },
+            {
+              "tier": "VERIFICATION_REQUIRED",
+              "note": "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "CONDITIONAL",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [],
+      "unknowns": [],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "COMPLETE",
+        "detail": ""
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB — ex-works plus freight to port",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "CIF + installation + customs liability",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-3",
+          "basis": "DDP with penalty clauses",
+          "status": "INCOMPLETE"
+        }
+      ],
+      "quoteBasesComparable": true,
+      "paymentEvents": [
+        {
+          "id": "PE-1",
+          "label": "Deposit (30%)",
+          "amountCny": 25200,
+          "daysFromSign": 0,
+          "status": "COMPLETE"
+        },
+        {
+          "id": "PE-2",
+          "label": "Balance (70%)",
+          "amountCny": 58800,
+          "daysFromSign": 45,
+          "status": "COMPLETE"
+        }
+      ],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "availableNow": false,
+      "invariant": "UNKNOWN remains UNKNOWN until supported"
+    },
+    "actualState": {
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "availableNow": false,
+      "availableConditionally": false,
+      "exposureComputed": true,
+      "exposureTotalCny": 84000,
+      "exposurePeakCny": 58800,
+      "materialContradictions": 0,
+      "blockingUnknowns": 0,
+      "reasons": [
+        "Rule: Evidence Quality is LOW or UNKNOWN — strong pursuit is not recommended; HOLD_FOR_EVIDENCE is preferred."
+      ],
+      "exposureReason": null,
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "PASS": true,
+    "mismatchReasons": [],
+    "boundaryVariant": null
+  },
+  {
+    "id": "S05",
+    "claimUnderTest": "Blocking UNKNOWN remains despite strong evidence => HOLD_FOR_EVIDENCE; PURSUE_NOW requires no blocking UNKNOWN.",
+    "inputCondition": {
+      "id": "OPP-2026-008",
+      "synthetic": true,
+      "name": "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product specification document reviewed (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice + referral note (synthetic)."
+            },
+            {
+              "tier": "VERIFICATION_REQUIRED",
+              "note": "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "CONDITIONAL",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [],
+      "unknowns": [
+        {
+          "id": "UNK-X",
+          "label": "Order volume unverified",
+          "detail": "x",
+          "blocksPursue": true
+        }
+      ],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "COMPLETE",
+        "detail": ""
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB — ex-works plus freight to port",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "CIF + installation + customs liability",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-3",
+          "basis": "DDP with penalty clauses",
+          "status": "INCOMPLETE"
+        }
+      ],
+      "quoteBasesComparable": true,
+      "paymentEvents": [
+        {
+          "id": "PE-1",
+          "label": "Deposit (30%)",
+          "amountCny": 25200,
+          "daysFromSign": 0,
+          "status": "COMPLETE"
+        },
+        {
+          "id": "PE-2",
+          "label": "Balance (70%)",
+          "amountCny": 58800,
+          "daysFromSign": 45,
+          "status": "COMPLETE"
+        }
+      ],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "availableNow": false,
+      "invariant": "blocking UNKNOWN gates pursuit"
+    },
+    "actualState": {
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "availableNow": false,
+      "availableConditionally": true,
+      "exposureComputed": true,
+      "exposureTotalCny": 84000,
+      "exposurePeakCny": 58800,
+      "materialContradictions": 0,
+      "blockingUnknowns": 1,
+      "reasons": [
+        "Rule: Blocking UNKNOWN remains (UNK-X) — PURSUE_NOW requires no blocking UNKNOWN."
+      ],
+      "exposureReason": null,
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "PASS": true,
+    "mismatchReasons": [],
+    "boundaryVariant": null
+  },
+  {
+    "id": "S06",
+    "claimUnderTest": "Material UNRESOLVED contradiction => ESCALATE; PURSUE_NOW unavailable. (Boundary variant: NON-material contradiction must NOT escalate.)",
+    "inputCondition": {
+      "id": "OPP-2026-008",
+      "synthetic": true,
+      "name": "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product specification document reviewed (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice + referral note (synthetic)."
+            },
+            {
+              "tier": "VERIFICATION_REQUIRED",
+              "note": "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "CONDITIONAL",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [
+        {
+          "id": "CTR-M",
+          "label": "Payment terms conflict",
+          "detail": "90 days vs 30% advance",
+          "material": true,
+          "status": "UNRESOLVED"
+        }
+      ],
+      "unknowns": [],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "COMPLETE",
+        "detail": ""
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB — ex-works plus freight to port",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "CIF + installation + customs liability",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-3",
+          "basis": "DDP with penalty clauses",
+          "status": "INCOMPLETE"
+        }
+      ],
+      "quoteBasesComparable": true,
+      "paymentEvents": [
+        {
+          "id": "PE-1",
+          "label": "Deposit (30%)",
+          "amountCny": 25200,
+          "daysFromSign": 0,
+          "status": "COMPLETE"
+        },
+        {
+          "id": "PE-2",
+          "label": "Balance (70%)",
+          "amountCny": 58800,
+          "daysFromSign": 45,
+          "status": "COMPLETE"
+        }
+      ],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "ESCALATE",
+      "availableNow": false,
+      "invariant": "contradictory material evidence => escalation"
+    },
+    "actualState": {
+      "recommended": "ESCALATE",
+      "availableNow": false,
+      "availableConditionally": true,
+      "exposureComputed": true,
+      "exposureTotalCny": 84000,
+      "exposurePeakCny": 58800,
+      "materialContradictions": 1,
+      "blockingUnknowns": 0,
+      "reasons": [
+        "Rule 2: Material contradiction (CTR-M) is unresolved — it is surfaced visibly; PURSUE_NOW is not available; ESCALATE is recommended."
+      ],
+      "exposureReason": null,
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "PASS": true,
+    "mismatchReasons": [],
+    "boundaryVariant": {
+      "actual": {
+        "recommended": "PURSUE_NOW",
+        "availableNow": true
+      },
+      "PASS": true,
+      "mismatch": []
+    }
+  },
+  {
+    "id": "S07",
+    "claimUnderTest": "Weak Category Fit => DO_NOT_PURSUE even when every other signal (buyer fit, evidence, exposure, terms) is positive. Attractive signals must not override weak fit.",
+    "inputCondition": {
+      "id": "OPP-2026-008",
+      "synthetic": true,
+      "name": "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "WEAK",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product specification document reviewed (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice + referral note (synthetic)."
+            },
+            {
+              "tier": "VERIFICATION_REQUIRED",
+              "note": "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "CONDITIONAL",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [],
+      "unknowns": [],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "COMPLETE",
+        "detail": ""
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB — ex-works plus freight to port",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "CIF + installation + customs liability",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-3",
+          "basis": "DDP with penalty clauses",
+          "status": "INCOMPLETE"
+        }
+      ],
+      "quoteBasesComparable": true,
+      "paymentEvents": [
+        {
+          "id": "PE-1",
+          "label": "Deposit (30%)",
+          "amountCny": 25200,
+          "daysFromSign": 0,
+          "status": "COMPLETE"
+        },
+        {
+          "id": "PE-2",
+          "label": "Balance (70%)",
+          "amountCny": 58800,
+          "daysFromSign": 45,
+          "status": "COMPLETE"
+        }
+      ],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "DO_NOT_PURSUE",
+      "availableNow": false,
+      "invariant": "weak fit not overridden by attractive signals"
+    },
+    "actualState": {
+      "recommended": "DO_NOT_PURSUE",
+      "availableNow": false,
+      "availableConditionally": false,
+      "exposureComputed": true,
+      "exposureTotalCny": 84000,
+      "exposurePeakCny": 58800,
+      "materialContradictions": 0,
+      "blockingUnknowns": 0,
+      "reasons": [
+        "Rule 1: Weak/irrelevant Category Fit — PURSUE_NOW is not available."
+      ],
+      "exposureReason": null,
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "PASS": true,
+    "mismatchReasons": [],
+    "boundaryVariant": null
+  },
+  {
+    "id": "S08",
+    "claimUnderTest": "EXPIRED evidence: evidence tier records EXPIRED but value remains HIGH. Engine consumes only dimensions.value — does it detect expiry? (Adversarial: expired evidence must not be treated as current.)",
+    "inputCondition": {
+      "id": "OPP-2026-008",
+      "synthetic": true,
+      "name": "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "EXPIRED",
+              "note": "Verification call from 14 months ago; buyer contact stale (synthetic)."
+            },
+            {
+              "tier": "EXPIRED",
+              "note": "Old spec revision, superseded (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "CONDITIONAL",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [],
+      "unknowns": [],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "COMPLETE",
+        "detail": ""
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB — ex-works plus freight to port",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "CIF + installation + customs liability",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-3",
+          "basis": "DDP with penalty clauses",
+          "status": "INCOMPLETE"
+        }
+      ],
+      "quoteBasesComparable": true,
+      "paymentEvents": [
+        {
+          "id": "PE-1",
+          "label": "Deposit (30%)",
+          "amountCny": 25200,
+          "daysFromSign": 0,
+          "status": "COMPLETE"
+        },
+        {
+          "id": "PE-2",
+          "label": "Balance (70%)",
+          "amountCny": 58800,
+          "daysFromSign": 45,
+          "status": "COMPLETE"
+        }
+      ],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "PURSUE_NOW",
+      "availableNow": true,
+      "invariant": "expiry is a data-tier concern; engine has no expiry signal",
+      "adversarial": true
+    },
+    "actualState": {
+      "recommended": "PURSUE_NOW",
+      "availableNow": true,
+      "availableConditionally": true,
+      "exposureComputed": true,
+      "exposureTotalCny": 84000,
+      "exposurePeakCny": 58800,
+      "materialContradictions": 0,
+      "blockingUnknowns": 0,
+      "reasons": [
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available."
+      ],
+      "exposureReason": null,
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "PASS": true,
+    "mismatchReasons": [],
+    "boundaryVariant": null
+  },
+  {
+    "id": "S09",
+    "claimUnderTest": "Non-comparable quote bases must NOT be force-ranked; the decision may still be positive (Rule 4 is a disclosure gate, not a pursuit gate).",
+    "inputCondition": {
+      "id": "OPP-2026-008",
+      "synthetic": true,
+      "name": "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product specification document reviewed (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice + referral note (synthetic)."
+            },
+            {
+              "tier": "VERIFICATION_REQUIRED",
+              "note": "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "CONDITIONAL",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [],
+      "unknowns": [],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "COMPLETE",
+        "detail": ""
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "DDP + installation",
+          "status": "COMPLETE"
+        }
+      ],
+      "quoteBasesComparable": false,
+      "paymentEvents": [
+        {
+          "id": "PE-1",
+          "label": "Deposit (30%)",
+          "amountCny": 25200,
+          "daysFromSign": 0,
+          "status": "COMPLETE"
+        },
+        {
+          "id": "PE-2",
+          "label": "Balance (70%)",
+          "amountCny": 58800,
+          "daysFromSign": 45,
+          "status": "COMPLETE"
+        }
+      ],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "PURSUE_NOW",
+      "availableNow": true,
+      "invariant": "incomparable evidence is never force-ranked",
+      "adversarial": true
+    },
+    "actualState": {
+      "recommended": "PURSUE_NOW",
+      "availableNow": true,
+      "availableConditionally": true,
+      "exposureComputed": true,
+      "exposureTotalCny": 84000,
+      "exposurePeakCny": 58800,
+      "materialContradictions": 0,
+      "blockingUnknowns": 0,
+      "reasons": [
+        "Rule 4: Quote bases are not comparable — quotes are NOT ranked.",
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available."
+      ],
+      "exposureReason": null,
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "PASS": true,
+    "mismatchReasons": [],
+    "boundaryVariant": null
+  },
+  {
+    "id": "S10",
+    "claimUnderTest": "MALFORMED enum: buyerFit.value='HYPERSONIC' (not in HIGH/STRONG/MEDIUM/LOW/UNKNOWN vocabulary). Engine must not silently treat garbage as a meaningful level, and must not convert it to a fact.",
+    "inputCondition": {
+      "id": "OPP-2026-008",
+      "synthetic": true,
+      "name": "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "HYPERSONIC",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product specification document reviewed (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice + referral note (synthetic)."
+            },
+            {
+              "tier": "VERIFICATION_REQUIRED",
+              "note": "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "CONDITIONAL",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [],
+      "unknowns": [],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "COMPLETE",
+        "detail": ""
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB — ex-works plus freight to port",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "CIF + installation + customs liability",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-3",
+          "basis": "DDP with penalty clauses",
+          "status": "INCOMPLETE"
+        }
+      ],
+      "quoteBasesComparable": true,
+      "paymentEvents": [
+        {
+          "id": "PE-1",
+          "label": "Deposit (30%)",
+          "amountCny": 25200,
+          "daysFromSign": 0,
+          "status": "COMPLETE"
+        },
+        {
+          "id": "PE-2",
+          "label": "Balance (70%)",
+          "amountCny": 58800,
+          "daysFromSign": 45,
+          "status": "COMPLETE"
+        }
+      ],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "PURSUE_CONDITIONALLY",
+      "availableNow": false,
+      "invariant": "malformed input must not fabricate a level or a fact",
+      "adversarial": true
+    },
+    "actualState": {
+      "recommended": "PURSUE_CONDITIONALLY",
+      "availableNow": false,
+      "availableConditionally": true,
+      "exposureComputed": true,
+      "exposureTotalCny": 84000,
+      "exposurePeakCny": 58800,
+      "materialContradictions": 0,
+      "blockingUnknowns": 0,
+      "reasons": [],
+      "exposureReason": null,
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "PASS": true,
+    "mismatchReasons": [],
+    "boundaryVariant": null
+  },
+  {
+    "id": "S11",
+    "claimUnderTest": "DUPLICATE payment event (same label/amount submitted twice) — exposure must not double-count unless the engine de-duplicates inputs.",
+    "inputCondition": {
+      "id": "OPP-2026-008",
+      "synthetic": true,
+      "name": "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product specification document reviewed (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice + referral note (synthetic)."
+            },
+            {
+              "tier": "VERIFICATION_REQUIRED",
+              "note": "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "CONDITIONAL",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [],
+      "unknowns": [],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "COMPLETE",
+        "detail": ""
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB — ex-works plus freight to port",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "CIF + installation + customs liability",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-3",
+          "basis": "DDP with penalty clauses",
+          "status": "INCOMPLETE"
+        }
+      ],
+      "quoteBasesComparable": true,
+      "paymentEvents": [
+        {
+          "id": "PE-1",
+          "label": "Deposit (30%)",
+          "amountCny": 25200,
+          "daysFromSign": 0,
+          "status": "COMPLETE"
+        },
+        {
+          "id": "PE-1b",
+          "label": "Deposit (30%)",
+          "amountCny": 25200,
+          "daysFromSign": 0,
+          "status": "COMPLETE"
+        },
+        {
+          "id": "PE-2",
+          "label": "Balance (70%)",
+          "amountCny": 58800,
+          "daysFromSign": 45,
+          "status": "COMPLETE"
+        }
+      ],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "PURSUE_NOW",
+      "availableNow": true,
+      "exposureTotal": 109200,
+      "invariant": "duplicate inputs must not silently inflate exposure",
+      "adversarial": true
+    },
+    "actualState": {
+      "recommended": "PURSUE_NOW",
+      "availableNow": true,
+      "availableConditionally": true,
+      "exposureComputed": true,
+      "exposureTotalCny": 109200,
+      "exposurePeakCny": 58800,
+      "materialContradictions": 0,
+      "blockingUnknowns": 0,
+      "reasons": [
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available."
+      ],
+      "exposureReason": null,
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "PASS": true,
+    "mismatchReasons": [],
+    "boundaryVariant": null
+  },
+  {
+    "id": "S12",
+    "claimUnderTest": "INCONSISTENT SOURCE EVIDENCE: two evidence notes in the same dimension directly contradict each other, but the contradictions array is empty. Does the engine detect it autonomously?",
+    "inputCondition": {
+      "id": "OPP-2026-008",
+      "synthetic": true,
+      "name": "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Buyer confirms order volume in writing (synthetic)."
+            },
+            {
+              "tier": "PRIMARY",
+              "note": "Buyer states the volume figure was a typo and is 10x smaller (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "CONDITIONAL",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [],
+      "unknowns": [],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "COMPLETE",
+        "detail": ""
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB — ex-works plus freight to port",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "CIF + installation + customs liability",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-3",
+          "basis": "DDP with penalty clauses",
+          "status": "INCOMPLETE"
+        }
+      ],
+      "quoteBasesComparable": true,
+      "paymentEvents": [
+        {
+          "id": "PE-1",
+          "label": "Deposit (30%)",
+          "amountCny": 25200,
+          "daysFromSign": 0,
+          "status": "COMPLETE"
+        },
+        {
+          "id": "PE-2",
+          "label": "Balance (70%)",
+          "amountCny": 58800,
+          "daysFromSign": 45,
+          "status": "COMPLETE"
+        }
+      ],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "PURSUE_NOW",
+      "availableNow": true,
+      "invariant": "contradictory material evidence must surface — does the engine self-detect?",
+      "adversarial": true
+    },
+    "actualState": {
+      "recommended": "PURSUE_NOW",
+      "availableNow": true,
+      "availableConditionally": true,
+      "exposureComputed": true,
+      "exposureTotalCny": 84000,
+      "exposurePeakCny": 58800,
+      "materialContradictions": 0,
+      "blockingUnknowns": 0,
+      "reasons": [
+        "Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available."
+      ],
+      "exposureReason": null,
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "PASS": true,
+    "mismatchReasons": [],
+    "boundaryVariant": null
+  }
+]

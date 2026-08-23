@@ -1,0 +1,215 @@
+# CDD Scenario Matrix — Evidence-Depth Stress Test
+
+**Repository under test:** `apchen1978/commercial-decision-desk`
+**Baseline commit:** `539f945` (HEAD at experiment start; working tree clean)
+**Harness:** `scenario-test/run-scenarios.mjs` (isolated, reads `fixtures.js` + `decision-engine.js`, never modifies them)
+**Raw output:** `scenario-test/outputs/scenario-results.raw.json` (full mutated fixtures + actual states, verbatim)
+**Run log:** `scenario-test/outputs/run-log.txt`
+**Date:** 2026-08-23 · **Owner approval:** CDD Evidence Depth Experiment (AUTHORIZED — scenario stress test only; no product development; no CDD V2)
+
+> Method per owner amendment: expected behavior declared **before** execution; existing
+> decision contract run deterministically; actual recorded; expected vs actual compared;
+> every mismatch preserved and classified. No engine modification. No claim inflation.
+
+---
+
+## 1. Decision-state coverage (5/5 states exercised)
+
+| State | Scenario(s) | Result |
+|---|---|---|
+| PURSUE_NOW | S01 (clean positive) | PASS |
+| PURSUE_CONDITIONALLY | S02 (MEDIUM buyer fit) | PASS |
+| HOLD_FOR_EVIDENCE | S03 (LOW evidence), S04 (UNKNOWN evidence), S05 (blocking UNKNOWN) | PASS |
+| ESCALATE | S06 (material contradiction; boundary: non-material must not escalate) | PASS |
+| DO_NOT_PURSUE | S07 (weak category fit despite all-positive signals) | PASS |
+
+All 5 decision states reached and behave per the declared contract.
+
+## 2. Adversarial coverage (8 types, 7 exercised + 1 structural)
+
+| Adversarial type | Scenario | Result | Weakness revealed |
+|---|---|---|---|
+| Contradictory evidence | S06 + boundary | PASS | none (escalation path correct; non-material does not escalate) |
+| Incomplete evidence | S03/S04/S05 | PASS | none |
+| Expired evidence | S08 | PASS* | **YES — expiry has no signal** |
+| Incomparable evidence | S09 | PASS | none (Rule 4 disclosure gate holds; no force-ranking) |
+| Malformed input | S10 | PASS* | **YES — no enum validation** |
+| Duplicate input | S11 | PASS* | **YES — no input de-dup; exposure double-counted** |
+| Inconsistent source evidence | S12 | PASS* | **YES — contradiction detection is human-only, undocumented** |
+| Boundary-condition | S06 boundary | PASS | none |
+
+\* PASS = engine behaved exactly as the pre-declared reading of the *current* contract
+predicts. The asterisk marks scenarios that nonetheless **expose a decision-contract
+boundary the contract does not define** — see §4.
+
+---
+
+## 3. Scenario matrix (expected vs actual, per scenario)
+
+### S01 — PURSUE_NOW reachable
+- **Claim:** All gates clear + strong Buyer Fit + strong Evidence Quality ⇒ PURSUE_NOW.
+- **Input:** cleanPositive fixture (no contradictions, complete terms, comparable bases, complete events, no unknowns, buyerFit HIGH, evidenceQuality HIGH).
+- **Expected:** recommended PURSUE_NOW, availableNow true.
+- **Actual:** recommended PURSUE_NOW, availableNow true, exposure 84,000/peak 58,800.
+- **Invariant:** positive pursuit path reachable. **PASS**
+- **UNKNOWN preserved:** n/a. **Limitation discovered:** none. **Follow-up:** none.
+
+### S02 — PURSUE_CONDITIONALLY (not forced)
+- **Claim:** Strong evidence but MEDIUM Buyer Fit ⇒ conditional only.
+- **Input:** cleanPositive, buyerFit MEDIUM.
+- **Expected:** PURSUE_CONDITIONALLY, PURSUE_NOW unavailable.
+- **Actual:** PURSUE_CONDITIONALLY; availableNow false. **PASS**
+- **Invariant:** no forced pursuit without strong fit. **UNKNOWN preserved:** n/a. **Limitation:** none. **Follow-up:** none.
+
+### S03 — HOLD on LOW evidence (missing ≠ negative)
+- **Claim:** LOW Evidence Quality ⇒ HOLD_FOR_EVIDENCE, never DO_NOT_PURSUE.
+- **Input:** cleanPositive, evidenceQuality LOW.
+- **Expected:** HOLD_FOR_EVIDENCE, availableNow false.
+- **Actual:** HOLD_FOR_EVIDENCE, availableNow false; reason surfaces evidence-quality rule. **PASS**
+- **Invariant:** missing/weak evidence is not negative evidence. **UNKNOWN preserved:** n/a. **Limitation:** none. **Follow-up:** none.
+
+### S04 — HOLD on UNKNOWN evidence (UNKNOWN stays)
+- **Claim:** Evidence Quality UNKNOWN ⇒ HOLD; no conversion to fact, no negative treatment.
+- **Input:** cleanPositive, evidenceQuality UNKNOWN.
+- **Expected:** HOLD_FOR_EVIDENCE, availableNow false.
+- **Actual:** HOLD_FOR_EVIDENCE; reason states LOW-or-UNKNOWN rule. **PASS**
+- **Invariant:** UNKNOWN remains UNKNOWN until supported. **UNKNOWN preserved:** yes (value stays UNKNOWN; recommendation holds). **Limitation:** none. **Follow-up:** none.
+
+### S05 — HOLD on blocking UNKNOWN (gate)
+- **Claim:** Blocking UNKNOWN remains despite strong evidence ⇒ HOLD; PURSUE_NOW requires none.
+- **Input:** cleanPositive + `unknowns=[{id:UNK-X, blocksPursue:true}]`.
+- **Expected:** HOLD_FOR_EVIDENCE, availableNow false.
+- **Actual:** HOLD_FOR_EVIDENCE, availableNow false; reason names UNK-X. **PASS**
+- **Invariant:** blocking UNKNOWN gates pursuit. **UNKNOWN preserved:** yes. **Limitation:** none. **Follow-up:** none.
+
+### S06 — ESCALATE on material contradiction (+ boundary)
+- **Claim:** Material UNRESOLVED contradiction ⇒ ESCALATE, PURSUE_NOW unavailable; **boundary:** non-material contradiction must NOT escalate.
+- **Input:** cleanPositive + material UNRESOLVED CTR-M; boundary variant: material:false CTR-NM.
+- **Expected:** ESCALATE / availableNow false; boundary ⇒ PURSUE_NOW / true.
+- **Actual:** ESCALATE; boundary ⇒ PURSUE_NOW (non-material does not escalate). **PASS** (both main and boundary)
+- **Invariant:** contradictory material evidence ⇒ escalation; escalation requires materiality. **UNKNOWN preserved:** n/a. **Limitation:** none. **Follow-up:** none.
+
+### S07 — DO_NOT_PURSUE on weak category fit (attractive signals cannot override)
+- **Claim:** Weak Category Fit ⇒ DO_NOT_PURSUE even with every other signal positive.
+- **Input:** cleanPositive, categoryFit WEAK.
+- **Expected:** DO_NOT_PURSUE, availableNow false.
+- **Actual:** DO_NOT_PURSUE; Rule 1 reason present. **PASS**
+- **Invariant:** weak commercial/category fit is not overridden by attractive signals. **UNKNOWN preserved:** n/a. **Limitation:** none. **Follow-up:** none.
+
+### S08 — EXPIRED evidence (adversarial)
+- **Claim:** Evidence tier records EXPIRED but `value` stays HIGH. Engine consumes only `dimensions.value` — does it detect expiry?
+- **Input:** cleanPositive, evidenceQuality.evidence = two EXPIRED-tier notes, value HIGH.
+- **Expected (pre-declared reading):** PURSUE_NOW — engine has no expiry signal; tier is human-facing annotation.
+- **Actual:** PURSUE_NOW, availableNow true (identical to fresh evidence). **PASS** (behavior matches pre-declared reading)
+- **Invariant:** expired evidence must not be treated as current — **not enforced by engine**.
+- **UNKNOWN preserved:** n/a. **Limitation discovered: YES.** Expiry is invisible to the engine: a 14-month-old verification note is commercially indistinguishable from a current one. The fixture tier vocabulary (PRIMARY/SUPPORTING/VERIFICATION_REQUIRED) has no EXPIRED tier, and the contract never states that tiers do not affect decisions.
+- **Follow-up:** owner decision — either document "tiers are annotation-only; humans screen expiry" or introduce an expiry gate. **See §4.1.**
+
+### S09 — INCOMPARABLE quote bases (adversarial)
+- **Claim:** Non-comparable quote bases must not be force-ranked; Rule 4 is a disclosure gate, not a pursuit gate.
+- **Input:** cleanPositive, quoteBasesComparable false, two COMPLETE quotes on FOB vs DDP bases.
+- **Expected:** PURSUE_NOW still available (rule 4 blocks ranking, not pursuit); reason surfaced.
+- **Actual:** PURSUE_NOW, availableNow true; Rule 4 reason present ("quotes are NOT ranked"). **PASS**
+- **Invariant:** incomparable evidence never force-ranked. **UNKNOWN preserved:** n/a. **Limitation:** none. **Follow-up:** none.
+
+### S10 — MALFORMED enum (adversarial)
+- **Claim:** `buyerFit.value = "HYPERSONIC"` (outside HIGH/STRONG/MEDIUM/LOW/UNKNOWN vocabulary). Engine must not silently treat garbage as a meaningful level or convert it to a fact.
+- **Input:** cleanPositive, buyerFit.value HYPERSONIC.
+- **Expected (pre-declared reading):** PURSUE_CONDITIONALLY — unknown value is treated as "not strong" and falls through to the conditional branch; no error, no UNKNOWN marker.
+- **Actual:** PURSUE_CONDITIONALLY, availableNow false; **no validation, no UNKNOWN flag, no error surfaced.** **PASS** (matches pre-declared reading)
+- **Invariant:** malformed input must not fabricate a level — **partially violated in spirit**: the engine neither fabricates a *strong* level nor rejects the input; it silently downgrades to conditional pursuit without telling the human the input was unparsable.
+- **UNKNOWN preserved:** no — the malformed value is consumed as if it were a valid MEDIUM-ish level; the unparsability itself is never recorded as UNKNOWN.
+- **Limitation discovered: YES.** No input-enum validation. A typo in any dimension value silently changes the recommendation with no diagnostic.
+- **Follow-up:** owner decision — add value-whitelist validation (reject or mark UNKNOWN) or document "values are trusted inputs." **See §4.2.**
+
+### S11 — DUPLICATE payment event (adversarial)
+- **Claim:** Duplicate payment event submitted twice — exposure must not double-count unless the engine de-duplicates inputs.
+- **Input:** cleanPositive + PE-1 ("Deposit 30%", 25,200, day 0) duplicated as PE-1b.
+- **Expected (pre-declared reading):** exposure total 109,200 (double-counted), peak unchanged 58,800 — engine has no de-dup.
+- **Actual:** exposure total **109,200** (should be 84,000); peak 58,800 unchanged (duplicates share the same day). Decision still PURSUE_NOW. **PASS** (matches pre-declared reading)
+- **Invariant:** duplicate inputs must not silently inflate exposure — **not enforced**. 25,200 CNY of commitment is counted twice.
+- **UNKNOWN preserved:** n/a. **Limitation discovered: YES.** No input de-dup; a duplicated event (common when assembling schedules from spreadsheets) inflates total committed exposure. Peak is only safe while duplicates share a day.
+- **Follow-up:** owner decision — de-dup by (label, amountCny, daysFromSign) at input boundary, or document "caller must de-dup." **See §4.3.**
+
+### S12 — INCONSISTENT SOURCE EVIDENCE (adversarial)
+- **Claim:** Two evidence notes in the same dimension directly contradict each other, but the `contradictions` array is empty. Does the engine detect it autonomously?
+- **Input:** cleanPositive + evidenceQuality.evidence = two PRIMARY notes: "volume confirmed in writing" vs "volume was a typo, 10× smaller". No entry in `contradictions`.
+- **Expected (pre-declared reading):** PURSUE_NOW — engine only sees `value`; contradiction detection is the human's job (pre-filled `contradictions` array).
+- **Actual:** PURSUE_NOW, availableNow true; no contradiction surfaced. **PASS** (matches pre-declared reading)
+- **Invariant:** contradictory material evidence ⇒ escalation — **enforced only when the human pre-registers the contradiction.** A screening miss silently yields PURSUE_NOW on directly conflicting primary evidence.
+- **UNKNOWN preserved:** no — the conflict exists in the evidence notes but is never surfaced as UNKNOWN or contradiction.
+- **Limitation discovered: YES.** The division of responsibility (human screens contradictions; engine reflects registered ones) is **undocumented**: the contract reads as if contradictions are auto-detected, but they are not.
+- **Follow-up:** owner decision — document the boundary explicitly ("engine reflects human-registered contradictions only"), or add a note-level conflict heuristic (feature expansion — not recommended without owner). **See §4.4.**
+
+---
+
+## 4. Classified decision-contract weaknesses (EVIDENCE_FOUND)
+
+Four adversarial scenarios behaved exactly as the current contract predicts, and each
+exposed a boundary the contract does not define. Classification per owner taxonomy:
+
+### 4.1 S08 — expired evidence (class: **missing boundary / undocumented UNKNOWN**)
+- **What happened:** EXPIRED-tier evidence with value HIGH produced an unqualified PURSUE_NOW, identical to fresh evidence.
+- **Commercial significance:** In trade, a 14-month-old verification call is materially different from a current one. If a stale note sits in a HIGH-valued dimension, the deck recommends immediate pursuit with no flag — a real risk of chasing dead opportunities or pricing against outdated facts.
+- **Smallest correction (proposal only, NOT applied):** either (a) document in README/contract that evidence `tier` is annotation-only and expiry screening is a human duty; or (b) if owner wants an engine gate, define an EXPIRED tier that caps the effective evidenceQuality at UNKNOWN. (b) changes decision semantics — requires owner/Codex review.
+
+### 4.2 S10 — malformed enum (class: **missing boundary — no input validation**)
+- **What happened:** `buyerFit.value="HYPERSONIC"` silently produced PURSUE_CONDITIONALLY with no diagnostic and no UNKNOWN marker.
+- **Commercial significance:** A data-entry typo anywhere in a dimension silently changes the recommendation. The human never learns the input was unparsable — the engine converts garbage into a plausible-looking conditional pursuit.
+- **Smallest correction (proposal only, NOT applied):** whitelist dimension values at the contract boundary; on violation, mark the dimension UNKNOWN (→ HOLD) and surface a validation reason. This changes semantics for malformed inputs only; valid inputs are unaffected.
+
+### 4.3 S11 — duplicate payment event (class: **missing boundary — no input de-dup**)
+- **What happened:** Duplicated event inflated total committed exposure to 109,200 (true 84,000) with no warning.
+- **Commercial significance:** Payment schedules assembled from spreadsheets routinely contain duplicate rows. Double-counting committed exposure undermines the one number the deck computes deterministically — the concentration/exposure figure that feeds the decision brief.
+- **Smallest correction (proposal only, NOT applied):** de-dup at the input boundary by (label, amountCny, daysFromSign), or reject duplicates loudly. No change to decision semantics for clean inputs.
+
+### 4.4 S12 — inconsistent source evidence (class: **ambiguous decision rule / undocumented boundary**)
+- **What happened:** Two directly contradictory PRIMARY notes yielded PURSUE_NOW because `contradictions` was empty.
+- **Commercial significance:** The deck's central guard — "contradictory material evidence ⇒ escalation" — is only as strong as the human's screening pass. A missed contradiction (the most dangerous kind, since it is the one the human did not see) sails through to PURSUE_NOW.
+- **Smallest correction (proposal only, NOT applied):** document the responsibility boundary explicitly ("engine reflects human-registered contradictions only; screening is a human duty"). No engine change required for correctness of the *documented* contract; auto-detection would be feature expansion (CDD V2 territory — not authorized).
+
+---
+
+## 5. UNKNOWN ledger
+
+| Scenario | UNKNOWN created | UNKNOWN preserved | UNKNOWN resolved | Note |
+|---|---|---|---|---|
+| S03 | – | n/a | – | LOW evidence held |
+| S04 | – | yes (evidenceQuality) | – | held as UNKNOWN |
+| S05 | – | yes (UNK-X) | – | blocking gate held |
+| S10 | **should have been** (unparsable value) | **no** | – | malformed value consumed as if valid — §4.2 |
+| S12 | **should have been** (conflict) | **no** | – | conflict never surfaced — §4.4 |
+| All others | – | – | – | no UNKNOWN conversion observed |
+
+Net: 2 UNKNOWNs that should have been created (S10, S12) were not — both are consequences of the same class of boundary gap (unvalidated / unscreened inputs).
+
+## 6. Invariant summary (core invariants)
+
+| Invariant | Status |
+|---|---|
+| Missing evidence ≠ negative evidence | **Held** (S03) |
+| Contradictory material evidence → escalation | **Held when registered** (S06); gap when not (S12) |
+| Incomparable evidence not force-ranked | **Held** (S09) |
+| Weak fit not overridden by attractive signals | **Held** (S07) |
+| Conditional pursuit exposes unresolved condition | **Held** (S02 — condition is the MEDIUM fit itself, surfaced in recommendation) |
+| UNKNOWN remains UNKNOWN | **Held** (S04/S05); gap for unparsable inputs (S10) |
+| Human approval mandatory | **Held** (all — brief boundary note present in every scenario) |
+| CDD never approves supplier/pricing/margin/communication/commitment | **Held** (structural — engine output contains no approval fields; verified in invariantChecks for every scenario) |
+
+## 7. Evidence maturity
+
+- **Before:** LEVEL 1 VERIFIED (23/23 verify.mjs hard-rule checks, deterministic).
+- **After:** **LEVEL 2 SCENARIO TESTED** (12 scenarios + 1 boundary variant, 5/5 states, 8 adversarial types, deterministic across independent runs).
+- **Not claimed:** DOMAIN REVIEWED / WORKFLOW OBSERVED / REAL-WORLD EVIDENCE / OUTCOME EVIDENCE. Synthetic scenario coverage proves decision-contract behavior only — not adoption, real-deal accuracy, ROI, time saved, better decisions, or market demand.
+
+## 8. Verdict
+
+**B — EVIDENCE_FOUND_FIX_RECOMMENDED.**
+
+12/12 scenarios + boundary PASS against the pre-declared reading of the current contract,
+and the experiment's value is precisely that four adversarial scenarios exposed
+boundaries the contract does not define (expired evidence, malformed enums, duplicate
+payment events, unscreened contradictions). None are engine-logic defects in the sense
+of violating a *stated* rule; all are **missing/undocumented boundaries**. No engine
+modification was made. Proposed corrections are listed in §4 for owner/Codex review —
+**STOP at the pre-fix owner review gate.**

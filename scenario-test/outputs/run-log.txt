@@ -1,0 +1,16 @@
+[PASS] S01 All gates clear + strong Buyer Fit + strong Evidence Quality => PURSUE_NOW available and recommended.
+[PASS] S02 Strong evidence but MEDIUM (not strong) Buyer Fit => only conditional pursuit; PURSUE_NOW unavailable.
+[PASS] S03 LOW Evidence Quality (with everything else positive) => HOLD_FOR_EVIDENCE, NOT DO_NOT_PURSUE. Missing/weak evidence != negative evidence.
+[PASS] S04 Evidence Quality UNKNOWN => HOLD_FOR_EVIDENCE and UNKNOWN stays UNKNOWN (not converted to fact, not treated as negative).
+[PASS] S05 Blocking UNKNOWN remains despite strong evidence => HOLD_FOR_EVIDENCE; PURSUE_NOW requires no blocking UNKNOWN.
+[PASS] S06 Material UNRESOLVED contradiction => ESCALATE; PURSUE_NOW unavailable. (Boundary variant: NON-material contradiction must NOT escalate.)
+        boundary[non-material contradiction must not escalate]: PASS
+[PASS] S07 Weak Category Fit => DO_NOT_PURSUE even when every other signal (buyer fit, evidence, exposure, terms) is positive. Attractive signals must not override weak fit.
+[PASS] S08 EXPIRED evidence: evidence tier records EXPIRED but value remains HIGH. Engine consumes only dimensions.value — does it detect expiry? (Adversarial: expired evidence must not be treated as current.)
+[PASS] S09 Non-comparable quote bases must NOT be force-ranked; the decision may still be positive (Rule 4 is a disclosure gate, not a pursuit gate).
+[PASS] S10 MALFORMED enum: buyerFit.value='HYPERSONIC' (not in HIGH/STRONG/MEDIUM/LOW/UNKNOWN vocabulary). Engine must not silently treat garbage as a meaningful level, and must not convert it to a fact.
+[PASS] S11 DUPLICATE payment event (same label/amount submitted twice) — exposure must not double-count unless the engine de-duplicates inputs.
+[PASS] S12 INCONSISTENT SOURCE EVIDENCE: two evidence notes in the same dimension directly contradict each other, but the contradictions array is empty. Does the engine detect it autonomously?
+
+DETERMINISM: identical across independent runs
+SCENARIOS: 12 | PASS 12 | FAIL 0

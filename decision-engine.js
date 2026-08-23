@@ -125,10 +125,12 @@ export function evaluateDecision(opp) {
   const marginBelowThreshold = marginBps !== null && marginThreshold !== null && marginBps < marginThreshold;
   const costShiftToSupplier = String(m.costPayer || "").toUpperCase() === "SUPPLIER";
   const marginPresent = Object.keys(m).length > 0;
-  // ABSENT when no margin input, or when bps exists but NO declared threshold
-  // (engine invents no threshold — S08 lesson). CLEAR only when a threshold is
-  // declared AND the margin meets it.
-  const marginGate = !marginPresent ? "ABSENT" : marginBelowThreshold ? "BELOW_THRESHOLD" : costShiftToSupplier ? "COST_SHIFT" : marginThreshold !== null ? "CLEAR" : "ABSENT";
+  // ABSENT when: no margin input; OR either bps or thresholdBps is missing
+  // (engine invents nothing and cannot judge 'met' without both — S08 lesson;
+  // review P2: threshold-only input must NOT claim CLEAR).
+  // CLEAR only when BOTH bps and threshold are present AND margin meets it.
+  const bothProvided = marginBps !== null && marginThreshold !== null;
+  const marginGate = !marginPresent ? "ABSENT" : marginBelowThreshold ? "BELOW_THRESHOLD" : costShiftToSupplier ? "COST_SHIFT" : bothProvided ? "CLEAR" : "ABSENT";
 
   // S10 fix: fail closed on invalid enum values. A value outside the accepted
   // vocabulary (HIGH/STRONG/MEDIUM/LOW/WEAK/UNKNOWN/NONE/IRRELEVANT, or empty)

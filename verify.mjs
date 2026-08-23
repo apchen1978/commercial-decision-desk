@@ -239,6 +239,9 @@ function cleanScenario() {
   // no declared threshold -> gate ABSENT, engine does not invent one (S08 lesson)
   const noThr = evaluateDecision(marg((c) => { c.margin = { bps: 300 }; }));
   check("MARGIN no declared threshold -> no gate (engine invents nothing)", noThr.marginGate === "ABSENT" && noThr.recommended === "PURSUE_NOW", noThr.recommended + " gate=" + noThr.marginGate);
+  // threshold-only input (no bps) -> ABSENT, must NOT claim CLEAR (P2 review edge case)
+  const thrOnly = evaluateDecision(marg((c) => { c.margin = { thresholdBps: 800 }; }));
+  check("MARGIN threshold-only (no bps) -> ABSENT, not CLEAR", thrOnly.marginGate === "ABSENT" && thrOnly.recommended === "PURSUE_NOW", thrOnly.recommended + " gate=" + thrOnly.marginGate);
   // cost shift to supplier alone -> risk signal, NOT a veto
   const shift = evaluateDecision(marg((c) => { c.margin = { bps: 900, thresholdBps: 800, costPayer: "SUPPLIER", costType: "CERTIFICATION" }; }));
   check("MARGIN cost-shift alone is signal, not veto", shift.recommended === "PURSUE_NOW" && shift.marginGate === "COST_SHIFT" && shift.reasons.some((r) => r.includes("MARGIN GATE")), shift.recommended + " gate=" + shift.marginGate);

@@ -176,9 +176,13 @@ Gate semantics (verified by verify.mjs + S19):
   previously only `ESCALATE` on the authority contradiction; S19 proves it now
   vetoes with structured margin input).
 - **Cost-shift to supplier alone → risk signal, not a veto** (the declared
-  threshold comparison decides).
-- **Absent `margin` field, or no declared threshold → gate transparent** — clean
-  behavior unchanged.
+  threshold comparison decides). When `bps < thresholdBps` AND cost is shifted to
+  the supplier, the classification is `BELOW_THRESHOLD` (priority) — the cost-shift
+  fact is still present in the input and can be surfaced through `reasons`.
+- **Absent `margin` field → gate transparent**; and **if either `bps` or
+  `thresholdBps` is missing, the gate reports `ABSENT`** — without both, the engine
+  cannot judge "met" and must not claim `CLEAR` (it invents neither a threshold nor
+  a margin figure). Clean behavior unchanged.
 
 The `marginGate` result field reports `BELOW_THRESHOLD` / `COST_SHIFT` / `CLEAR` /
 `ABSENT`. Margin gate semantics are **provisional** (interview 001 deferred) —

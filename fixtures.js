@@ -8,6 +8,7 @@ export const SYNTHETIC_LABEL =
 
 export const opportunity = {
   id: "OPP-2026-008",
+  synthetic: true,
   name: "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
   summary:
     "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
@@ -59,10 +60,10 @@ export const opportunity = {
     },
   ],
   unknowns: [
-    { id: "UNK-1", label: "Actual order volume", detail: "Indicative volumes are unverified (VERIFICATION_REQUIRED tier). Volume remains UNKNOWN until confirmed." },
-    { id: "UNK-2", label: "Final payment terms", detail: "Contradictory sources (CTR-1); the binding terms are UNKNOWN until confirmed in writing." },
-    { id: "UNK-3", label: "Installation liability", detail: "Whether installation + customs liability is negotiable is UNKNOWN." },
-    { id: "UNK-4", label: "Buyer payment history", detail: "No public payment-history data exists for this buyer. Payment behavior is UNKNOWN — no credit score is invented." },
+    { id: "UNK-1", label: "Actual order volume", detail: "Indicative volumes are unverified (VERIFICATION_REQUIRED tier). Volume remains UNKNOWN until confirmed.", blocksPursue: true },
+    { id: "UNK-2", label: "Final payment terms", detail: "Contradictory sources (CTR-1); the binding terms are UNKNOWN until confirmed in writing.", blocksPursue: true },
+    { id: "UNK-3", label: "Installation liability", detail: "Whether installation + customs liability is negotiable is UNKNOWN.", blocksPursue: false },
+    { id: "UNK-4", label: "Buyer payment history", detail: "No public payment-history data exists for this buyer. Payment behavior is UNKNOWN — no credit score is invented.", blocksPursue: false },
   ],
   whyNot: [
     "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",

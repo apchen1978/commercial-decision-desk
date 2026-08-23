@@ -98,6 +98,75 @@ check("R4 quote bases not comparable", opportunity.quoteBasesComparable === fals
   check("engine has no network/persistence calls", !/fetch\(|localStorage|XMLHttpRequest|WebSocket/.test(engineSrc));
 }
 
+// ---------------------------------------------------------------------------
+// Audit-fix regression tests (positive evidence consulted, PURSUE_NOW path,
+// blocking UNKNOWN, synthetic data flag, no weighted score).
+// ---------------------------------------------------------------------------
+function cleanScenario() {
+  const c = JSON.parse(JSON.stringify(opportunity));
+  c.contradictions = [];
+  c.commercialTerms = { status: "COMPLETE", detail: "" };
+  c.quoteBasesComparable = true;
+  c.paymentEvents = c.paymentEvents.map((e) => ({ ...e, status: "COMPLETE", amountCny: e.amountCny || 10000, daysFromSign: e.daysFromSign ?? 10 }));
+  c.unknowns = [];
+  c.dimensions.buyerFit.value = "HIGH";
+  c.dimensions.evidenceQuality.value = "HIGH";
+  return c;
+}
+
+{
+  const clean = cleanScenario();
+  const e = evaluateDecision(clean);
+  check("audit all-positive clean recommends PURSUE_NOW", e.recommended === "PURSUE_NOW" && e.available.PURSUE_NOW === true, e.recommended);
+}
+{
+  const c = cleanScenario();
+  c.dimensions.buyerFit.value = "LOW";
+  const e = evaluateDecision(c);
+  check("audit Buyer Fit LOW changes recommendation", e.recommended === "PURSUE_CONDITIONALLY" && e.available.PURSUE_NOW === false, e.recommended);
+}
+{
+  const c = cleanScenario();
+  c.dimensions.evidenceQuality.value = "LOW";
+  const e = evaluateDecision(c);
+  check("audit Evidence Quality LOW changes recommendation", e.recommended === "HOLD_FOR_EVIDENCE" && e.available.PURSUE_NOW === false, e.recommended);
+}
+{
+  const c = cleanScenario();
+  c.dimensions.evidenceQuality.value = "UNKNOWN";
+  const e = evaluateDecision(c);
+  check("audit Evidence Quality UNKNOWN stays UNKNOWN and holds", e.recommended === "HOLD_FOR_EVIDENCE" && e.available.PURSUE_NOW === false, e.recommended);
+}
+{
+  const c = cleanScenario();
+  c.contradictions = [{ id: "CTR-X", label: "test", detail: "x", material: true, status: "UNRESOLVED" }];
+  const e = evaluateDecision(c);
+  check("audit material contradiction blocks PURSUE_NOW in clean scenario", e.recommended === "ESCALATE" && e.available.PURSUE_NOW === false, e.recommended);
+}
+{
+  const c = cleanScenario();
+  c.unknowns = [{ id: "UNK-X", label: "blocking", detail: "x", blocksPursue: true }];
+  const e = evaluateDecision(c);
+  check("audit blocking UNKNOWN prevents PURSUE_NOW", e.recommended === "HOLD_FOR_EVIDENCE" && e.available.PURSUE_NOW === false, e.recommended);
+}
+{
+  const e = paymentExposure(opportunity.paymentEvents);
+  check("audit payment semantics unchanged", e.computed && e.totalCommittedCny === 84000 && e.peakWindowCny === 58800);
+}
+{
+  const engineSrc = readFileSync(new URL("./decision-engine.js", import.meta.url), "utf8");
+  check("audit no weighted score introduced", !/\bweight\b/.test(engineSrc) && !/\*\s*0\.\d/.test(engineSrc));
+  check("audit synthetic detection uses data flag (no fixture id in engine)", !engineSrc.includes("OPP-2026-008"));
+  const briefT = buildBrief({ ...opportunity, synthetic: true }, "PURSUE_NOW", evaluateDecision(cleanScenario()));
+  const briefF = buildBrief({ ...opportunity, synthetic: false }, "PURSUE_NOW", evaluateDecision(cleanScenario()));
+  check("audit synthetic flag drives brief marker", briefT.synthetic === true && briefF.synthetic === false);
+}
+{
+  const c = cleanScenario();
+  const brief = buildBrief(c, "PURSUE_NOW", evaluateDecision(c));
+  check("audit human approval still mandatory", brief.boundaryNote.includes("Human approval is always required") && brief.humanDecision === "PURSUE_NOW");
+}
+
 const failed = results.filter(([, ok]) => !ok);
 console.log(`\nRESULT: ${results.length - failed.length}/${results.length} PASS`);
 process.exitCode = failed.length ? 1 : 0;

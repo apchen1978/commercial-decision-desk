@@ -61,6 +61,14 @@ volume evidence, or decline on the liability scope.
    shortfall, or credit capacity (disclosure shown in the UI).
 8. The final commercial decision always belongs to the human.
 
+The desk **consults positive evidence** (Buyer Fit, Evidence Quality) when
+forming its recommendation — no weighting/scoring is used. `PURSUE_NOW` is
+recommended only when every gate is clear (acceptable Category Fit, no
+material contradiction, complete commercial terms, complete payment events,
+no blocking UNKNOWN) **and** Buyer Fit and Evidence Quality are strong.
+LOW/UNKNOWN Evidence Quality prefers `HOLD_FOR_EVIDENCE`. Human approval is
+still required in every case.
+
 ## Deterministic calculations
 
 - Payment exposure: sum of complete committed events; peak rolling N-day

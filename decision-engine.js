@@ -51,13 +51,23 @@ export function paymentExposure(events, opts = {}) {
 
 // ---------------------------------------------------------------------------
 // Decision rules — deterministic guards; no opaque overall score is produced.
+// The recommendation consults POSITIVE evidence dimensions (Buyer Fit,
+// Evidence Quality) plus conservative gates. No weights anywhere.
 // ---------------------------------------------------------------------------
 export function evaluateDecision(opp) {
   const d = opp.dimensions;
   const categoryFit = String(d.categoryFit.value || "").toUpperCase();
+  const buyerFit = String(d.buyerFit.value || "").toUpperCase();
+  const evidenceQuality = String(d.evidenceQuality.value || "").toUpperCase();
   const materialContradictions = (opp.contradictions || []).filter((c) => c.material && c.status === "UNRESOLVED");
   const quoteBasesComparable = Boolean(opp.quoteBasesComparable);
   const termsIncomplete = (opp.commercialTerms && opp.commercialTerms.status === "INCOMPLETE") || false;
+  const blockingUnknowns = (opp.unknowns || []).filter((u) => u.blocksPursue === true);
+
+  const strongBuyerFit = ["HIGH", "STRONG"].includes(buyerFit);
+  const strongEvidence = ["HIGH", "STRONG"].includes(evidenceQuality);
+  const weakEvidence = ["LOW", "WEAK"].includes(evidenceQuality);
+  const evidenceMissing = !evidenceQuality || evidenceQuality === "UNKNOWN";
 
   const reasons = [];
 
@@ -90,30 +100,59 @@ export function evaluateDecision(opp) {
     reasons.push("Rule 5: Payment exposure is UNKNOWN — no complete payment-event inputs.");
   }
 
+  // Positive evidence — evidence-first: strong evidence may support pursuit,
+  // LOW/UNKNOWN evidence quality prefers HOLD_FOR_EVIDENCE. No weighting.
+  if (weakEvidence || evidenceMissing) {
+    reasons.push("Rule: Evidence Quality is LOW or UNKNOWN — strong pursuit is not recommended; HOLD_FOR_EVIDENCE is preferred.");
+  } else if (!strongEvidence) {
+    reasons.push("Rule: Evidence Quality is not strong — only a conditional pursue is considered.");
+  }
+  if (blockingUnknowns.length > 0) {
+    reasons.push(`Rule: Blocking UNKNOWN remains (${blockingUnknowns.map((u) => u.id).join(", ")}) — PURSUE_NOW requires no blocking UNKNOWN.`);
+  }
+  if (strongBuyerFit && strongEvidence && materialContradictions.length === 0 && !termsIncomplete && exposure.computed && blockingUnknowns.length === 0 && !categoryWeak) {
+    reasons.push("Positive evidence supports pursuit: Buyer Fit strong + Evidence Quality strong and all gates are clear — PURSUE_NOW is available.");
+  }
+
   // Deterministic recommendation (pure decision-support state).
   let recommended = "HOLD_FOR_EVIDENCE";
   if (categoryWeak) {
-    recommended = "DO_NOT_PURSUE";
+    recommended = "DO_NOT_PURSUE"; // rule 1
   } else if (materialContradictions.length > 0) {
     recommended = "ESCALATE"; // rule 2
+  } else if (weakEvidence || evidenceMissing) {
+    recommended = "HOLD_FOR_EVIDENCE"; // weak/unknown evidence → HOLD
   } else if (termsIncomplete) {
     recommended = "HOLD_FOR_EVIDENCE"; // rule 3
   } else if (!exposure.computed) {
     recommended = "HOLD_FOR_EVIDENCE"; // rule 5
+  } else if (blockingUnknowns.length > 0) {
+    recommended = "HOLD_FOR_EVIDENCE"; // blocking UNKNOWN remains
+  } else if (strongBuyerFit && strongEvidence) {
+    recommended = "PURSUE_NOW"; // all gates clear + strong positive evidence
   } else {
     recommended = "PURSUE_CONDITIONALLY";
   }
 
   // State availability under the hard rules (what the human may select).
   const available = {
-    PURSUE_NOW: !categoryWeak && materialContradictions.length === 0 && !termsIncomplete && exposure.computed,
-    PURSUE_CONDITIONALLY: !categoryWeak,
+    PURSUE_NOW:
+      !categoryWeak &&
+      materialContradictions.length === 0 &&
+      !termsIncomplete &&
+      exposure.computed &&
+      blockingUnknowns.length === 0 &&
+      strongBuyerFit &&
+      strongEvidence &&
+      !weakEvidence &&
+      !evidenceMissing,
+    PURSUE_CONDITIONALLY: !categoryWeak && !weakEvidence && !evidenceMissing,
     HOLD_FOR_EVIDENCE: true,
-    ESCALATE: materialContradictions.length > 0 || true,
+    ESCALATE: true,
     DO_NOT_PURSUE: true,
   };
 
-  return { recommended, available, reasons, categoryWeak, materialContradictions, termsIncomplete, quoteBasesComparable, exposure };
+  return { recommended, available, reasons, categoryWeak, materialContradictions, termsIncomplete, quoteBasesComparable, exposure, blockingUnknowns, strongBuyerFit, strongEvidence };
 }
 
 // ---------------------------------------------------------------------------
@@ -132,6 +171,6 @@ export function buildBrief(opp, humanDecision, engine) {
     unknowns: opp.unknowns.map((u) => ({ id: u.id, label: u.label })),
     contradictions: opp.contradictions.map((c) => ({ id: c.id, label: c.label, material: c.material, status: c.status })),
     boundaryNote: "This brief supports a human decision. It does not approve, reject, quote, or commit. Human approval is always required before any external action.",
-    synthetic: opp.id === "OPP-2026-008", // fixture provenance marker
+    synthetic: opp.synthetic === true, // explicit data flag, never inferred from id
   };
 }

@@ -17,6 +17,9 @@
 4. **絕不**因受訪者指名某變數就加該變數（毛利/匯率/庫存/信用…）。
 5. 單一受訪者意見 ≠ domain consensus；樣本數由 owner 決定。
 6. 宣稱 LEVEL 3 DOMAIN REVIEWED 的權力在 owner，不在訪談本身。
+7. 訪談記錄歸檔於 `docs/interviews/`（編號大綱 + RECORD_* 實錄）；已執行：
+   `RECORD_DEF_2026-08-23.md`（D/E/F 三角色，首批 Level 3 資料點）；待排程：
+   `001_MARGIN_AND_COST_GATE.md`、`002_SANCTIONS_KYC_GATE.md`、`003_URGENT_ORDER_DUAL_SIGNAL.md`。
 
 ---
 

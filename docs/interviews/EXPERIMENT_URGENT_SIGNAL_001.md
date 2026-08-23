@@ -2,6 +2,10 @@
 
 > **MODE**: DESIGN-ONLY synthetic boundary experiment. **STATUS**: evidence produced;
 > **no production change — STOP at pre-fix owner review gate.**
+> **POST-DECISION NOTE (2026-08-23):** the owner accepted the experiment and adopted
+> **proposal 2** (caller discipline, zero engine change — README rule, commit
+> `d675708`). A structured `urgency` field was NOT implemented (convenience, not a
+> capability gap). This record preserves the experiment as the evidence basis.
 > **Repo**: apchen1978/commercial-decision-desk @ `52042cb` (experiment start).
 > **Harness**: `scenario-test/urgent-signal-experiment.mjs` (in-memory; **production
 > decision-engine.js NOT modified** — the urgency-direction layer is an additive variant).

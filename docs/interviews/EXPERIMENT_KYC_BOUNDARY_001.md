@@ -2,6 +2,10 @@
 
 > **MODE**: REAL synthetic boundary experiment (owner authorization: "give you 授權! GO").
 > **STATUS**: Evidence produced; **fix NOT applied — STOP at pre-fix owner review gate.**
+> **POST-DECISION NOTE (2026-08-23):** the owner subsequently authorized the KYC
+> gate implementation (`e1a8924`) — this record preserves the experiment as the
+> pre-implementation evidence; the harness was re-pointed to validate the
+> production gate (10/10 PASS, see commit `e1a8924`).
 > **Repo**: apchen1978/commercial-decision-desk @ `05e7e64` (experiment start) → post-commit.
 > **Harness**: `scenario-test/kyc-boundary-experiment.mjs` (in-memory; **production
 > decision-engine.js NOT modified** — the gate is modeled as an additive variant).

@@ -1,0 +1,236 @@
+[
+  {
+    "id": "U-S1",
+    "label": "urgent + switch reason VERIFIED (benign)",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW",
+      "urgencyDirection": "JUSTIFIED",
+      "briefHumanBoundary": true
+    },
+    "urgency": {
+      "isUrgent": true,
+      "switchReason": "VERIFIED",
+      "justification": "JUSTIFIED",
+      "referral": false
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "U-S2",
+    "label": "urgent + switch reason UNKNOWN (F's red flag — the core case)",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "HOLD_FOR_EVIDENCE"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "HOLD_FOR_EVIDENCE",
+      "urgencyDirection": "SWITCH_REASON_UNKNOWN",
+      "briefHumanBoundary": true
+    },
+    "urgency": {
+      "isUrgent": true,
+      "switchReason": "UNKNOWN",
+      "justification": "ABSENT",
+      "referral": false
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "U-S3",
+    "label": "urgent + repeated prior-vendor failure (risk signal, not veto)",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW",
+      "urgencyDirection": "PRIOR_FAILURE_RISK",
+      "briefHumanBoundary": true
+    },
+    "urgency": {
+      "isUrgent": true,
+      "switchReason": "REPEATED_FAILURE",
+      "justification": "ABSENT",
+      "referral": false,
+      "priorVendorHistory": "REPEATED_FAILURE"
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "U-S4",
+    "label": "urgent + trusted referral + switch reason UNKNOWN (referral does NOT override)",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "HOLD_FOR_EVIDENCE"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "HOLD_FOR_EVIDENCE",
+      "urgencyDirection": "SWITCH_REASON_UNKNOWN",
+      "briefHumanBoundary": true
+    },
+    "urgency": {
+      "isUrgent": true,
+      "switchReason": "UNKNOWN",
+      "justification": "ABSENT",
+      "referral": true
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "U-S5",
+    "label": "urgent + weak payment history (already HOLD via blocking unknown)",
+    "expected": {
+      "base": "HOLD_FOR_EVIDENCE",
+      "gated": "HOLD_FOR_EVIDENCE"
+    },
+    "actual": {
+      "base": "HOLD_FOR_EVIDENCE",
+      "gated": "HOLD_FOR_EVIDENCE",
+      "urgencyDirection": "JUSTIFIED",
+      "briefHumanBoundary": true
+    },
+    "urgency": {
+      "isUrgent": true,
+      "switchReason": "VERIFIED",
+      "justification": "JUSTIFIED",
+      "referral": false
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "U-S6",
+    "label": "urgent + operationally justified (CE deadline; benign)",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW",
+      "urgencyDirection": "JUSTIFIED",
+      "briefHumanBoundary": true
+    },
+    "urgency": {
+      "isUrgent": true,
+      "switchReason": "VERIFIED",
+      "justification": "JUSTIFIED",
+      "referral": false
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "U-S7",
+    "label": "urgent + switch UNKNOWN + margin BELOW threshold (margin veto priority)",
+    "expected": {
+      "base": "DO_NOT_PURSUE",
+      "gated": "DO_NOT_PURSUE"
+    },
+    "actual": {
+      "base": "DO_NOT_PURSUE",
+      "gated": "DO_NOT_PURSUE",
+      "urgencyDirection": "MARGIN_VETO_PRIORITY",
+      "briefHumanBoundary": true
+    },
+    "urgency": {
+      "isUrgent": true,
+      "switchReason": "UNKNOWN",
+      "justification": "ABSENT",
+      "referral": false
+    },
+    "margin": {
+      "bps": 300,
+      "thresholdBps": 800
+    },
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "U-S8",
+    "label": "urgent + switch UNKNOWN + weak evidence (HOLD either way)",
+    "expected": {
+      "base": "HOLD_FOR_EVIDENCE",
+      "gated": "HOLD_FOR_EVIDENCE"
+    },
+    "actual": {
+      "base": "HOLD_FOR_EVIDENCE",
+      "gated": "HOLD_FOR_EVIDENCE",
+      "urgencyDirection": "SWITCH_REASON_UNKNOWN",
+      "briefHumanBoundary": true
+    },
+    "urgency": {
+      "isUrgent": true,
+      "switchReason": "UNKNOWN",
+      "justification": "ABSENT",
+      "referral": false
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "U-S9",
+    "label": "non-urgent + switch reason UNKNOWN (no urgency signal — pass-through)",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW",
+      "urgencyDirection": "NON_URGENT",
+      "briefHumanBoundary": true
+    },
+    "urgency": {
+      "isUrgent": false,
+      "switchReason": "UNKNOWN",
+      "justification": "ABSENT",
+      "referral": false
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "U-S10",
+    "label": "urgent + switch VERIFIED + trusted referral (fully benign)",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW",
+      "urgencyDirection": "JUSTIFIED",
+      "briefHumanBoundary": true
+    },
+    "urgency": {
+      "isUrgent": true,
+      "switchReason": "VERIFIED",
+      "justification": "JUSTIFIED",
+      "referral": true
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  }
+]

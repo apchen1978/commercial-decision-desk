@@ -1,0 +1,283 @@
+[
+  {
+    "id": "CP-1",
+    "label": "channel-price clear + clean deal (pass-through)",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW",
+      "channelPriceGate": "CLEAR",
+      "kycGate": "ABSENT",
+      "marginGate": "ABSENT",
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "CLEAR",
+      "dumpingRisk": false,
+      "policy": "PRICE_FLOOR"
+    },
+    "kyc": null,
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "CP-2",
+    "label": "dumping risk + clean deal (channel-price veto fires)",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "DO_NOT_PURSUE"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "DO_NOT_PURSUE",
+      "channelPriceGate": "DUMPING_RISK_VETO",
+      "vetoSource": "CHANNEL_PRICE",
+      "kycGate": "ABSENT",
+      "marginGate": "ABSENT",
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR"
+    },
+    "kyc": null,
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "CP-3",
+    "label": "dumping risk + sanctions hit (sanctions outranks — both DNP, source distinguishable)",
+    "expected": {
+      "base": "DO_NOT_PURSUE",
+      "gated": "DO_NOT_PURSUE"
+    },
+    "actual": {
+      "base": "DO_NOT_PURSUE",
+      "gated": "DO_NOT_PURSUE",
+      "channelPriceGate": "DUMPING_RISK_PRESENT_LOWER_PRIORITY",
+      "vetoSource": "SANCTIONS",
+      "kycGate": "SANCTIONS_VETO",
+      "marginGate": "ABSENT",
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR"
+    },
+    "kyc": {
+      "status": "ADVERSE",
+      "sanctionsHit": true,
+      "adverseFinding": true,
+      "beneficialOwnerVerified": true
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "CP-4",
+    "label": "dumping risk + margin below threshold (margin outranks — both DNP)",
+    "expected": {
+      "base": "DO_NOT_PURSUE",
+      "gated": "DO_NOT_PURSUE"
+    },
+    "actual": {
+      "base": "DO_NOT_PURSUE",
+      "gated": "DO_NOT_PURSUE",
+      "channelPriceGate": "DUMPING_RISK_PRESENT_LOWER_PRIORITY",
+      "vetoSource": "MARGIN",
+      "kycGate": "ABSENT",
+      "marginGate": "BELOW_THRESHOLD",
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR"
+    },
+    "kyc": null,
+    "margin": {
+      "bps": 300,
+      "thresholdBps": 800
+    },
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "CP-5",
+    "label": "dumping risk + KYC-incomplete (channel-price OUTRANKS KYC: DNP, base would HOLD)",
+    "expected": {
+      "base": "HOLD_FOR_EVIDENCE",
+      "gated": "DO_NOT_PURSUE"
+    },
+    "actual": {
+      "base": "HOLD_FOR_EVIDENCE",
+      "gated": "DO_NOT_PURSUE",
+      "channelPriceGate": "DUMPING_RISK_VETO",
+      "vetoSource": "CHANNEL_PRICE",
+      "kycGate": "KYC_INCOMPLETE",
+      "marginGate": "ABSENT",
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR"
+    },
+    "kyc": {
+      "status": "INCOMPLETE",
+      "beneficialOwnerVerified": false,
+      "sanctionsHit": false
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "CP-6",
+    "label": "channel-price clear + KYC-incomplete (KYC acts normally: HOLD)",
+    "expected": {
+      "base": "HOLD_FOR_EVIDENCE",
+      "gated": "HOLD_FOR_EVIDENCE"
+    },
+    "actual": {
+      "base": "HOLD_FOR_EVIDENCE",
+      "gated": "HOLD_FOR_EVIDENCE",
+      "channelPriceGate": "CLEAR",
+      "kycGate": "KYC_INCOMPLETE",
+      "marginGate": "ABSENT",
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "CLEAR",
+      "dumpingRisk": false,
+      "policy": "PRICE_FLOOR"
+    },
+    "kyc": {
+      "status": "INCOMPLETE",
+      "beneficialOwnerVerified": false,
+      "sanctionsHit": false
+    },
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "CP-7",
+    "label": "dumping risk + weak evidence (channel-price OUTRANKS rules: DNP)",
+    "expected": {
+      "base": "HOLD_FOR_EVIDENCE",
+      "gated": "DO_NOT_PURSUE"
+    },
+    "actual": {
+      "base": "HOLD_FOR_EVIDENCE",
+      "gated": "DO_NOT_PURSUE",
+      "channelPriceGate": "DUMPING_RISK_VETO",
+      "vetoSource": "CHANNEL_PRICE",
+      "kycGate": "ABSENT",
+      "marginGate": "ABSENT",
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR"
+    },
+    "kyc": null,
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "CP-8",
+    "label": "dumping risk + weak category fit (category-weak Rule 1 outranks or ties — both DNP)",
+    "expected": {
+      "base": "DO_NOT_PURSUE",
+      "gated": "DO_NOT_PURSUE"
+    },
+    "actual": {
+      "base": "DO_NOT_PURSUE",
+      "gated": "DO_NOT_PURSUE",
+      "channelPriceGate": "DUMPING_RISK_PRESENT_LOWER_PRIORITY",
+      "vetoSource": "CATEGORY_WEAK_RULE1",
+      "kycGate": "ABSENT",
+      "marginGate": "ABSENT",
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR"
+    },
+    "kyc": null,
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "CP-9",
+    "label": "dumping + sanctions + margin + KYC all present (highest priority sanctions wins; source distinguishable)",
+    "expected": {
+      "base": "DO_NOT_PURSUE",
+      "gated": "DO_NOT_PURSUE"
+    },
+    "actual": {
+      "base": "DO_NOT_PURSUE",
+      "gated": "DO_NOT_PURSUE",
+      "channelPriceGate": "DUMPING_RISK_PRESENT_LOWER_PRIORITY",
+      "vetoSource": "SANCTIONS",
+      "kycGate": "SANCTIONS_VETO",
+      "marginGate": "BELOW_THRESHOLD",
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "DUMPING_RISK",
+      "dumpingRisk": true,
+      "policy": "PRICE_FLOOR"
+    },
+    "kyc": {
+      "status": "ADVERSE",
+      "sanctionsHit": true,
+      "adverseFinding": true,
+      "beneficialOwnerVerified": true
+    },
+    "margin": {
+      "bps": 200,
+      "thresholdBps": 800
+    },
+    "PASS": true,
+    "mismatch": []
+  },
+  {
+    "id": "CP-10",
+    "label": "clear channel-price + everything clear (PURSUE_NOW baseline)",
+    "expected": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW"
+    },
+    "actual": {
+      "base": "PURSUE_NOW",
+      "gated": "PURSUE_NOW",
+      "channelPriceGate": "CLEAR",
+      "kycGate": "ABSENT",
+      "marginGate": "ABSENT",
+      "briefHumanBoundary": true
+    },
+    "channelPrice": {
+      "status": "CLEAR",
+      "dumpingRisk": false,
+      "policy": "PRICE_FLOOR"
+    },
+    "kyc": null,
+    "margin": null,
+    "PASS": true,
+    "mismatch": []
+  }
+]

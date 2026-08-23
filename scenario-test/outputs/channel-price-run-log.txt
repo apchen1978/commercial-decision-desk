@@ -1,0 +1,12 @@
+[PASS] CP-1 channel-price clear + clean deal (pass-through) | base=PURSUE_NOW gated=PURSUE_NOW (CLEAR)
+[PASS] CP-2 dumping risk + clean deal (channel-price veto fires) | base=PURSUE_NOW gated=DO_NOT_PURSUE (DUMPING_RISK_VETO src=CHANNEL_PRICE)
+[PASS] CP-3 dumping risk + sanctions hit (sanctions outranks — both DNP, source distinguishable) | base=DO_NOT_PURSUE gated=DO_NOT_PURSUE (DUMPING_RISK_PRESENT_LOWER_PRIORITY src=SANCTIONS)
+[PASS] CP-4 dumping risk + margin below threshold (margin outranks — both DNP) | base=DO_NOT_PURSUE gated=DO_NOT_PURSUE (DUMPING_RISK_PRESENT_LOWER_PRIORITY src=MARGIN)
+[PASS] CP-5 dumping risk + KYC-incomplete (channel-price OUTRANKS KYC: DNP, base would HOLD) | base=HOLD_FOR_EVIDENCE gated=DO_NOT_PURSUE (DUMPING_RISK_VETO src=CHANNEL_PRICE)
+[PASS] CP-6 channel-price clear + KYC-incomplete (KYC acts normally: HOLD) | base=HOLD_FOR_EVIDENCE gated=HOLD_FOR_EVIDENCE (CLEAR)
+[PASS] CP-7 dumping risk + weak evidence (channel-price OUTRANKS rules: DNP) | base=HOLD_FOR_EVIDENCE gated=DO_NOT_PURSUE (DUMPING_RISK_VETO src=CHANNEL_PRICE)
+[PASS] CP-8 dumping risk + weak category fit (category-weak Rule 1 outranks or ties — both DNP) | base=DO_NOT_PURSUE gated=DO_NOT_PURSUE (DUMPING_RISK_PRESENT_LOWER_PRIORITY src=CATEGORY_WEAK_RULE1)
+[PASS] CP-9 dumping + sanctions + margin + KYC all present (highest priority sanctions wins; source distinguishable) | base=DO_NOT_PURSUE gated=DO_NOT_PURSUE (DUMPING_RISK_PRESENT_LOWER_PRIORITY src=SANCTIONS)
+[PASS] CP-10 clear channel-price + everything clear (PURSUE_NOW baseline) | base=PURSUE_NOW gated=PURSUE_NOW (CLEAR)
+
+CASES: 10 | PASS 10 | FAIL 0

@@ -163,6 +163,8 @@
     "mismatchReasons": [],
     "baseline": false,
     "isRegression": false,
+    "tags": [],
+    "futureFlipNote": null,
     "boundaryVariant": null
   },
   {
@@ -327,6 +329,8 @@
     "mismatchReasons": [],
     "baseline": false,
     "isRegression": false,
+    "tags": [],
+    "futureFlipNote": null,
     "boundaryVariant": null
   },
   {
@@ -493,6 +497,8 @@
     "mismatchReasons": [],
     "baseline": false,
     "isRegression": false,
+    "tags": [],
+    "futureFlipNote": null,
     "boundaryVariant": null
   },
   {
@@ -659,6 +665,8 @@
     "mismatchReasons": [],
     "baseline": false,
     "isRegression": false,
+    "tags": [],
+    "futureFlipNote": null,
     "boundaryVariant": null
   },
   {
@@ -832,6 +840,8 @@
     "mismatchReasons": [],
     "baseline": false,
     "isRegression": false,
+    "tags": [],
+    "futureFlipNote": null,
     "boundaryVariant": null
   },
   {
@@ -1006,6 +1016,8 @@
     "mismatchReasons": [],
     "baseline": false,
     "isRegression": false,
+    "tags": [],
+    "futureFlipNote": null,
     "boundaryVariant": {
       "actual": {
         "recommended": "PURSUE_NOW",
@@ -1179,6 +1191,8 @@
     "mismatchReasons": [],
     "baseline": false,
     "isRegression": false,
+    "tags": [],
+    "futureFlipNote": null,
     "boundaryVariant": null
   },
   {
@@ -1342,6 +1356,8 @@
     "mismatchReasons": [],
     "baseline": false,
     "isRegression": false,
+    "tags": [],
+    "futureFlipNote": null,
     "boundaryVariant": null
   },
   {
@@ -1505,6 +1521,8 @@
     "mismatchReasons": [],
     "baseline": false,
     "isRegression": false,
+    "tags": [],
+    "futureFlipNote": null,
     "boundaryVariant": null
   },
   {
@@ -1676,6 +1694,8 @@
     ],
     "baseline": true,
     "isRegression": false,
+    "tags": [],
+    "futureFlipNote": null,
     "boundaryVariant": null
   },
   {
@@ -1845,6 +1865,8 @@
     "mismatchReasons": [],
     "baseline": false,
     "isRegression": true,
+    "tags": [],
+    "futureFlipNote": null,
     "boundaryVariant": null
   },
   {
@@ -2022,6 +2044,8 @@
     ],
     "baseline": true,
     "isRegression": false,
+    "tags": [],
+    "futureFlipNote": null,
     "boundaryVariant": null
   },
   {
@@ -2197,6 +2221,8 @@
     "mismatchReasons": [],
     "baseline": false,
     "isRegression": true,
+    "tags": [],
+    "futureFlipNote": null,
     "boundaryVariant": null
   },
   {
@@ -2360,6 +2386,555 @@
     "mismatchReasons": [],
     "baseline": false,
     "isRegression": false,
+    "tags": [],
+    "futureFlipNote": null,
+    "boundaryVariant": null
+  },
+  {
+    "id": "S13",
+    "claimUnderTest": "INBOUND L1 (EU distributor, $2M annual, OA-90): cold inbound, all claims self-asserted — volume unverified, OA-90 credit unverified, switch reason UNKNOWN. Evidence-first: HOLD, never a pursuit recommendation from unverified claims.",
+    "inputCondition": {
+      "id": "LEAD-EU-DIST",
+      "synthetic": true,
+      "name": "EU distributor full-line quote request (anonymized synthetic)",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "MEDIUM",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "LOW",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product specification document reviewed (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice + referral note (synthetic)."
+            },
+            {
+              "tier": "VERIFICATION_REQUIRED",
+              "note": "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "CONDITIONAL",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [],
+      "unknowns": [
+        {
+          "id": "UNK-1",
+          "label": "Annual purchase volume ($2M)",
+          "detail": "Self-asserted; unverified.",
+          "blocksPursue": true,
+          "resolveWith": "Verified volume / PO history"
+        },
+        {
+          "id": "UNK-2",
+          "label": "Reason for switching supplier",
+          "detail": "Unknown — price-driven switch is a risk signal.",
+          "blocksPursue": false,
+          "resolveWith": "Buyer's switch motivation"
+        },
+        {
+          "id": "UNK-3",
+          "label": "Creditworthiness under OA-90",
+          "detail": "No credit history; OA-90 = 90-day payment exposure.",
+          "blocksPursue": true,
+          "resolveWith": "Credit check / payment terms negotiation"
+        }
+      ],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "INCOMPLETE",
+        "detail": "OA 90 days stated as standard; volume and pricing basis not yet negotiated."
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB — ex-works plus freight to port",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "CIF + installation + customs liability",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-3",
+          "basis": "DDP with penalty clauses",
+          "status": "INCOMPLETE"
+        }
+      ],
+      "quoteBasesComparable": true,
+      "paymentEvents": [],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "availableNow": false,
+      "invariant": "unverified volume + OA-90 credit + unknown switch reason -> HOLD, not pursuit"
+    },
+    "actualState": {
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "availableNow": false,
+      "availableConditionally": false,
+      "exposureComputed": false,
+      "exposureTotalCny": null,
+      "exposurePeakCny": null,
+      "dedupedCount": 0,
+      "invalidDimensions": [],
+      "materialContradictions": 0,
+      "blockingUnknowns": 2,
+      "reasons": [
+        "Rule 3: Commercial terms are incomplete — missing items remain UNKNOWN; HOLD_FOR_EVIDENCE is available.",
+        "Rule 5: Payment exposure is UNKNOWN — no complete payment-event inputs.",
+        "Rule: Evidence Quality is LOW or UNKNOWN — strong pursuit is not recommended; HOLD_FOR_EVIDENCE is preferred.",
+        "Rule: Blocking UNKNOWN remains (UNK-1, UNK-3) — PURSUE_NOW requires no blocking UNKNOWN."
+      ],
+      "exposureReason": "UNKNOWN — no complete payment-event inputs; exposure is NOT calculated.",
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "verdict": "PASS",
+    "mismatchReasons": [],
+    "baseline": false,
+    "isRegression": false,
+    "tags": [
+      "SYNTHETIC",
+      "PRE-MARGIN-GATE"
+    ],
+    "futureFlipNote": null,
+    "boundaryVariant": null
+  },
+  {
+    "id": "S14",
+    "claimUnderTest": "INBOUND L2 (industry referral, 500 A-302 samples by Sep 15, 30% T/T + balance): real urgent need + acceptable payment terms, but drawings/BOM not yet provided — the object being quoted is UNKNOWN. Guardrail: no quote without spec evidence.",
+    "inputCondition": {
+      "id": "LEAD-REF-A302",
+      "synthetic": true,
+      "name": "Industry-referred urgent A-302 component need (anonymized synthetic)",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "MEDIUM",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "MEDIUM",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product specification document reviewed (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice + referral note (synthetic)."
+            },
+            {
+              "tier": "VERIFICATION_REQUIRED",
+              "note": "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "CONDITIONAL",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [],
+      "unknowns": [
+        {
+          "id": "UNK-1",
+          "label": "A-302 drawings / BOM",
+          "detail": "Promised as attachment, not received — the object being quoted is UNKNOWN.",
+          "blocksPursue": true,
+          "resolveWith": "Receive drawings + BOM"
+        },
+        {
+          "id": "UNK-2",
+          "label": "500-sample feasibility by Sep 15",
+          "detail": "Capacity + certification timeline unverified.",
+          "blocksPursue": true,
+          "resolveWith": "Capacity + timeline check"
+        },
+        {
+          "id": "UNK-3",
+          "label": "CE certification requirements",
+          "detail": "Which standard, who bears cost — UNKNOWN.",
+          "blocksPursue": false,
+          "resolveWith": "Certification spec"
+        }
+      ],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "INCOMPLETE",
+        "detail": "Payment acceptable (30% T/T + balance); delivery deadline is a hard, time-bound condition."
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB — ex-works plus freight to port",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "CIF + installation + customs liability",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-3",
+          "basis": "DDP with penalty clauses",
+          "status": "INCOMPLETE"
+        }
+      ],
+      "quoteBasesComparable": true,
+      "paymentEvents": [],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "availableNow": false,
+      "invariant": "no spec evidence -> no quote; referral/urgency does not bypass the spec-unknown guardrail"
+    },
+    "actualState": {
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "availableNow": false,
+      "availableConditionally": true,
+      "exposureComputed": false,
+      "exposureTotalCny": null,
+      "exposurePeakCny": null,
+      "dedupedCount": 0,
+      "invalidDimensions": [],
+      "materialContradictions": 0,
+      "blockingUnknowns": 2,
+      "reasons": [
+        "Rule 3: Commercial terms are incomplete — missing items remain UNKNOWN; HOLD_FOR_EVIDENCE is available.",
+        "Rule 5: Payment exposure is UNKNOWN — no complete payment-event inputs.",
+        "Rule: Evidence Quality is not strong — only a conditional pursue is considered.",
+        "Rule: Blocking UNKNOWN remains (UNK-1, UNK-2) — PURSUE_NOW requires no blocking UNKNOWN."
+      ],
+      "exposureReason": "UNKNOWN — no complete payment-event inputs; exposure is NOT calculated.",
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "verdict": "PASS",
+    "mismatchReasons": [],
+    "baseline": false,
+    "isRegression": false,
+    "tags": [
+      "SYNTHETIC",
+      "PRE-MARGIN-GATE"
+    ],
+    "futureFlipNote": null,
+    "boundaryVariant": null
+  },
+  {
+    "id": "S15",
+    "claimUnderTest": "INBOUND L3 (end-customer custom equipment, 5% margin, certification costs on supplier, HQ committee decides): no decision authority at the contact point -> material contradiction -> ESCALATE. KEY EDGE CASE: engine sees the authority contradiction but NOT the commercial killer (5% margin + cost shift). PRE-MARGIN-GATE baseline: ESCALATE expected; after Margin gate lands this must flip to DO_NOT_PURSUE.",
+    "inputCondition": {
+      "id": "LEAD-CUST-EQ",
+      "synthetic": true,
+      "name": "End-customer custom-equipment inquiry via intermediary (anonymized synthetic)",
+      "summary": "A Gulf-region hospitality procurement desk invites international suppliers to quote on window treatments for a multi-property hotel rollout. Volume figures are indicative only.",
+      "source": "Synthetic procurement notice + referral call note (both fabricated)",
+      "dimensions": {
+        "buyerFit": {
+          "value": "LOW",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Referral call note records a scheduled follow-up with the procurement desk (synthetic)."
+            }
+          ]
+        },
+        "categoryFit": {
+          "value": "MEDIUM",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)."
+            }
+          ]
+        },
+        "evidenceQuality": {
+          "value": "LOW",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "Product specification document reviewed (synthetic)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Procurement notice + referral note (synthetic)."
+            },
+            {
+              "tier": "VERIFICATION_REQUIRED",
+              "note": "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)."
+            }
+          ]
+        },
+        "importOpenness": {
+          "value": "HIGH",
+          "evidence": [
+            {
+              "tier": "PRIMARY",
+              "note": "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)."
+            }
+          ]
+        },
+        "commercialFeasibility": {
+          "value": "LOW",
+          "evidence": [
+            {
+              "tier": "SUPPORTING",
+              "note": "MOQ and lead time are feasible at current capacity (synthetic estimate)."
+            },
+            {
+              "tier": "SUPPORTING",
+              "note": "Buyer requests installation + customs-liability terms that fall outside the standard quoted scope (synthetic)."
+            }
+          ]
+        }
+      },
+      "contradictions": [
+        {
+          "id": "CTR-1",
+          "label": "Authority vs commitment",
+          "detail": "Contact says decision rests with client HQ committee while requesting a quote — no authority at the contact point.",
+          "material": true,
+          "status": "UNRESOLVED",
+          "resolveWith": "Confirm decision authority / commitment level"
+        }
+      ],
+      "unknowns": [
+        {
+          "id": "UNK-1",
+          "label": "Specification",
+          "detail": "Still being confirmed with end user — the object is UNKNOWN.",
+          "blocksPursue": true,
+          "resolveWith": "Final spec from end user"
+        },
+        {
+          "id": "UNK-2",
+          "label": "Budget / commitment",
+          "detail": "'Budget tight', committee decides — price-discovery risk.",
+          "blocksPursue": true,
+          "resolveWith": "Budget band + decision authority"
+        }
+      ],
+      "whyNot": [
+        "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
+        "Installation + customs-liability scope is requested but outside the standard quoted scope.",
+        "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier)."
+      ],
+      "why": [
+        "Strong Buyer Fit: active procurement desk with an explicit schedule.",
+        "Strong Category Fit: window treatments are the core category.",
+        "Clear import openness: RFP invites international suppliers.",
+        "Feasible MOQ and lead time at current capacity (synthetic estimate)."
+      ],
+      "commercialTerms": {
+        "status": "INCOMPLETE",
+        "detail": "5% margin, certification costs on supplier, budget tight — economically marginal."
+      },
+      "quotes": [
+        {
+          "id": "Q-1",
+          "basis": "FOB — ex-works plus freight to port",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-2",
+          "basis": "CIF + installation + customs liability",
+          "status": "COMPLETE"
+        },
+        {
+          "id": "Q-3",
+          "basis": "DDP with penalty clauses",
+          "status": "INCOMPLETE"
+        }
+      ],
+      "quoteBasesComparable": false,
+      "paymentEvents": [],
+      "buyers": [
+        {
+          "id": "BUYER-1",
+          "label": "Gulf Coast Hospitality Procurement (synthetic)"
+        }
+      ],
+      "paymentDisclosure": "Payment exposure is calculated from committed payment events only. It is NOT cash balance, liquidity, affordability, cash shortfall, or credit capacity. Payment concentration refers to payment commitments only."
+    },
+    "expectedState": {
+      "recommended": "ESCALATE",
+      "availableNow": false,
+      "invariant": "authority contradiction -> ESCALATE under current contract; margin-blind — the 5%-margin killer is invisible (PRE-MARGIN-GATE)"
+    },
+    "actualState": {
+      "recommended": "ESCALATE",
+      "availableNow": false,
+      "availableConditionally": false,
+      "exposureComputed": false,
+      "exposureTotalCny": null,
+      "exposurePeakCny": null,
+      "dedupedCount": 0,
+      "invalidDimensions": [],
+      "materialContradictions": 1,
+      "blockingUnknowns": 2,
+      "reasons": [
+        "Rule 2: Material contradiction (CTR-1) is unresolved — it is surfaced visibly; PURSUE_NOW is not available; ESCALATE is recommended.",
+        "Rule 3: Commercial terms are incomplete — missing items remain UNKNOWN; HOLD_FOR_EVIDENCE is available.",
+        "Rule 4: Quote bases are not comparable — quotes are NOT ranked.",
+        "Rule 5: Payment exposure is UNKNOWN — no complete payment-event inputs.",
+        "Rule: Evidence Quality is LOW or UNKNOWN — strong pursuit is not recommended; HOLD_FOR_EVIDENCE is preferred.",
+        "Rule: Blocking UNKNOWN remains (UNK-1, UNK-2) — PURSUE_NOW requires no blocking UNKNOWN."
+      ],
+      "exposureReason": "UNKNOWN — no complete payment-event inputs; exposure is NOT calculated.",
+      "briefHumanBoundary": true,
+      "briefSynthetic": true
+    },
+    "invariantChecks": {
+      "missingNotNegative": true,
+      "unknownPreserved": true,
+      "humanMandatory": true,
+      "noApprovals": true
+    },
+    "verdict": "PASS",
+    "mismatchReasons": [],
+    "baseline": false,
+    "isRegression": false,
+    "tags": [
+      "SYNTHETIC",
+      "PRE-MARGIN-GATE"
+    ],
+    "futureFlipNote": "After Margin gate: expected state must become DO_NOT_PURSUE (the commercial killer becomes visible). This flip is the measured evidence of decision evolution.",
     "boundaryVariant": null
   }
 ]

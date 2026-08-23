@@ -79,6 +79,32 @@
 |---|---|---|---|---|---|---|
 | | | | | | | |
 
+### 實戰範例（引擎壓力測試 L1/L2/L3 — 2026-08-23，SYNTHETIC）
+
+以下三筆是引擎對真實形狀 inbound lead 的實際輸出，作為未來 Domain Review 的
+**標準參考點**。每筆列出「Part C 引擎視角（contract 實際收到的輸入）」與
+「Part D 分類比對（引擎判定 state 與原因）」。來源：`cdd-lead-scan.mjs`（workspace，
+SYNTHETIC 標記、無真實識別碼）；已歸檔為 S13/S14/S15。
+
+#### L1 — 歐洲 $2M 經銷商 / OA90（冷 inbound）
+- **Part C（引擎視角）**：$2M volume 未驗證 · OA-90 credit 未驗證 · 換供應商原因
+  UNKNOWN（可能 price-shopping）。
+- **Part D（分類比對）**：引擎判定 `HOLD_FOR_EVIDENCE`。此案例示範 **B 桶（可結構化）
+  條件不足時，系統拒絕進入 A 桶（Gate）** 的紀律——證據不足就不給 Pursuit 建議，
+  而不是「先追再說」。
+
+#### L2 — 同業介紹 / 9月15前 500 樣品 / 30% T/T
+- **Part C（引擎視角）**：有 referral + 需求真實急迫 + 付款條件可接受；但圖紙/BOM
+  未到 → **報價對象本身 UNKNOWN**。
+- **Part D（分類比對）**：引擎判定 `HOLD_FOR_EVIDENCE`。護欄價值示範：**沒有規格
+  證據，絕對不准報價**——C 桶的人類直覺通常會想趕快報價搶單，但系統強制攔截。
+
+#### L3 — 終端定製 / 5% 毛利 / 認證費轉嫁 / 委員會決策（關鍵 Edge Case）
+- **Part C（引擎視角）**：要求報價卻無決策權 → 註冊為 material contradiction（CTR-1）。
+- **Part D（分類比對）**：引擎判定 `ESCALATE`。**商業真實死因是「5% 毛利 + 成本轉嫁」，
+  但系統只看到「決策權矛盾」**——證明當前 Contract 缺乏 Margin 維度（A 桶 gate 候選）。
+  未來若 Margin gate 落地，預期此案例轉為 `DO_NOT_PURSUE`（S15 為其回歸基線）。
+
 ---
 
 ## D. 訪談後分類與比對
@@ -88,6 +114,14 @@
 - **C 桶**（人類專屬——永不入引擎）
 - **與 Pre-registration 比對**：H1/H2/H3 命中哪些、未命中哪些 → 逐項記錄
 - **UNKNOWN**：訪談新增哪些 UNKNOWN、保留哪些
+
+### 實戰範例分類總結（L1/L2/L3）
+
+| Lead | 引擎 state | 商業判讀 | 桶歸屬 |
+|---|---|---|---|
+| L1（$2M 經銷商 / OA90） | `HOLD_FOR_EVIDENCE` | 證據不足不追；B 桶條件未滿足 → 不進入 A 桶判定 | B 桶優先（先取證） |
+| L2（同業介紹 / 500 樣品） | `HOLD_FOR_EVIDENCE` | 對象 UNKNOWN 不准報價（護欄） | C 桶直覺 vs 系統紀律 |
+| L3（終端定製 / 5% 毛利） | `ESCALATE` | 真實死因（毛利/成本轉嫁）系統看不到 → Margin gate 候選 | **A 桶候選**（待訪談確認） |
 
 ---
 

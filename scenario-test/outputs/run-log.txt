@@ -17,6 +17,13 @@
         MISMATCH: exposureTotal 84000 != 109200
 [PASS] S11R REGRESSION (post-fix S11): duplicate complete payment event is de-duplicated (label+amountCny+daysFromSign), total exposure not inflated, dedupedCount=1.
 [PASS] S12 INCONSISTENT SOURCE EVIDENCE: two evidence notes in the same dimension directly contradict each other, but the contradictions array is empty. Does the engine detect it autonomously?
+[PASS] S13 INBOUND L1 (EU distributor, $2M annual, OA-90): cold inbound, all claims self-asserted — volume unverified, OA-90 credit unverified, switch reason UNKNOWN. Evidence-first: HOLD, never a pursuit recommendation from unverified claims.
+        tags: SYNTHETIC, PRE-MARGIN-GATE
+[PASS] S14 INBOUND L2 (industry referral, 500 A-302 samples by Sep 15, 30% T/T + balance): real urgent need + acceptable payment terms, but drawings/BOM not yet provided — the object being quoted is UNKNOWN. Guardrail: no quote without spec evidence.
+        tags: SYNTHETIC, PRE-MARGIN-GATE
+[PASS] S15 INBOUND L3 (end-customer custom equipment, 5% margin, certification costs on supplier, HQ committee decides): no decision authority at the contact point -> material contradiction -> ESCALATE. KEY EDGE CASE: engine sees the authority contradiction but NOT the commercial killer (5% margin + cost shift). PRE-MARGIN-GATE baseline: ESCALATE expected; after Margin gate lands this must flip to DO_NOT_PURSUE.
+        tags: SYNTHETIC, PRE-MARGIN-GATE
+        FUTURE FLIP: After Margin gate: expected state must become DO_NOT_PURSUE (the commercial killer becomes visible). This flip is the measured evidence of decision evolution.
 
 DETERMINISM: identical across independent runs
-SCENARIOS: 14 | PASS 12 | BASELINE_FIX_CONFIRMED 2 | FAIL 0 | BASELINE_FIX_ABSENT 0
+SCENARIOS: 17 | PASS 15 | BASELINE_FIX_CONFIRMED 2 | FAIL 0 | BASELINE_FIX_ABSENT 0

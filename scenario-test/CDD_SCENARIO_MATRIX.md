@@ -3,8 +3,7 @@
 **Repository under test:** `apchen1978/commercial-decision-desk`
 **Baseline commit:** `539f945` (HEAD at experiment start; working tree clean)
 **Experiment artifacts:** `6141606` (scenario experiment, Level 2, verdict B)
-**Post-fix commits:** `7ecbe5c` (S10/S11 fixes + S08/S12 documentation + S10R/S11R regressions) → `fbe8548` (inbound lead scan S13–S15 + protocol examples + interview 001)
-**Current HEAD:** `fbe8548` (this matrix is synced to it)
+**Post-fix commits:** `7ecbe5c` (S10/S11 fixes + S08/S12 documentation + S10R/S11R regressions) → `fbe8548` (inbound lead scan S13–S15 + protocol examples + interview 001) → `9c1ae4a` (KYC boundary experiment) → KYC gate implementation + S16–S18 (see Git section)
 **Harness:** `scenario-test/run-scenarios.mjs` (isolated, reads `fixtures.js` + `decision-engine.js`, never modifies them)
 **Raw output:** `scenario-test/outputs/scenario-results.raw.json` (full mutated fixtures + actual states, verbatim)
 **Run log:** `scenario-test/outputs/run-log.txt`
@@ -42,18 +41,22 @@ authorized and executed:
 10. Document Parity Closing Rule evaluated — no public copy changes required
     (Level 2 evidence does not materially change any existing external claim).
 
-## INBOUND LEAD SCAN (owner task, commit `fbe8548`)
+## INBOUND LEAD SCAN + KYC GATE (owner tasks, commits `fbe8548` + KYC implementation)
 
 Three real-shaped inbound-lead emails (L1/L2/L3, anonymized synthetic) were run
 through the contract and archived as **S13/S14/S15** (tags `SYNTHETIC` +
-`PRE-MARGIN-GATE`). Full matrix now: **17 scenarios — 15 PASS, 2
+`PRE-MARGIN-GATE`); the owner-authorized KYC gate added **S16/S17/S18** (tags
+`SYNTHETIC` + `KYC-GATE`). Full matrix now: **20 scenarios — 18 PASS, 2
 BASELINE_FIX_CONFIRMED, 0 FAIL, deterministic**.
 
-| ID | Lead | Engine state | Finding |
+| ID | Lead / case | Engine state | Finding |
 |---|---|---|---|
 | S13 | L1 — EU distributor $2M / OA-90 (cold inbound) | `HOLD_FOR_EVIDENCE` | Evidence-first discipline: unverified volume + OA-90 credit + unknown switch reason → HOLD, never pursuit from self-asserted claims |
 | S14 | L2 — industry referral, 500 A-302 samples by Sep 15, 30% T/T | `HOLD_FOR_EVIDENCE` | Guardrail: no quote without spec evidence — drawings/BOM not yet provided, the quoted object is UNKNOWN |
 | S15 | L3 — end-customer custom equipment, 5% margin, certification costs on supplier, HQ committee decides | `ESCALATE` | **KEY EDGE CASE** — see below |
+| S16 | KYC sanctions hit / adverse finding (+ high margin) | `DO_NOT_PURSUE` | **KYC GATE**: one-vote veto — margin cannot rescue (margin × KYC: veto wins) |
+| S17 | KYC incomplete / beneficial owner unknown (+ referral, high margin) | `HOLD_FOR_EVIDENCE` | **KYC GATE**: evidence-required; insurance does not clear it |
+| S18 | KYC clear (clean positive) | `PURSUE_NOW` | **KYC GATE**: transparent pass-through; clean-input unchanged |
 
 **S15 (L3) — the margin-not-yet-a-gate edge case.** The system receives the relevant
 descriptions in the input (`commercialFeasibility: LOW`, "5% margin",
@@ -240,6 +243,30 @@ boundary the contract does not define** — see §4.
 - **FUTURE FLIP (pre-declared, not current):** after a Margin gate lands, expected state must become `DO_NOT_PURSUE`. **Margin gate = UNKNOWN until interview 001.**
 - **Tags:** `SYNTHETIC`, `PRE-MARGIN-GATE`.
 
+### S16 — KYC sanctions veto (KYC-GATE)
+- **Claim:** Sanctions hit / adverse finding → `DO_NOT_PURSUE` one-vote veto regardless of margin (margin × KYC: veto wins).
+- **Input:** cleanPositive + structured `kyc={status:ADVERSE, sanctionsHit, adverseFinding}` + `margin={bps:2000}`.
+- **Expected:** DO_NOT_PURSUE, availableNow false, availableConditionally false.
+- **Actual:** DO_NOT_PURSUE (kycGate=SANCTIONS_VETO). **PASS**
+- **Invariant:** one-vote veto; high margin cannot rescue. **UNKNOWN preserved:** n/a. **Limitation:** gate semantics provisional (single domain source, interview 002 pending). **Follow-up:** none — gate implemented.
+- **Tags:** `SYNTHETIC`, `KYC-GATE`.
+
+### S17 — KYC incomplete (KYC-GATE)
+- **Claim:** Beneficial owner unverified → `HOLD_FOR_EVIDENCE` even with referral + high margin; insurance does not clear it.
+- **Input:** cleanPositive + `kyc={status:INCOMPLETE, beneficialOwnerVerified:false}` + `margin={bps:1800}`.
+- **Expected:** HOLD_FOR_EVIDENCE, availableNow false, availableConditionally false.
+- **Actual:** HOLD_FOR_EVIDENCE (kycGate=KYC_INCOMPLETE). **PASS**
+- **Invariant:** evidence-required path; insurance is not a KYC substitute. **UNKNOWN preserved:** yes (KYC status stays UNKNOWN until verified). **Limitation:** none. **Follow-up:** none.
+- **Tags:** `SYNTHETIC`, `KYC-GATE`.
+
+### S18 — KYC clear pass-through (KYC-GATE)
+- **Claim:** Clear or absent kyc field → gate transparent; clean positive path preserved.
+- **Input:** cleanPositive + `kyc={status:CLEAR, beneficialOwnerVerified:true}`.
+- **Expected:** PURSUE_NOW, availableNow true.
+- **Actual:** PURSUE_NOW (kycGate=CLEAR). **PASS**
+- **Invariant:** pass-through; clean-input behavior unchanged (H6). **UNKNOWN preserved:** n/a. **Limitation:** none. **Follow-up:** none.
+- **Tags:** `SYNTHETIC`, `KYC-GATE`.
+
 ---
 
 ## 4. Classified decision-contract weaknesses (EVIDENCE_FOUND)
@@ -306,7 +333,8 @@ adds a third pending UNKNOWN: whether margin belongs in the contract at all.
 - **Before:** LEVEL 1 VERIFIED (23/23 verify.mjs hard-rule checks, deterministic).
 - **After experiment (pre-fix):** LEVEL 2 SCENARIO TESTED (12 scenarios + 1 boundary variant, 5/5 states, 8 adversarial types, deterministic across independent runs).
 - **After owner-review closing:** **LEVEL 2 SCENARIO TESTED** — S10/S11 fixes + S10R/S11R regression coverage (14 scenarios: 12 PASS + 2 baseline-confirmed; verify.mjs 38/38).
-- **After inbound lead scan (current, HEAD `fbe8548`):** **LEVEL 2 SCENARIO TESTED** — S13/S14/S15 added (17 scenarios: 15 PASS + 2 BASELINE_FIX_CONFIRMED + 0 FAIL, deterministic). Lead-scan cases are synthetic; they prove decision-contract behavior on real-shaped inputs, nothing more. **Not promoted beyond Level 2.**
+- **After inbound lead scan (commit `fbe8548`):** **LEVEL 2 SCENARIO TESTED** — S13/S14/S15 added (17 scenarios: 15 PASS + 2 BASELINE_FIX_CONFIRMED + 0 FAIL, deterministic).
+- **After KYC gate implementation (owner-authorized):** **LEVEL 2 SCENARIO TESTED** — S16/S17/S18 added (20 scenarios: 18 PASS + 2 BASELINE_FIX_CONFIRMED + 0 FAIL, deterministic; verify.mjs 44/44; KYC boundary experiment 10/10). The KYC gate is a contract extension with synthetic-verified behavior; it does not by itself raise evidence maturity. **Not promoted beyond Level 2.**
 - **Not claimed:** DOMAIN REVIEWED / WORKFLOW OBSERVED / REAL-WORLD EVIDENCE / OUTCOME EVIDENCE. Synthetic scenario coverage proves decision-contract behavior only — not adoption, real-deal accuracy, ROI, time saved, better decisions, or market demand.
 
 ## 8. Verdict

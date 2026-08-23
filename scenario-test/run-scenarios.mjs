@@ -306,6 +306,48 @@ const SCENARIOS = [
     tags: ["SYNTHETIC", "PRE-MARGIN-GATE"],
     futureFlipNote: "After Margin gate: expected state must become DO_NOT_PURSUE (the commercial killer becomes visible). This flip is the measured evidence of decision evolution.",
   },
+
+  // =========================================================================
+  // S16–S18 — KYC GATE regression (owner-authorized implementation, 2026-08-23;
+  // verified by kyc-boundary-experiment.mjs). Production engine now reads the
+  // structured kyc field: sanctions/adverse -> DO_NOT_PURSUE one-vote veto;
+  // KYC incomplete -> HOLD_FOR_EVIDENCE; clear/absent -> pass-through.
+  // =========================================================================
+  {
+    id: "S16",
+    claim: "KYC GATE: sanctions hit / adverse finding -> DO_NOT_PURSUE one-vote veto regardless of other signals (margin cannot rescue).",
+    build: () => {
+      const c = cleanPositive();
+      c.kyc = { status: "ADVERSE", sanctionsHit: true, adverseFinding: true, beneficialOwnerVerified: true };
+      c.margin = { bps: 2000, note: "high margin cannot rescue sanctions veto" };
+      return c;
+    },
+    expected: { recommended: "DO_NOT_PURSUE", availableNow: false, availableConditionally: false, invariant: "one-vote veto; margin x KYC interaction -> veto wins" },
+    tags: ["SYNTHETIC", "KYC-GATE"],
+  },
+  {
+    id: "S17",
+    claim: "KYC GATE: KYC incomplete / beneficial owner unknown -> HOLD_FOR_EVIDENCE (evidence-required), even with strong referral + high margin; insurance does not clear it.",
+    build: () => {
+      const c = cleanPositive();
+      c.kyc = { status: "INCOMPLETE", beneficialOwnerVerified: false, sanctionsHit: false, adverseFinding: false };
+      c.margin = { bps: 1800, note: "referral/margin/insurance cannot clear KYC gate" };
+      return c;
+    },
+    expected: { recommended: "HOLD_FOR_EVIDENCE", availableNow: false, availableConditionally: false, invariant: "evidence-required path; insurance is not a KYC substitute" },
+    tags: ["SYNTHETIC", "KYC-GATE"],
+  },
+  {
+    id: "S18",
+    claim: "KYC GATE: clear KYC passes through unchanged (gate transparent when clear/absent); clean positive path preserved.",
+    build: () => {
+      const c = cleanPositive();
+      c.kyc = { status: "CLEAR", beneficialOwnerVerified: true, sanctionsHit: false, adverseFinding: false };
+      return c;
+    },
+    expected: { recommended: "PURSUE_NOW", availableNow: true, invariant: "gate pass-through; clean-input behavior unchanged" },
+    tags: ["SYNTHETIC", "KYC-GATE"],
+  },
 ];
 
 // ---------------------------------------------------------------------------

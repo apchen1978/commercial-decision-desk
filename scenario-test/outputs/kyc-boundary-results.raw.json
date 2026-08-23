@@ -2,14 +2,12 @@
   {
     "id": "KYC-E1",
     "label": "KYC confirmed clear",
-    "expected": {
-      "base": "PURSUE_NOW",
-      "gated": "PURSUE_NOW"
-    },
+    "expectedGated": "PURSUE_NOW",
+    "preFixBase": "PURSUE_NOW",
     "actual": {
-      "base": "PURSUE_NOW",
-      "gated": "PURSUE_NOW",
-      "gatedGate": "CLEAR",
+      "recommended": "PURSUE_NOW",
+      "kycGate": "CLEAR",
+      "preFixBase": "PURSUE_NOW",
       "briefHumanBoundary": true
     },
     "kyc": {
@@ -30,14 +28,12 @@
   {
     "id": "KYC-E2",
     "label": "KYC incomplete / beneficial owner unknown",
-    "expected": {
-      "base": "PURSUE_NOW",
-      "gated": "HOLD_FOR_EVIDENCE"
-    },
+    "expectedGated": "HOLD_FOR_EVIDENCE",
+    "preFixBase": "PURSUE_NOW",
     "actual": {
-      "base": "PURSUE_NOW",
-      "gated": "HOLD_FOR_EVIDENCE",
-      "gatedGate": "KYC_INCOMPLETE",
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "kycGate": "KYC_INCOMPLETE",
+      "preFixBase": "PURSUE_NOW",
       "briefHumanBoundary": true
     },
     "kyc": {
@@ -58,14 +54,12 @@
   {
     "id": "KYC-E3",
     "label": "sanctions hit / adverse finding",
-    "expected": {
-      "base": "PURSUE_NOW",
-      "gated": "DO_NOT_PURSUE"
-    },
+    "expectedGated": "DO_NOT_PURSUE",
+    "preFixBase": "PURSUE_NOW",
     "actual": {
-      "base": "PURSUE_NOW",
-      "gated": "DO_NOT_PURSUE",
-      "gatedGate": "SANCTIONS_VETO",
+      "recommended": "DO_NOT_PURSUE",
+      "kycGate": "SANCTIONS_VETO",
+      "preFixBase": "PURSUE_NOW",
       "briefHumanBoundary": true
     },
     "kyc": {
@@ -86,14 +80,12 @@
   {
     "id": "KYC-E4",
     "label": "insurance available but KYC unresolved",
-    "expected": {
-      "base": "PURSUE_NOW",
-      "gated": "HOLD_FOR_EVIDENCE"
-    },
+    "expectedGated": "HOLD_FOR_EVIDENCE",
+    "preFixBase": "PURSUE_NOW",
     "actual": {
-      "base": "PURSUE_NOW",
-      "gated": "HOLD_FOR_EVIDENCE",
-      "gatedGate": "KYC_INCOMPLETE",
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "kycGate": "KYC_INCOMPLETE",
+      "preFixBase": "PURSUE_NOW",
       "briefHumanBoundary": true
     },
     "kyc": {
@@ -114,14 +106,12 @@
   {
     "id": "KYC-E5",
     "label": "HIGH-MARGIN deal with failed KYC (margin × KYC interaction)",
-    "expected": {
-      "base": "PURSUE_NOW",
-      "gated": "DO_NOT_PURSUE"
-    },
+    "expectedGated": "DO_NOT_PURSUE",
+    "preFixBase": "PURSUE_NOW",
     "actual": {
-      "base": "PURSUE_NOW",
-      "gated": "DO_NOT_PURSUE",
-      "gatedGate": "SANCTIONS_VETO",
+      "recommended": "DO_NOT_PURSUE",
+      "kycGate": "SANCTIONS_VETO",
+      "preFixBase": "PURSUE_NOW",
       "briefHumanBoundary": true
     },
     "kyc": {
@@ -142,14 +132,12 @@
   {
     "id": "KYC-E6",
     "label": "LOW-MARGIN deal with clear KYC (margin alone is not a veto here)",
-    "expected": {
-      "base": "PURSUE_NOW",
-      "gated": "PURSUE_NOW"
-    },
+    "expectedGated": "PURSUE_NOW",
+    "preFixBase": "PURSUE_NOW",
     "actual": {
-      "base": "PURSUE_NOW",
-      "gated": "PURSUE_NOW",
-      "gatedGate": "CLEAR",
+      "recommended": "PURSUE_NOW",
+      "kycGate": "CLEAR",
+      "preFixBase": "PURSUE_NOW",
       "briefHumanBoundary": true
     },
     "kyc": {
@@ -170,14 +158,12 @@
   {
     "id": "KYC-E7",
     "label": "sanctions hit + high margin + insurance available (all three)",
-    "expected": {
-      "base": "PURSUE_NOW",
-      "gated": "DO_NOT_PURSUE"
-    },
+    "expectedGated": "DO_NOT_PURSUE",
+    "preFixBase": "PURSUE_NOW",
     "actual": {
-      "base": "PURSUE_NOW",
-      "gated": "DO_NOT_PURSUE",
-      "gatedGate": "SANCTIONS_VETO",
+      "recommended": "DO_NOT_PURSUE",
+      "kycGate": "SANCTIONS_VETO",
+      "preFixBase": "PURSUE_NOW",
       "briefHumanBoundary": true
     },
     "kyc": {
@@ -198,14 +184,12 @@
   {
     "id": "KYC-E8",
     "label": "KYC incomplete + strong referral + high margin (evidence-required wins)",
-    "expected": {
-      "base": "PURSUE_NOW",
-      "gated": "HOLD_FOR_EVIDENCE"
-    },
+    "expectedGated": "HOLD_FOR_EVIDENCE",
+    "preFixBase": "PURSUE_NOW",
     "actual": {
-      "base": "PURSUE_NOW",
-      "gated": "HOLD_FOR_EVIDENCE",
-      "gatedGate": "KYC_INCOMPLETE",
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "kycGate": "KYC_INCOMPLETE",
+      "preFixBase": "PURSUE_NOW",
       "briefHumanBoundary": true
     },
     "kyc": {
@@ -226,14 +210,12 @@
   {
     "id": "KYC-E9",
     "label": "clear KYC + clear base → gate passes through unchanged",
-    "expected": {
-      "base": "PURSUE_NOW",
-      "gated": "PURSUE_NOW"
-    },
+    "expectedGated": "PURSUE_NOW",
+    "preFixBase": "PURSUE_NOW",
     "actual": {
-      "base": "PURSUE_NOW",
-      "gated": "PURSUE_NOW",
-      "gatedGate": "CLEAR",
+      "recommended": "PURSUE_NOW",
+      "kycGate": "CLEAR",
+      "preFixBase": "PURSUE_NOW",
       "briefHumanBoundary": true
     },
     "kyc": {
@@ -254,14 +236,12 @@
   {
     "id": "KYC-E10",
     "label": "KYC incomplete + weak evidence (HOLD either way — gate and base agree)",
-    "expected": {
-      "base": "HOLD_FOR_EVIDENCE",
-      "gated": "HOLD_FOR_EVIDENCE"
-    },
+    "expectedGated": "HOLD_FOR_EVIDENCE",
+    "preFixBase": "HOLD_FOR_EVIDENCE",
     "actual": {
-      "base": "HOLD_FOR_EVIDENCE",
-      "gated": "HOLD_FOR_EVIDENCE",
-      "gatedGate": "KYC_INCOMPLETE",
+      "recommended": "HOLD_FOR_EVIDENCE",
+      "kycGate": "KYC_INCOMPLETE",
+      "preFixBase": "HOLD_FOR_EVIDENCE",
       "briefHumanBoundary": true
     },
     "kyc": {

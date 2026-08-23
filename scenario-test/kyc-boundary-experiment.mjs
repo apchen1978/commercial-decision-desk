@@ -1,27 +1,18 @@
-// kyc-boundary-experiment.mjs — REAL KYC boundary experiment (owner-authorized).
+// kyc-boundary-experiment.mjs — KYC boundary experiment (owner-authorized).
 // -----------------------------------------------------------------------------
-// DESIGN PRINCIPLE: production decision-engine.js is NOT modified. This harness
-// models "what the contract WOULD do with a structured KYC field + a sanctions
-// veto gate" as an additive variant, and compares it against the current engine
-// on the same fixtures. Evidence first; fix proposals STOP at the pre-fix gate.
+// PHASE 2 (post-fix): the production engine now HAS the KYC gate (owner-authorized
+// implementation, commit after 9c1ae4a). This harness re-runs the same 10 cases
+// against the PRODUCTION engine to confirm the implemented gate matches the
+// experiment's verified semantics. Phase 1 (pre-fix, additive-variant comparison)
+// is preserved in EXPERIMENT_KYC_BOUNDARY_001.md.
 //
 // PRE-REGISTERED EXPECTED BEHAVIOR (declared before execution):
-//   H1: sanctions hit / adverse finding -> DO_NOT_PURSUE (one-vote veto) under a
-//       KYC gate; the CURRENT engine (no KYC field, sanctions NOT registered as a
-//       contradiction in these structured fixtures) returns PURSUE_NOW — the
-//       signal is fully invisible to it.
+//   H1: sanctions hit / adverse finding -> DO_NOT_PURSUE (one-vote veto)
 //   H2: KYC incomplete / beneficial owner unknown -> HOLD_FOR_EVIDENCE
-//       (evidence-required), downgrading NOW/CONDITIONAL
-//   H3: margin does NOT override a KYC veto — high margin + failed KYC still
-//       DO_NOT_PURSUE (E's "暴利也斬"); margin×KYC interaction = veto wins
-//   H4: low margin + clear KYC -> base engine result stands (margin alone is not
-//       a veto in this experiment; margin-as-gate is interview 001's question)
-//   H5: insurance availability does NOT clear KYC (independent signals)
-//   H6: a STRUCTURED kyc field is invisible to the current engine (no field, no
-//       contradiction registration) — base behavior is the clean-positive path;
-//       only the gated variant sees the signal. (REVISED pre-declared reading —
-//       initial run showed base=PURSUE_NOW, not ESCALATE, because these fixtures
-//       carry the signal in kyc.*, not in contradictions[].)
+//   H3: margin does NOT override a KYC veto (margin×KYC: veto wins)
+//   H4: low margin + clear KYC -> base engine result stands (margin not a veto)
+//   H5: insurance availability does NOT clear KYC
+//   H6: absent kyc field -> no gate behavior (clean-input unchanged)
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -67,45 +58,10 @@ function baseOpp(id, name) {
 }
 
 // ---------------------------------------------------------------------------
-// Experiment variant — additive KYC gate layer on top of the CURRENT contract.
-// This is the harness's model of "contract + structured KYC + veto gate".
-// It does NOT modify decision-engine.js; it composes with it.
+// (Phase-1 variant `evaluateWithKycGate` removed: the production engine now
+// implements the gate itself — this harness validates production behavior
+// directly, preserving the phase-1 pre-fix baseline in `expected.base`.)
 // ---------------------------------------------------------------------------
-export function evaluateWithKycGate(opp) {
-  const base = evaluateDecision(opp); // current contract, unmodified
-  const k = opp.kyc || {};
-  const sanctionsHit = k.sanctionsHit === true || k.adverseFinding === true;
-  const kycIncomplete = k.status === "INCOMPLETE" || k.beneficialOwnerVerified === false;
-
-  if (sanctionsHit) {
-    // H1 + H3: one-vote veto — margin and commercial signals cannot rescue.
-    return {
-      ...base,
-      recommended: "DO_NOT_PURSUE",
-      available: { ...base.available, PURSUE_NOW: false, PURSUE_CONDITIONALLY: false },
-      reasons: [
-        ...base.reasons,
-        "KYC GATE: sanctions/adverse finding — one-vote veto; DO_NOT_PURSUE regardless of margin or commercial signals.",
-      ],
-      kycGate: "SANCTIONS_VETO",
-    };
-  }
-  if (kycIncomplete) {
-    // H2: evidence-required path; H5: insurance does not clear it.
-    return {
-      ...base,
-      recommended: "HOLD_FOR_EVIDENCE",
-      available: { ...base.available, PURSUE_NOW: false, PURSUE_CONDITIONALLY: false },
-      reasons: [
-        ...base.reasons,
-        "KYC GATE: beneficial-owner verification incomplete — evidence-required; HOLD_FOR_EVIDENCE. Insurance availability does not clear this gate.",
-      ],
-      kycGate: "KYC_INCOMPLETE",
-    };
-  }
-  // H4: KYC clear — base engine result stands (margin alone is not a veto here).
-  return { ...base, kycGate: "CLEAR" };
-}
 
 // ---------------------------------------------------------------------------
 // Cases — 6 KYC + 4 margin×KYC interaction (all SYNTHETIC / DESIGN-ONLY).
@@ -175,23 +131,25 @@ const CASES = [
 ];
 
 // ---------------------------------------------------------------------------
-// Run both engines on every case; compare against pre-registered expected.
+// Run the PRODUCTION engine (now with the implemented KYC gate) on every case;
+// compare against the pre-registered gate semantics (expected.gated). The
+// expected.base column is retained as the phase-1 (pre-fix) reference: it is the
+// behavior the engine exhibited before the gate existed.
 // ---------------------------------------------------------------------------
 const results = [];
 const log = [];
 for (const c of CASES) {
   const opp = c.build();
-  const base = evaluateDecision(opp);
-  const gated = evaluateWithKycGate(opp);
-  const brief = buildBrief(opp, "HOLD_FOR_EVIDENCE", base);
-  const actual = { base: base.recommended, gated: gated.recommended, gatedGate: gated.kycGate, briefHumanBoundary: brief.boundaryNote.includes("Human approval is always required") };
+  const eng = evaluateDecision(opp); // production engine, gate implemented
+  const brief = buildBrief(opp, "HOLD_FOR_EVIDENCE", eng);
+  const actual = { recommended: eng.recommended, kycGate: eng.kycGate, preFixBase: c.expected.base, briefHumanBoundary: brief.boundaryNote.includes("Human approval is always required") };
   const mismatch = [];
-  if (actual.base !== c.expected.base) mismatch.push(`base ${actual.base} != ${c.expected.base}`);
-  if (actual.gated !== c.expected.gated) mismatch.push(`gated ${actual.gated} != ${c.expected.gated}`);
+  if (actual.recommended !== c.expected.gated) mismatch.push(`recommended ${actual.recommended} != gated ${c.expected.gated}`);
+  if (eng.kycGate === "ABSENT" && c.id !== "KYC-E1") mismatch.push("kycGate ABSENT — gate not engaged");
   if (!actual.briefHumanBoundary) mismatch.push("human-approval boundary missing");
   const PASS = mismatch.length === 0;
-  results.push({ id: c.id, label: c.label, expected: c.expected, actual, kyc: opp.kyc, margin: opp.margin, PASS, mismatch });
-  log.push(`[${PASS ? "PASS" : "FAIL"}] ${c.id} ${c.label} | base=${actual.base} gated=${actual.gated} (exp base=${c.expected.base} gated=${c.expected.gated})`);
+  results.push({ id: c.id, label: c.label, expectedGated: c.expected.gated, preFixBase: c.expected.base, actual, kyc: opp.kyc, margin: opp.margin, PASS, mismatch });
+  log.push(`[${PASS ? "PASS" : "FAIL"}] ${c.id} ${c.label} | production=${actual.recommended} (gate=${actual.kycGate}; pre-fix base=${c.expected.base}; exp gated=${c.expected.gated})`);
   mismatch.forEach((m) => log.push(`      MISMATCH: ${m}`));
 }
 

@@ -189,6 +189,37 @@ function cleanScenario() {
   check("audit human approval still mandatory", brief.boundaryNote.includes("Human approval is always required") && brief.humanDecision === "PURSUE_NOW");
 }
 
+// ---------------------------------------------------------------------------
+// KYC gate regression (owner-authorized implementation, verified by
+// kyc-boundary-experiment.mjs — production behavior must match).
+// ---------------------------------------------------------------------------
+{
+  const kyc = (mut) => {
+    const c = cleanScenario();
+    mut(c);
+    return c;
+  };
+  // H1: sanctions/adverse -> one-vote veto DO_NOT_PURSUE
+  const e3 = evaluateDecision(kyc((c) => { c.kyc = { status: "ADVERSE", sanctionsHit: true, adverseFinding: true, beneficialOwnerVerified: true }; }));
+  check("KYC sanctions hit -> DO_NOT_PURSUE veto", e3.recommended === "DO_NOT_PURSUE" && e3.kycGate === "SANCTIONS_VETO" && e3.available.PURSUE_NOW === false && e3.available.PURSUE_CONDITIONALLY === false, e3.recommended + " gate=" + e3.kycGate);
+  // H3: margin cannot rescue sanctions veto (margin x KYC interaction)
+  const e5 = evaluateDecision(kyc((c) => { c.kyc = { status: "ADVERSE", sanctionsHit: true, adverseFinding: true, beneficialOwnerVerified: true }; c.margin = { bps: 2000 }; }));
+  check("KYC high margin cannot rescue sanctions veto", e5.recommended === "DO_NOT_PURSUE", e5.recommended);
+  // H2: KYC incomplete -> HOLD_FOR_EVIDENCE
+  const e2 = evaluateDecision(kyc((c) => { c.kyc = { status: "INCOMPLETE", beneficialOwnerVerified: false, sanctionsHit: false }; }));
+  check("KYC incomplete -> HOLD_FOR_EVIDENCE", e2.recommended === "HOLD_FOR_EVIDENCE" && e2.kycGate === "KYC_INCOMPLETE" && e2.available.PURSUE_NOW === false, e2.recommended + " gate=" + e2.kycGate);
+  // H5: insurance does not clear KYC
+  const e4 = evaluateDecision(kyc((c) => { c.kyc = { status: "INCOMPLETE", beneficialOwnerVerified: false, sanctionsHit: false }; c.margin = { bps: 0, note: "insurable but KYC unresolved" }; }));
+  check("KYC insurance does not clear gate", e4.recommended === "HOLD_FOR_EVIDENCE", e4.recommended);
+  // H6: absent kyc field -> gate ABSENT, behavior unchanged (clean positive still NOW)
+  const clean = cleanScenario();
+  const eAbsent = evaluateDecision(clean);
+  check("KYC absent field -> no gate, clean path unchanged", eAbsent.kycGate === "ABSENT" && eAbsent.recommended === "PURSUE_NOW", eAbsent.recommended + " gate=" + eAbsent.kycGate);
+  // H4: clear KYC passes through
+  const e1 = evaluateDecision(kyc((c) => { c.kyc = { status: "CLEAR", beneficialOwnerVerified: true, sanctionsHit: false, adverseFinding: false }; }));
+  check("KYC clear passes through unchanged", e1.recommended === "PURSUE_NOW" && e1.kycGate === "CLEAR", e1.recommended + " gate=" + e1.kycGate);
+}
+
 const failed = results.filter(([, ok]) => !ok);
 console.log(`\nRESULT: ${results.length - failed.length}/${results.length} PASS`);
 process.exitCode = failed.length ? 1 : 0;

@@ -98,6 +98,17 @@ export function evaluateDecision(opp) {
   const termsIncomplete = (opp.commercialTerms && opp.commercialTerms.status === "INCOMPLETE") || false;
   const blockingUnknowns = (opp.unknowns || []).filter((u) => u.blocksPursue === true);
 
+  // KYC gate (owner-authorized 2026-08-23, verified by KYC boundary experiment):
+  // structured kyc field. Sanctions/adverse finding = one-vote veto; KYC
+  // incomplete = evidence-required (HOLD). Absent field => no gate behavior,
+  // clean-input behavior unchanged. Insurance does NOT clear the gate.
+  const k = opp.kyc || {};
+  const kycStatus = String(k.status || "").toUpperCase();
+  const sanctionsHit = k.sanctionsHit === true || k.adverseFinding === true || kycStatus === "ADVERSE";
+  const kycIncomplete = kycStatus === "INCOMPLETE" || k.beneficialOwnerVerified === false;
+  const kycPresent = Object.keys(k).length > 0;
+  const kycGate = !kycPresent ? "ABSENT" : sanctionsHit ? "SANCTIONS_VETO" : kycIncomplete ? "KYC_INCOMPLETE" : "CLEAR";
+
   // S10 fix: fail closed on invalid enum values. A value outside the accepted
   // vocabulary (HIGH/STRONG/MEDIUM/LOW/WEAK/UNKNOWN/NONE/IRRELEVANT, or empty)
   // is NOT silently treated as a meaningful level — it is surfaced and the
@@ -115,6 +126,13 @@ export function evaluateDecision(opp) {
   const evidenceMissing = !evidenceQuality || evidenceQuality === "UNKNOWN";
 
   const reasons = [];
+
+  // KYC gate — surfaced reasons.
+  if (sanctionsHit) {
+    reasons.push("KYC GATE: sanctions/adverse finding — one-vote veto; DO_NOT_PURSUE regardless of margin or commercial signals.");
+  } else if (kycIncomplete) {
+    reasons.push("KYC GATE: beneficial-owner verification incomplete — evidence-required; HOLD_FOR_EVIDENCE. Insurance availability does not clear this gate.");
+  }
 
   // S10 — invalid enum surfaced, not silently consumed.
   if (hasInvalidDim) {
@@ -166,7 +184,11 @@ export function evaluateDecision(opp) {
 
   // Deterministic recommendation (pure decision-support state).
   let recommended = "HOLD_FOR_EVIDENCE";
-  if (hasInvalidDim) {
+  if (sanctionsHit) {
+    recommended = "DO_NOT_PURSUE"; // KYC gate: one-vote veto (highest priority)
+  } else if (kycIncomplete) {
+    recommended = "HOLD_FOR_EVIDENCE"; // KYC gate: evidence-required
+  } else if (hasInvalidDim) {
     recommended = "HOLD_FOR_EVIDENCE"; // S10: invalid input → evidence-required path, never a valid commercial recommendation
   } else if (categoryWeak) {
     recommended = "DO_NOT_PURSUE"; // rule 1
@@ -189,6 +211,8 @@ export function evaluateDecision(opp) {
   // State availability under the hard rules (what the human may select).
   const available = {
     PURSUE_NOW:
+      !sanctionsHit &&
+      !kycIncomplete &&
       !hasInvalidDim &&
       !categoryWeak &&
       materialContradictions.length === 0 &&
@@ -199,13 +223,13 @@ export function evaluateDecision(opp) {
       strongEvidence &&
       !weakEvidence &&
       !evidenceMissing,
-    PURSUE_CONDITIONALLY: !hasInvalidDim && !categoryWeak && !weakEvidence && !evidenceMissing,
+    PURSUE_CONDITIONALLY: !sanctionsHit && !kycIncomplete && !hasInvalidDim && !categoryWeak && !weakEvidence && !evidenceMissing,
     HOLD_FOR_EVIDENCE: true,
     ESCALATE: true,
     DO_NOT_PURSUE: true,
   };
 
-  return { recommended, available, reasons, categoryWeak, materialContradictions, termsIncomplete, quoteBasesComparable, exposure, blockingUnknowns, strongBuyerFit, strongEvidence, invalidDimensions };
+  return { recommended, available, reasons, categoryWeak, materialContradictions, termsIncomplete, quoteBasesComparable, exposure, blockingUnknowns, strongBuyerFit, strongEvidence, invalidDimensions, kycGate };
 }
 
 // ---------------------------------------------------------------------------

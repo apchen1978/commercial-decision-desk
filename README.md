@@ -135,12 +135,34 @@ evidence-required path — the recommendation becomes `HOLD_FOR_EVIDENCE` and
 inputs no longer silently inflate committed exposure. `dedupedCount` reports how
 many duplicate complete events were dropped (0 for clean inputs).
 
+### KYC / sanctions gate (owner-authorized implementation, 2026-08-23)
+
+`evaluateDecision()` reads an optional structured `kyc` field:
+
+- `kyc.status` — `CLEAR` / `INCOMPLETE` / `ADVERSE`
+- `kyc.sanctionsHit`, `kyc.adverseFinding`, `kyc.beneficialOwnerVerified`
+
+Gate semantics (verified by the KYC boundary experiment, 10/10 PASS):
+
+- **Sanctions hit / adverse finding → `DO_NOT_PURSUE`** — a one-vote veto,
+  regardless of margin, insurance availability, or commercial signals
+  (matches the domain-record claim "利潤再高都沒用 / 公司能不能活的問題").
+- **KYC incomplete / beneficial owner unverified → `HOLD_FOR_EVIDENCE`** —
+  evidence-required; insurance availability does NOT clear this gate.
+- **Clear or absent `kyc` field → gate transparent** — clean-input behavior
+  unchanged (no field = no gate).
+
+The `kycGate` result field reports `SANCTIONS_VETO` / `KYC_INCOMPLETE` /
+`CLEAR` / `ABSENT`. No scoring, no new decision states, no new dependencies.
+KYC gate semantics remain **provisional** (single domain source so far —
+interview 002 pending) but the engine behavior is deterministic and tested.
+
 ## Scenario evidence
 
-`scenario-test/` holds the owner-approved evidence-depth experiment: a **17-scenario
-matrix** (5/5 decision states, 8 adversarial types, plus 3 inbound-lead scans S13–S15)
-with pre-declared expectations, raw deterministic output, and a limitation/classification
-record. Run it with:
+`scenario-test/` holds the owner-approved evidence-depth experiment: a **20-scenario
+matrix** (5/5 decision states, 8 adversarial types, 3 inbound-lead scans S13–S15,
+3 KYC-gate regressions S16–S18) with pre-declared expectations, raw deterministic
+output, and a limitation/classification record. Run it with:
 
 ```bash
 node scenario-test/run-scenarios.mjs
@@ -150,5 +172,7 @@ S13–S15 are tagged `SYNTHETIC` + `PRE-MARGIN-GATE`: S15 (a 5%-margin custom-eq
 lead with certification costs shifted to the supplier) is the key edge case — the
 system receives the margin/cost descriptions but has no independent margin gate yet;
 see `docs/interviews/001_MARGIN_AND_COST_GATE.md` for the pending domain review.
-Current matrix: **17 scenarios — 15 PASS, 2 BASELINE_FIX_CONFIRMED, 0 FAIL,
+S16–S18 are tagged `SYNTHETIC` + `KYC-GATE` (sanctions veto / KYC-incomplete HOLD /
+clear pass-through — the owner-authorized KYC gate, see "Documented boundaries").
+Current matrix: **20 scenarios — 18 PASS, 2 BASELINE_FIX_CONFIRMED, 0 FAIL,
 deterministic** (see `scenario-test/outputs/run-log.txt`).

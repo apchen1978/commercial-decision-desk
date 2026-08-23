@@ -119,6 +119,22 @@ This is a documented responsibility boundary: the engine reflects registered
 contradictions; it does not discover them. There is no automatic NLP/agent-based
 contradiction detection, and none is planned under the current scope.
 
+### Urgent-order caller discipline: unknown supplier-switch reason (proposal 2, owner-accepted 2026-08-23)
+
+> When an urgent opportunity has an unknown supplier-switch reason, the caller must
+> register it as a blocking UNKNOWN. The engine will return `HOLD_FOR_EVIDENCE`; it
+> will not infer whether the buyer is a red flag.
+
+This is a **caller discipline rule, not an engine gate** — verified directly by the
+urgent-signal boundary experiment (U-S2/U-S4): injecting `{id:"U-SWITCH-REASON",
+blocksPursue:true}` into `unknowns[]` and re-running the unmodified
+`evaluateDecision()` yields `HOLD_FOR_EVIDENCE` through the existing
+blocking-UNKNOWN rule. The engine does NOT consume a structured `urgency` field and
+does NOT auto-judge urgency as positive or negative — the direction judgment
+("urgent = red flag") is C-bucket human intuition (single domain source F;
+interview 003 deferred). No structured `urgency` field is implemented (it would be
+a convenience, not a capability gap).
+
 ### Malformed dimension values fail closed (S10 fix)
 
 Dimension values outside the accepted vocabulary

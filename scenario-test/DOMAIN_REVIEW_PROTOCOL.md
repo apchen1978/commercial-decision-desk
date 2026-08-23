@@ -83,7 +83,8 @@
 
 以下三筆是引擎對真實形狀 inbound lead 的實際輸出，作為未來 Domain Review 的
 **標準參考點**。每筆列出「Part C 引擎視角（contract 實際收到的輸入）」與
-「Part D 分類比對（引擎判定 state 與原因）」。來源：`cdd-lead-scan.mjs`（workspace，
+「Part D 分類比對（引擎判定 state 與原因）」。來源：`lead-scan-source.mjs`（本 repo 內，
+archived canonical copy of the original `cdd-lead-scan.mjs`，commit `fbe8548`，
 SYNTHETIC 標記、無真實識別碼）；已歸檔為 S13/S14/S15。
 
 #### L1 — 歐洲 $2M 經銷商 / OA90（冷 inbound）

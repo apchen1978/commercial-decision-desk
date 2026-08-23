@@ -55,7 +55,7 @@ BASELINE_FIX_CONFIRMED, 0 FAIL, deterministic**.
 | S14 | L2 — industry referral, 500 A-302 samples by Sep 15, 30% T/T | `HOLD_FOR_EVIDENCE` | Guardrail: no quote without spec evidence — drawings/BOM not yet provided, the quoted object is UNKNOWN |
 | S15 | L3 — end-customer custom equipment, 5% margin, certification costs on supplier, HQ committee decides | `ESCALATE` | **KEY EDGE CASE** — see below |
 
-**S15 (L3) — the margin-blind edge case.** The system receives the relevant
+**S15 (L3) — the margin-not-yet-a-gate edge case.** The system receives the relevant
 descriptions in the input (`commercialFeasibility: LOW`, "5% margin",
 "certification costs on supplier"), but the current contract does **not** convert
 margin / cost-burden into an independent, explainable go/no-go gate. The engine

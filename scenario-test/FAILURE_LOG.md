@@ -22,7 +22,7 @@ the post-fix resolution.
 - verify.mjs: 38/38 PASS (no regression to the existing suite)
 - **Later extension (commit `fbe8548`):** inbound lead scan S13/S14/S15 added —
   current matrix is **17 scenarios: 15 PASS, 2 BASELINE_FIX_CONFIRMED, 0 FAIL**
-  (S13–S15 tagged SYNTHETIC + PRE-MARGIN-GATE; S15 is the margin-blind edge case).
+  (S13–S15 tagged SYNTHETIC + PRE-MARGIN-GATE; S15 is the margin-not-yet-a-gate edge case).
   This log records the post-fix run; the latest full output lives in
   `outputs/run-log.txt` / `outputs/scenario-results.raw.json`.
 

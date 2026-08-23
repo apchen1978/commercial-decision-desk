@@ -2895,7 +2895,7 @@
     "expectedState": {
       "recommended": "ESCALATE",
       "availableNow": false,
-      "invariant": "authority contradiction -> ESCALATE under current contract; margin-blind — the 5%-margin killer is invisible (PRE-MARGIN-GATE)"
+      "invariant": "authority contradiction -> ESCALATE under current contract; margin/cost information is received but not semanticized into an independent, explainable go/no-go gate (PRE-MARGIN-GATE)"
     },
     "actualState": {
       "recommended": "ESCALATE",

@@ -302,7 +302,7 @@ const SCENARIOS = [
       c.commercialTerms = { status: "INCOMPLETE", detail: "5% margin, certification costs on supplier, budget tight — economically marginal." };
       return c;
     },
-    expected: { recommended: "ESCALATE", availableNow: false, invariant: "authority contradiction -> ESCALATE under current contract; margin-blind — the 5%-margin killer is invisible (PRE-MARGIN-GATE)" },
+    expected: { recommended: "ESCALATE", availableNow: false, invariant: "authority contradiction -> ESCALATE under current contract; margin/cost information is received but not semanticized into an independent, explainable go/no-go gate (PRE-MARGIN-GATE)" },
     tags: ["SYNTHETIC", "PRE-MARGIN-GATE"],
     futureFlipNote: "After Margin gate: expected state must become DO_NOT_PURSUE (the commercial killer becomes visible). This flip is the measured evidence of decision evolution.",
   },

@@ -21,8 +21,8 @@ const EXPECTED = {
     why: "Blocking UNKNOWN: A-302 drawings/BOM not yet provided (spec unknown); urgency + referral give MEDIUM evidence but the object being quoted is UNKNOWN until drawings arrive. Category fit of 'A-302 零組件' itself unconfirmed.",
   },
   L3: {
-    recommended: "HOLD_FOR_EVIDENCE",
-    why: "Evidence Quality LOW (spec unconfirmed with end user, budget vague, authority sits with client HQ committee — this is a price-discovery inquiry) + no decision authority at the contact point. NOTE: 5% margin + certification-cost shift is a REAL-WORLD go/no-go signal the contract has no dimension for — expected to be missed by the engine.",
+    recommended: "ESCALATE",
+    why: "The contact point has NO decision authority (client HQ committee decides) while requesting a quote — registered as material contradiction (CTR-1) -> Rule 2 fires -> ESCALATE under the current contract. NOTE: the system RECEIVES the margin/cost descriptions (commercialFeasibility LOW, '5% margin', 'certification costs on supplier') but the current contract does NOT semanticize them into an independent go/no-go gate. PRE-MARGIN-GATE: after a Margin gate lands, this case is expected to flip to DO_NOT_PURSUE.",
   },
 };
 

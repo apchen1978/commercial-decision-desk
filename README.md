@@ -85,3 +85,62 @@ node verify.mjs
 Checks: all hard rules, UNKNOWN stays UNKNOWN, contradiction visible,
 deterministic payment reproducible (two runs identical), disclosure present,
 human approval required, no network/persistence usage, no real records.
+
+## Documented boundaries (evidence-depth experiment findings)
+
+These are **explicit contract boundaries** — documented so callers and reviewers
+share the same expectations. They are not defects by themselves; they define
+what the engine does and does not evaluate.
+
+### Evidence freshness / expiry is NOT evaluated (S08 finding)
+
+The decision engine evaluates **evidence quality values only**. It does **not**
+evaluate how fresh evidence is — no expiry timestamp, no staleness check, no
+age threshold. A verification note from 14 months ago is treated exactly like
+one from yesterday if both carry the same dimension value.
+
+Freshness / expiry screening is currently a **human responsibility** at intake.
+There is deliberately **no universal expiry threshold** — a 90-day-old price
+confirmation may be useless while a 2-year-old buyer relationship record may
+still matter; only domain judgment can decide. If you want an engine-level
+expiry gate, that is a separate, owner-approved design decision — not something
+this engine invents on its own.
+
+### Contradiction records are expected to be normalized UPSTREAM (S12 finding)
+
+`evaluateDecision()` reads the opportunity's `contradictions` array **as given**.
+The engine does **not** scan evidence notes or free text to detect contradictions
+itself. Callers / the human workflow are expected to **normalize contradiction
+records before calling `evaluateDecision()`** — i.e., conflicting evidence must
+already be registered as entries in `contradictions` (with `material: true` and
+`status: "UNRESOLVED"`) for Rule 2 to fire.
+
+This is a documented responsibility boundary: the engine reflects registered
+contradictions; it does not discover them. There is no automatic NLP/agent-based
+contradiction detection, and none is planned under the current scope.
+
+### Malformed dimension values fail closed (S10 fix)
+
+Dimension values outside the accepted vocabulary
+(`HIGH / STRONG / MEDIUM / LOW / WEAK / UNKNOWN / NONE / IRRELEVANT`, or empty)
+are **not** silently treated as a meaningful level. `evaluateDecision()` marks
+the dimension invalid, surfaces it in `reasons`, and fails closed to the
+evidence-required path — the recommendation becomes `HOLD_FOR_EVIDENCE` and
+`PURSUE_NOW` / `PURSUE_CONDITIONALLY` are unavailable.
+
+### Duplicate payment events are de-duplicated (S11 fix)
+
+`paymentExposure()` de-duplicates complete payment events by
+`(label, amountCny, daysFromSign)`, preserving first occurrence. Duplicate
+inputs no longer silently inflate committed exposure. `dedupedCount` reports how
+many duplicate complete events were dropped (0 for clean inputs).
+
+## Scenario evidence
+
+`scenario-test/` holds the owner-approved evidence-depth experiment: a 12-scenario
+matrix (5/5 decision states, 8 adversarial types) with pre-declared expectations,
+raw deterministic output, and a limitation/classification record. Run it with:
+
+```bash
+node scenario-test/run-scenarios.mjs
+```

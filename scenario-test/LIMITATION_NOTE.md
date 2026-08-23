@@ -1,30 +1,32 @@
 # CDD Limitation Note — Evidence-Depth Stress Test (2026-08-23)
 
-**Repository:** apchen1978/commercial-decision-desk @ 539f945 (baseline, unmodified)
+**Repository:** apchen1978/commercial-decision-desk @ 539f945 (baseline) → post-fix
 **Experiment:** CDD Evidence Depth (owner-authorized; scenario stress test only)
-**Result:** Verdict B — EVIDENCE_FOUND_FIX_RECOMMENDED (see CDD_SCENARIO_MATRIX.md §4)
+**Result:** Verdict B — EVIDENCE_FOUND_FIX_RECOMMENDED (owner-accepted; closing executed)
 
-## Known limitations discovered by the experiment (new)
+## Limitations status (post owner review)
 
-1. **Expired evidence carries no signal (S08).** The engine consumes only
-   `dimensions.value`; evidence `tier` is a human-facing annotation and never gates a
-   decision. A stale verification note is commercially indistinguishable from a current
-   one. The fixture tier vocabulary has no EXPIRED tier, and the contract never states
-   that tiers are annotation-only.
+| # | Gap | Status after closing |
+|---|---|---|
+| 1 | Expired evidence (S08) | **DOCUMENTED boundary** — engine does not evaluate freshness/expiry; no universal threshold invented (README §Documented boundaries) |
+| 2 | Malformed enum (S10) | **FIXED** — whitelist validation, fail-closed to HOLD_FOR_EVIDENCE, reason surfaced; regression S10R PASS |
+| 3 | Duplicate events (S11) | **FIXED** — de-dup by (label, amountCny, daysFromSign), dedupedCount reported; regression S11R PASS |
+| 4 | Unscreened contradictions (S12) | **DOCUMENTED boundary** — contradiction records must be normalized upstream; engine reflects registered contradictions only; no NLP/agent (README §Documented boundaries) |
 
-2. **No dimension-value validation (S10).** A value outside the
-   HIGH/STRONG/MEDIUM/LOW/WEAK/UNKNOWN/NONE/IRRELEVANT vocabulary is silently treated as
-   "not strong" and falls through to PURSUE_CONDITIONALLY — no error, no UNKNOWN marker,
-   no diagnostic. Garbage input changes the recommendation quietly.
+## Known limitations remaining (post-fix)
 
-3. **No payment-event de-dup (S11).** Duplicated events double-count committed exposure
-   (S11: total 109,200 vs true 84,000). Peak happened to be safe because the duplicates
-   shared a day; duplicates on different days would corrupt the peak too.
+1. **Evidence freshness / expiry is not evaluated (S08, documented).** The engine
+   consumes only `dimensions.value`; `tier` is a human-facing annotation and never
+   gates a decision. A stale verification note is commercially indistinguishable
+   from a current one. Freshness screening remains a human responsibility at intake.
+   No universal expiry threshold exists by design.
 
-4. **Contradiction detection is human-only and undocumented (S12).** The engine surfaces
-   contradictions that appear in the pre-filled `contradictions` array; it does not scan
-   evidence notes. A screening miss silently yields PURSUE_NOW on directly conflicting
-   primary evidence. The division of responsibility is not stated in the contract.
+2. **Contradiction detection is human-only (S12, documented).** The engine surfaces
+   contradictions that appear in the pre-filled `contradictions` array; it does not
+   scan evidence notes. Callers must normalize contradiction records upstream of
+   `evaluateDecision()`. A screening miss can still silently yield pursuit on
+   conflicting primary evidence — this is now an explicit, documented contract
+   boundary rather than an undocumented gap.
 
 ## What the experiment does NOT prove (evidence maturity boundary)
 
@@ -35,19 +37,21 @@
 
 ## Deliberately unchanged
 
-- No engine modification (STOP at pre-fix owner review gate per owner amendment).
+- No engine changes beyond the two owner-authorized fixes (S10 fail-closed enum,
+  S11 input de-dup). No CDD V2, no UI changes, no new agents, no new integrations.
 - No fixture changes to production `fixtures.js` (the isolated harness builds its own
   mutated fixtures in-memory; `fixtures.js` untouched).
-- No portfolio copy, One-Pager, or Capability Brief changes.
-- No CDD V2. No feature expansion.
+- No portfolio copy, One-Pager, or Capability Brief changes (Document Parity: N/A —
+  Level 2 evidence does not materially change any existing external claim).
+- No evidence-maturity promotion beyond LEVEL 2 SCENARIO TESTED.
 
-## Proposed smallest corrections (for owner/Codex review — NOT applied)
+## Proposed smallest corrections (owner decision required for the documented gaps)
 
-| # | Gap | Smallest correction | Changes decision semantics? |
-|---|---|---|---|
-| 1 | Expired evidence (S08) | (a) Document tiers as annotation-only; or (b) EXPIRED tier caps effective evidenceQuality at UNKNOWN | (a) no / (b) yes |
-| 2 | Malformed enum (S10) | Whitelist dimension values; on violation mark UNKNOWN + surface reason | yes (malformed inputs only) |
-| 3 | Duplicate events (S11) | De-dup at input boundary by (label, amountCny, daysFromSign) or reject loudly | no (clean inputs unaffected) |
-| 4 | Unscreened contradictions (S12) | Document the human-only detection boundary explicitly | no |
+| # | Gap | Smallest correction | Changes decision semantics? | Status |
+|---|---|---|---|---|
+| 1 | Expired evidence (S08) | (a) Document tiers as annotation-only; or (b) EXPIRED tier caps effective evidenceQuality at UNKNOWN | (a) no / (b) yes | **(a) done — documented; (b) NOT authorized** |
+| 2 | Malformed enum (S10) | Whitelist dimension values; on violation mark UNKNOWN + surface reason | yes (malformed inputs only) | **FIXED (authorized)** |
+| 3 | Duplicate events (S11) | De-dup at input boundary by (label, amountCny, daysFromSign) or reject loudly | no (clean inputs unaffected) | **FIXED (authorized)** |
+| 4 | Unscreened contradictions (S12) | Document the human-only detection boundary explicitly | no | **done — documented** |
 
 Owner/Codex decision required before any of these are implemented.

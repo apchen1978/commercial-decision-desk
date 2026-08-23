@@ -8,9 +8,15 @@
 [PASS] S07 Weak Category Fit => DO_NOT_PURSUE even when every other signal (buyer fit, evidence, exposure, terms) is positive. Attractive signals must not override weak fit.
 [PASS] S08 EXPIRED evidence: evidence tier records EXPIRED but value remains HIGH. Engine consumes only dimensions.value — does it detect expiry? (Adversarial: expired evidence must not be treated as current.)
 [PASS] S09 Non-comparable quote bases must NOT be force-ranked; the decision may still be positive (Rule 4 is a disclosure gate, not a pursuit gate).
-[PASS] S10 MALFORMED enum: buyerFit.value='HYPERSONIC' (not in HIGH/STRONG/MEDIUM/LOW/UNKNOWN vocabulary). Engine must not silently treat garbage as a meaningful level, and must not convert it to a fact.
-[PASS] S11 DUPLICATE payment event (same label/amount submitted twice) — exposure must not double-count unless the engine de-duplicates inputs.
+[BASELINE_FIX_CONFIRMED] S10 MALFORMED enum: buyerFit.value='HYPERSONIC' (not in HIGH/STRONG/MEDIUM/LOW/UNKNOWN vocabulary). Engine must not silently treat garbage as a meaningful level, and must not convert it to a fact.
+        (pre-fix baseline — expected to diverge after fix; divergence confirms the fix)
+        MISMATCH: recommended HOLD_FOR_EVIDENCE != PURSUE_CONDITIONALLY
+[PASS] S10R REGRESSION (post-fix S10): malformed enum fail-closes to UNKNOWN/evidence-required path — HOLD_FOR_EVIDENCE, no valid commercial recommendation, reason surfaced.
+[BASELINE_FIX_CONFIRMED] S11 DUPLICATE payment event (same label/amount submitted twice) — exposure must not double-count unless the engine de-duplicates inputs.
+        (pre-fix baseline — expected to diverge after fix; divergence confirms the fix)
+        MISMATCH: exposureTotal 84000 != 109200
+[PASS] S11R REGRESSION (post-fix S11): duplicate complete payment event is de-duplicated (label+amountCny+daysFromSign), total exposure not inflated, dedupedCount=1.
 [PASS] S12 INCONSISTENT SOURCE EVIDENCE: two evidence notes in the same dimension directly contradict each other, but the contradictions array is empty. Does the engine detect it autonomously?
 
 DETERMINISM: identical across independent runs
-SCENARIOS: 12 | PASS 12 | FAIL 0
+SCENARIOS: 14 | PASS 12 | BASELINE_FIX_CONFIRMED 2 | FAIL 0 | BASELINE_FIX_ABSENT 0

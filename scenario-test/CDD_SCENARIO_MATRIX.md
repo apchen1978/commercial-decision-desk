@@ -2,6 +2,7 @@
 
 **Repository under test:** `apchen1978/commercial-decision-desk`
 **Baseline commit:** `539f945` (HEAD at experiment start; working tree clean)
+**Post-fix commits:** `6141606` (experiment artifacts) → engine fixes + regression (see Git section)
 **Harness:** `scenario-test/run-scenarios.mjs` (isolated, reads `fixtures.js` + `decision-engine.js`, never modifies them)
 **Raw output:** `scenario-test/outputs/scenario-results.raw.json` (full mutated fixtures + actual states, verbatim)
 **Run log:** `scenario-test/outputs/run-log.txt`
@@ -10,6 +11,52 @@
 > Method per owner amendment: expected behavior declared **before** execution; existing
 > decision contract run deterministically; actual recorded; expected vs actual compared;
 > every mismatch preserved and classified. No engine modification. No claim inflation.
+
+## POST-FIX RUN (owner-review closing)
+
+After owner review (EXPERIMENT ACCEPTED, VERDICT B ACCEPTED), the following were
+authorized and executed:
+
+1. Experiment artifacts committed as `6141606`.
+2. **S11 fix** — `paymentExposure()` de-duplicates complete events by
+   `(label, amountCny, daysFromSign)`, first occurrence preserved; `dedupedCount`
+   reports dropped duplicates. No payment-model redesign.
+3. **S10 fix** — `evaluateDecision()` whitelists dimension values
+   (`HIGH/STRONG/MEDIUM/LOW/WEAK/UNKNOWN/NONE/IRRELEVANT`); invalid values are
+   surfaced in `reasons` and fail closed to the evidence-required path
+   (`HOLD_FOR_EVIDENCE`; `PURSUE_NOW`/`PURSUE_CONDITIONALLY` unavailable).
+   No scoring, no new states.
+4. **S08 documented only** — evidence freshness/expiry is NOT evaluated by the
+   engine; no universal expiry threshold invented (see README "Documented boundaries").
+5. **S12 documented only** — contradiction records are expected to be normalized
+   upstream before `evaluateDecision()`; the engine reflects registered
+   contradictions only; no NLP/agent detection (see README).
+6. Regression scenarios S10R/S11R added; original S10/S11 preserved as pre-fix
+   baselines (expected to diverge — divergence confirms the fix).
+7. Full suite re-run: `verify.mjs` 38/38 PASS; scenario matrix 14/14 (12 PASS,
+   2 BASELINE_FIX_CONFIRMED, 0 FAIL, 0 BASELINE_FIX_ABSENT), deterministic.
+8. Evidence maturity remains **LEVEL 2 SCENARIO TESTED** (not promoted).
+9. Paul OS rule **FEATURE DEPTH ≠ EVIDENCE DEPTH** adopted (see Paul OS principles).
+10. Document Parity Closing Rule evaluated — no public copy changes required
+    (Level 2 evidence does not materially change any existing external claim).
+
+### S10 before / after (malformed enum)
+
+| | Before fix | After fix |
+|---|---|---|
+| Input | `buyerFit.value="HYPERSONIC"` | identical |
+| Recommendation | `PURSUE_CONDITIONALLY` (silent downgrade — garbage consumed as "not strong") | `HOLD_FOR_EVIDENCE` (fail closed to evidence-required path) |
+| Reason surfaced | none | `Rule: Invalid dimension value in buyerFit — value is not in the accepted vocabulary; treated as UNKNOWN; evidence-required path is recommended.` |
+| UNKNOWN marker | absent | present (invalid value treated as UNKNOWN) |
+
+### S11 before / after (duplicate payment event)
+
+| | Before fix | After fix |
+|---|---|---|
+| Input | PE-1 + PE-1b (identical label/amount/day) + PE-2 | identical |
+| Total committed exposure | 109,200 (25,200 counted twice) | 84,000 (true commitments) |
+| dedupedCount | n/a | 1 |
+| Peak window | 58,800 (safe only because duplicates shared a day) | 58,800 (same, now correct by construction) |
 
 ---
 
@@ -199,17 +246,16 @@ Net: 2 UNKNOWNs that should have been created (S10, S12) were not — both are c
 ## 7. Evidence maturity
 
 - **Before:** LEVEL 1 VERIFIED (23/23 verify.mjs hard-rule checks, deterministic).
-- **After:** **LEVEL 2 SCENARIO TESTED** (12 scenarios + 1 boundary variant, 5/5 states, 8 adversarial types, deterministic across independent runs).
+- **After experiment (pre-fix):** LEVEL 2 SCENARIO TESTED (12 scenarios + 1 boundary variant, 5/5 states, 8 adversarial types, deterministic across independent runs).
+- **After owner-review closing (current):** **LEVEL 2 SCENARIO TESTED** — same level, now with S10/S11 fixes and regression coverage (14 scenarios: 12 PASS + 2 baseline-confirmed; verify.mjs 38/38). **Not promoted beyond Level 2.**
 - **Not claimed:** DOMAIN REVIEWED / WORKFLOW OBSERVED / REAL-WORLD EVIDENCE / OUTCOME EVIDENCE. Synthetic scenario coverage proves decision-contract behavior only — not adoption, real-deal accuracy, ROI, time saved, better decisions, or market demand.
 
 ## 8. Verdict
 
-**B — EVIDENCE_FOUND_FIX_RECOMMENDED.**
+**B — EVIDENCE_FOUND_FIX_RECOMMENDED** (owner-accepted).
 
-12/12 scenarios + boundary PASS against the pre-declared reading of the current contract,
-and the experiment's value is precisely that four adversarial scenarios exposed
-boundaries the contract does not define (expired evidence, malformed enums, duplicate
-payment events, unscreened contradictions). None are engine-logic defects in the sense
-of violating a *stated* rule; all are **missing/undocumented boundaries**. No engine
-modification was made. Proposed corrections are listed in §4 for owner/Codex review —
-**STOP at the pre-fix owner review gate.**
+Post-fix status: authorized corrections applied (S10 fail-closed enum, S11 input
+de-dup), S08/S12 documented as contract boundaries, regressions pass, full suite
+green. Remaining findings (S08, S12) are **documented boundaries**, not open defects.
+No engine changes beyond the two authorized fixes. Evidence maturity stays at
+LEVEL 2. STOP per owner closing instructions.

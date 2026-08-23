@@ -25,17 +25,34 @@ export function dedupePreserveOrder(items) {
 
 // ---------------------------------------------------------------------------
 // Deterministic payment exposure — only from COMPLETE events (hard rule 5).
+// S11 fix: duplicate complete events (same label+amountCny+daysFromSign) are
+// de-duplicated, first occurrence preserved — duplicates must not silently
+// inflate committed exposure. dedupedCount reports how many were dropped.
 // ---------------------------------------------------------------------------
 export function paymentExposure(events, opts = {}) {
   const windowDays = opts.windowDays ?? 7;
-  const complete = (events || []).filter((e) => e.status === "COMPLETE" && Number.isFinite(e.amountCny) && Number.isFinite(e.daysFromSign));
-  const incomplete = (events || []).filter((e) => e.status !== "COMPLETE" || !Number.isFinite(e.amountCny) || !Number.isFinite(e.daysFromSign));
+  const raw = events || [];
+  const complete = [];
+  const seen = new Set();
+  for (const e of raw) {
+    if (e.status === "COMPLETE" && Number.isFinite(e.amountCny) && Number.isFinite(e.daysFromSign)) {
+      const key = `${e.label ?? ""}|${e.amountCny}|${e.daysFromSign}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        complete.push(e);
+      }
+    }
+  }
+  const incomplete = raw.filter((e) => e.status !== "COMPLETE" || !Number.isFinite(e.amountCny) || !Number.isFinite(e.daysFromSign));
+  const completeInputs = raw.filter((e) => e.status === "COMPLETE" && Number.isFinite(e.amountCny) && Number.isFinite(e.daysFromSign));
+  const dedupedCount = completeInputs.length - complete.length;
 
   if (complete.length === 0) {
     return {
       computed: false,
       reason: "UNKNOWN — no complete payment-event inputs; exposure is NOT calculated.",
       incompleteCount: incomplete.length,
+      dedupedCount,
     };
   }
 
@@ -62,6 +79,7 @@ export function paymentExposure(events, opts = {}) {
     byEvent,
     incompleteCount: incomplete.length,
     incompleteLabels: incomplete.map((e) => e.label),
+    dedupedCount,
   };
 }
 
@@ -80,12 +98,28 @@ export function evaluateDecision(opp) {
   const termsIncomplete = (opp.commercialTerms && opp.commercialTerms.status === "INCOMPLETE") || false;
   const blockingUnknowns = (opp.unknowns || []).filter((u) => u.blocksPursue === true);
 
+  // S10 fix: fail closed on invalid enum values. A value outside the accepted
+  // vocabulary (HIGH/STRONG/MEDIUM/LOW/WEAK/UNKNOWN/NONE/IRRELEVANT, or empty)
+  // is NOT silently treated as a meaningful level — it is surfaced and the
+  // recommendation falls into the UNKNOWN/evidence-required path.
+  const VALID_DIM_VALUES = new Set(["HIGH", "STRONG", "MEDIUM", "LOW", "WEAK", "UNKNOWN", "NONE", "IRRELEVANT"]);
+  const invalidDimensions = [];
+  if (!VALID_DIM_VALUES.has(categoryFit)) invalidDimensions.push("categoryFit");
+  if (!VALID_DIM_VALUES.has(buyerFit)) invalidDimensions.push("buyerFit");
+  if (!VALID_DIM_VALUES.has(evidenceQuality)) invalidDimensions.push("evidenceQuality");
+  const hasInvalidDim = invalidDimensions.length > 0;
+
   const strongBuyerFit = ["HIGH", "STRONG"].includes(buyerFit);
   const strongEvidence = ["HIGH", "STRONG"].includes(evidenceQuality);
   const weakEvidence = ["LOW", "WEAK"].includes(evidenceQuality);
   const evidenceMissing = !evidenceQuality || evidenceQuality === "UNKNOWN";
 
   const reasons = [];
+
+  // S10 — invalid enum surfaced, not silently consumed.
+  if (hasInvalidDim) {
+    reasons.push(`Rule: Invalid dimension value in ${invalidDimensions.join(", ")} — value is not in the accepted vocabulary; treated as UNKNOWN; evidence-required path is recommended.`);
+  }
 
   // Hard rule 1 — weak/irrelevant Category Fit can never produce PURSUE_NOW.
   const categoryWeak = ["WEAK", "LOW", "IRRELEVANT", "NONE"].includes(categoryFit);
@@ -132,7 +166,9 @@ export function evaluateDecision(opp) {
 
   // Deterministic recommendation (pure decision-support state).
   let recommended = "HOLD_FOR_EVIDENCE";
-  if (categoryWeak) {
+  if (hasInvalidDim) {
+    recommended = "HOLD_FOR_EVIDENCE"; // S10: invalid input → evidence-required path, never a valid commercial recommendation
+  } else if (categoryWeak) {
     recommended = "DO_NOT_PURSUE"; // rule 1
   } else if (materialContradictions.length > 0) {
     recommended = "ESCALATE"; // rule 2
@@ -153,6 +189,7 @@ export function evaluateDecision(opp) {
   // State availability under the hard rules (what the human may select).
   const available = {
     PURSUE_NOW:
+      !hasInvalidDim &&
       !categoryWeak &&
       materialContradictions.length === 0 &&
       !termsIncomplete &&
@@ -162,13 +199,13 @@ export function evaluateDecision(opp) {
       strongEvidence &&
       !weakEvidence &&
       !evidenceMissing,
-    PURSUE_CONDITIONALLY: !categoryWeak && !weakEvidence && !evidenceMissing,
+    PURSUE_CONDITIONALLY: !hasInvalidDim && !categoryWeak && !weakEvidence && !evidenceMissing,
     HOLD_FOR_EVIDENCE: true,
     ESCALATE: true,
     DO_NOT_PURSUE: true,
   };
 
-  return { recommended, available, reasons, categoryWeak, materialContradictions, termsIncomplete, quoteBasesComparable, exposure, blockingUnknowns, strongBuyerFit, strongEvidence };
+  return { recommended, available, reasons, categoryWeak, materialContradictions, termsIncomplete, quoteBasesComparable, exposure, blockingUnknowns, strongBuyerFit, strongEvidence, invalidDimensions };
 }
 
 // ---------------------------------------------------------------------------

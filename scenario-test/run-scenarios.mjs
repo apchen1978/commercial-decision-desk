@@ -156,6 +156,21 @@ const SCENARIOS = [
       return c;
     },
     expected: { recommended: "PURSUE_CONDITIONALLY", availableNow: false, invariant: "malformed input must not fabricate a level or a fact", adversarial: true },
+    baseline: true,
+    // NOTE: pre-fix engine returned PURSUE_CONDITIONALLY (silent downgrade).
+    // S10R below asserts the post-fix fail-closed behavior. Both records are kept:
+    // S10 preserves the original adversarial case as evidence of why the fix exists.
+  },
+  {
+    id: "S10R",
+    claim: "REGRESSION (post-fix S10): malformed enum fail-closes to UNKNOWN/evidence-required path — HOLD_FOR_EVIDENCE, no valid commercial recommendation, reason surfaced.",
+    build: () => {
+      const c = cleanPositive();
+      c.dimensions.buyerFit.value = "HYPERSONIC";
+      return c;
+    },
+    expected: { recommended: "HOLD_FOR_EVIDENCE", availableNow: false, availableConditionally: false, invariant: "malformed input fails closed into evidence-required path" },
+    isRegression: true,
   },
   {
     id: "S11",
@@ -170,6 +185,25 @@ const SCENARIOS = [
       return c;
     },
     expected: { recommended: "PURSUE_NOW", availableNow: true, exposureTotal: 109200, invariant: "duplicate inputs must not silently inflate exposure", adversarial: true },
+    baseline: true,
+    // NOTE: pre-fix engine returned exposureTotal 109200 (double-counted).
+    // S11R below asserts the post-fix de-dup behavior. Both records are kept:
+    // S11 preserves the original adversarial case as evidence of why the fix exists.
+  },
+  {
+    id: "S11R",
+    claim: "REGRESSION (post-fix S11): duplicate complete payment event is de-duplicated (label+amountCny+daysFromSign), total exposure not inflated, dedupedCount=1.",
+    build: () => {
+      const c = cleanPositive();
+      c.paymentEvents = [
+        { id: "PE-1", label: "Deposit (30%)", amountCny: 25200, daysFromSign: 0, status: "COMPLETE" },
+        { id: "PE-1b", label: "Deposit (30%)", amountCny: 25200, daysFromSign: 0, status: "COMPLETE" },
+        { id: "PE-2", label: "Balance (70%)", amountCny: 58800, daysFromSign: 45, status: "COMPLETE" },
+      ];
+      return c;
+    },
+    expected: { recommended: "PURSUE_NOW", availableNow: true, exposureTotal: 84000, dedupedCount: 1, invariant: "duplicate inputs de-duplicated; exposure reflects true commitments" },
+    isRegression: true,
   },
   {
     id: "S12",
@@ -211,6 +245,8 @@ for (const s of SCENARIOS) {
     exposureComputed: e.exposure.computed,
     exposureTotalCny: e.exposure.totalCommittedCny ?? null,
     exposurePeakCny: e.exposure.peakWindowCny ?? null,
+    dedupedCount: e.exposure.dedupedCount ?? null,
+    invalidDimensions: e.invalidDimensions ?? [],
     materialContradictions: e.materialContradictions.length,
     blockingUnknowns: e.blockingUnknowns.length,
     reasons: e.reasons,
@@ -223,12 +259,24 @@ for (const s of SCENARIOS) {
   const mismatchReasons = [];
   if (actual.recommended !== s.expected.recommended) mismatchReasons.push(`recommended ${actual.recommended} != ${s.expected.recommended}`);
   if (actual.availableNow !== s.expected.availableNow) mismatchReasons.push(`availableNow ${actual.availableNow} != ${s.expected.availableNow}`);
+  if (s.expected.availableConditionally !== undefined && actual.availableConditionally !== s.expected.availableConditionally)
+    mismatchReasons.push(`availableConditionally ${actual.availableConditionally} != ${s.expected.availableConditionally}`);
   if (s.expected.exposureTotal !== undefined && actual.exposureTotalCny !== s.expected.exposureTotal)
     mismatchReasons.push(`exposureTotal ${actual.exposureTotalCny} != ${s.expected.exposureTotal}`);
+  if (s.expected.dedupedCount !== undefined && actual.dedupedCount !== s.expected.dedupedCount)
+    mismatchReasons.push(`dedupedCount ${actual.dedupedCount} != ${s.expected.dedupedCount}`);
   if (!actual.briefHumanBoundary) mismatchReasons.push("human-approval boundary note missing from brief");
   if (!actual.briefSynthetic) mismatchReasons.push("synthetic flag missing from brief");
 
-  const PASS = mismatchReasons.length === 0;
+  // S10/S11 are preserved PRE-FIX baselines: their expected state encodes the OLD
+  // behavior. After the fix, they MUST diverge — divergence is the evidence the
+  // fix exists. A match would mean the fix is absent.
+  let verdict;
+  if (s.baseline) {
+    verdict = mismatchReasons.length === 0 ? "BASELINE_FIX_ABSENT" : "BASELINE_FIX_CONFIRMED";
+  } else {
+    verdict = mismatchReasons.length === 0 ? "PASS" : "FAIL";
+  }
 
   // -------- boundary variant (S06 only) --------
   let boundary = null;
@@ -250,10 +298,10 @@ for (const s of SCENARIOS) {
     noApprovals: ["supplier selection", "pricing", "margin acceptance", "external communication", "commercial commitment"].every((w) => !brief.boundaryNote.toLowerCase().includes(w)),
   };
 
-  results.push({ ...s, actual, PASS, mismatchReasons, boundary, invariantChecks });
+  results.push({ ...s, actual, verdict, mismatchReasons, boundary, invariantChecks });
 
-  const status = PASS ? "PASS" : "FAIL";
-  log.push(`[${status}] ${s.id} ${s.claim}`);
+  log.push(`[${verdict}] ${s.id} ${s.claim}`);
+  if (s.baseline) log.push(`        (pre-fix baseline — expected to diverge after fix; divergence confirms the fix)`);
   if (mismatchReasons.length) mismatchReasons.forEach((m) => log.push(`        MISMATCH: ${m}`));
   if (boundary) log.push(`        boundary[${s.boundaryVariant.label}]: ${boundary.PASS ? "PASS" : "FAIL " + boundary.mismatch.join("; ")}`);
 }
@@ -271,8 +319,10 @@ writeFileSync(
       expectedState: r.expected,
       actualState: r.actual,
       invariantChecks: r.invariantChecks,
-      PASS: r.PASS,
+      verdict: r.verdict,
       mismatchReasons: r.mismatchReasons,
+      baseline: r.baseline === true,
+      isRegression: r.isRegression === true,
       boundaryVariant: r.boundary,
     })),
     null,
@@ -289,7 +339,11 @@ const firstRun = SCENARIOS.map((s) => JSON.stringify(run(s).engine));
 const secondRun = SCENARIOS.map((s) => JSON.stringify(run(s).engine));
 const deterministic = JSON.stringify(firstRun) === JSON.stringify(secondRun);
 log.push(`\nDETERMINISM: ${deterministic ? "identical across independent runs" : "DIFFERED ACROSS RUNS"}`);
-log.push(`SCENARIOS: ${results.length} | PASS ${results.filter((r) => r.PASS).length} | FAIL ${results.filter((r) => !r.PASS).length}`);
+const passCount = results.filter((r) => r.verdict === "PASS").length;
+const baselineConfirmed = results.filter((r) => r.verdict === "BASELINE_FIX_CONFIRMED").length;
+const failCount = results.filter((r) => r.verdict === "FAIL").length;
+const baselineAbsent = results.filter((r) => r.verdict === "BASELINE_FIX_ABSENT").length;
+log.push(`SCENARIOS: ${results.length} | PASS ${passCount} | BASELINE_FIX_CONFIRMED ${baselineConfirmed} | FAIL ${failCount} | BASELINE_FIX_ABSENT ${baselineAbsent}`);
 
 writeFileSync(join(OUT, "run-log.txt"), log.join("\n") + "\n", "utf8");
 console.log(log.join("\n"));

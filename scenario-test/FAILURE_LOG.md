@@ -5,14 +5,21 @@ and any scenario whose actual state diverged from expected. Per owner amendment:
 "a failed adversarial scenario is valuable evidence" — disagreements are preserved, not
 smoothed over.
 
-## Summary
+## Post-fix closing note
 
-- Scenarios: 12 + 1 boundary variant
-- Expected-vs-actual mismatches (strict): **0** — every scenario matched its pre-declared
-  reading of the current contract; determinism verified across two independent runs.
-- Ideal-vs-actual disagreements (contract-boundary findings): **4** — S08, S10, S11, S12.
-  These are not violations of a *stated* rule; they are boundaries the contract does not
-  define. Each is recorded below with classification per owner taxonomy.
+Owner accepted Verdict B and authorized two fixes + two documentation items. After the
+fixes, the two original adversarial scenarios (S10, S11) became **pre-fix baselines**
+and now intentionally diverge from their recorded pre-fix expected states — the
+divergence is the evidence the fixes exist (verdict `BASELINE_FIX_CONFIRMED`). The
+disagreement log below therefore records both the pre-fix behavior (as evidence) and
+the post-fix resolution.
+
+## Summary (post-fix run)
+
+- Scenarios: 14 (12 original + S10R/S11R regressions) + 1 boundary variant
+- PASS: 12 · BASELINE_FIX_CONFIRMED: 2 (S10, S11) · FAIL: 0 · BASELINE_FIX_ABSENT: 0
+- Determinism: identical across two independent runs
+- verify.mjs: 38/38 PASS (no regression to the existing suite)
 
 ## Disagreement log
 
@@ -27,34 +34,32 @@ smoothed over.
 ### D2 — S10 · MALFORMED enum value
 - **Ideal expectation:** unparsable input should be rejected or marked UNKNOWN, never
   silently consumed as if valid.
-- **Actual:** buyerFit "HYPERSONIC" → PURSUE_CONDITIONALLY, no error, no UNKNOWN marker.
-- **Classification:** missing boundary — no input validation.
-- **UNKNOWN preserved:** no — the unparsable value was converted into a plausible
-  conditional-pursuit recommendation.
-- **Limitation:** any dimension-value typo silently changes the recommendation.
-- **Follow-up:** owner decision — value whitelist (§4.2 matrix).
+- **Actual (pre-fix):** buyerFit "HYPERSONIC" → PURSUE_CONDITIONALLY, no error, no UNKNOWN marker.
+- **Actual (post-fix):** → HOLD_FOR_EVIDENCE, reason "Invalid dimension value in buyerFit"
+  surfaced, PURSUE_NOW/PURSUE_CONDITIONALLY unavailable. Regression S10R PASS.
+- **Classification:** missing boundary — no input validation. **RESOLVED (authorized fix).**
+- **UNKNOWN preserved:** now yes (invalid value treated as UNKNOWN).
+- **Follow-up:** none — closed.
 
 ### D3 — S11 · DUPLICATE payment event
 - **Ideal expectation:** duplicate committed events must not inflate exposure.
-- **Actual:** total committed exposure 109,200 CNY (true 84,000) — double-counted;
+- **Actual (pre-fix):** total committed exposure 109,200 CNY (true 84,000) — double-counted;
   peak 58,800 unchanged only because duplicates share the same day.
-- **Classification:** missing boundary — no input de-dup.
+- **Actual (post-fix):** total 84,000; dedupedCount=1; regression S11R PASS.
+- **Classification:** missing boundary — no input de-dup. **RESOLVED (authorized fix).**
 - **UNKNOWN preserved:** n/a.
-- **Limitation:** schedule-assembly duplicates silently inflate the one deterministic
-  number the deck produces.
-- **Follow-up:** owner decision — de-dup at input boundary (§4.3 matrix).
+- **Follow-up:** none — closed.
 
 ### D4 — S12 · INCONSISTENT SOURCE EVIDENCE
 - **Ideal expectation:** contradictory material evidence must surface (escalation).
 - **Actual:** two directly conflicting PRIMARY notes, empty contradictions array →
   PURSUE_NOW; conflict invisible to the engine.
 - **Classification:** ambiguous decision rule / undocumented boundary (human-only
-  detection, never stated).
-- **UNKNOWN preserved:** no — the conflict never surfaced as contradiction or UNKNOWN.
-- **Limitation:** the central escalation guard is only as strong as the human screening
-  pass; the miss case is exactly the case that would silently pass.
-- **Follow-up:** owner decision — document boundary, or (feature expansion, not
-  recommended) note-level conflict heuristic (§4.4 matrix).
+  detection, never stated). **RESOLVED as documented boundary** — README now states
+  contradiction records must be normalized upstream; engine reflects registered
+  contradictions only; no NLP/agent detection.
+- **UNKNOWN preserved:** n/a (boundary documented, engine behavior unchanged by design).
+- **Follow-up:** none — closed as documentation.
 
 ## Non-findings (checked, held)
 
@@ -65,8 +70,11 @@ smoothed over.
 - Human approval remained mandatory in every brief; no approval fields exist in engine
   output: held (structural).
 
-## Bottom line
+## Bottom line (post-fix)
 
-0 strict mismatches; 4 boundary disagreements discovered; 0 engine-logic defects
-(violations of stated rules). No engine modification performed — STOP at pre-fix owner
-review gate.
+Original run: 0 strict mismatches; 4 boundary disagreements discovered; 0 engine-logic
+defects. Owner accepted Verdict B. Post-fix: S10 and S11 resolved by authorized engine
+fixes (verified by S10R/S11R regressions and BASELINE_FIX_CONFIRMED divergence); S08 and
+S12 resolved as documented boundaries in README. verify.mjs 38/38 PASS; scenario matrix
+14 scenarios — 12 PASS, 2 BASELINE_FIX_CONFIRMED, 0 FAIL. Evidence maturity remains
+LEVEL 2 SCENARIO TESTED. STOP per owner closing instructions.

@@ -2,10 +2,16 @@
 
 > **MODE**: Design-only synthetic boundary testing. **NOT production.**
 > **STATUS**: All cases are SYNTHETIC / DESIGN-ONLY. No engine/contract change.
+> **HISTORICAL NOTE (2026-08-23 post-decision):** this matrix documents the
+> PRE-implementation boundary findings of Sprint 01. Since then the KYC gate
+> (`e1a8924`) and Margin gate (`edd9446`+`52042cb`) have been implemented per the
+> KYC/Margin boundary experiments (see EXPERIMENT_KYC_BOUNDARY_001.md,
+> EXPERIMENT_URGENT_SIGNAL_001.md, and S16–S19 in the scenario matrix). The
+> engine-behavior columns below reflect the engine AT PACK TIME (no KYC/Margin
+> fields, no gate) and are preserved as the pre-fix evidence baseline.
 > Engine behavior below is REAL output from `decision-engine.js` @ `3d168b3`
 > (run via `scenario-test/design-only-scan.mjs`, in-memory fixtures only —
-> that tooling script is NOT committed per directive: commit limited to this
-> matrix + DECISION_PACK_001; it lives untracked in the working tree).
+> that tooling script was later committed with the KYC gate in `e1a8924`).
 > Every signal the current engine has no field for is recorded as:
 > **RECEIVED BUT NOT SEMANTICIZED INTO AN INDEPENDENT GATE.**
 

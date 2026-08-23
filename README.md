@@ -137,10 +137,18 @@ many duplicate complete events were dropped (0 for clean inputs).
 
 ## Scenario evidence
 
-`scenario-test/` holds the owner-approved evidence-depth experiment: a 12-scenario
-matrix (5/5 decision states, 8 adversarial types) with pre-declared expectations,
-raw deterministic output, and a limitation/classification record. Run it with:
+`scenario-test/` holds the owner-approved evidence-depth experiment: a **17-scenario
+matrix** (5/5 decision states, 8 adversarial types, plus 3 inbound-lead scans S13–S15)
+with pre-declared expectations, raw deterministic output, and a limitation/classification
+record. Run it with:
 
 ```bash
 node scenario-test/run-scenarios.mjs
 ```
+
+S13–S15 are tagged `SYNTHETIC` + `PRE-MARGIN-GATE`: S15 (a 5%-margin custom-equipment
+lead with certification costs shifted to the supplier) is the key edge case — the
+system receives the margin/cost descriptions but has no independent margin gate yet;
+see `docs/interviews/001_MARGIN_AND_COST_GATE.md` for the pending domain review.
+Current matrix: **17 scenarios — 15 PASS, 2 BASELINE_FIX_CONFIRMED, 0 FAIL,
+deterministic** (see `scenario-test/outputs/run-log.txt`).

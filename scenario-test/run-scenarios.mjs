@@ -224,10 +224,11 @@ const SCENARIOS = [
   // S13–S15 — INBOUND LEAD SCAN (owner task 2026-08-23)
   // Source: cdd-lead-scan.mjs — three real-shaped inbound-lead emails transcribed
   // as anonymized synthetic fixtures. Tags: SYNTHETIC + PRE-MARGIN-GATE.
-  // Purpose: L3 (S15) is the key edge case — engine sees the authority
-  // contradiction (ESCALATE) but NOT the commercial killer (5% margin +
-  // certification-cost shift). When a Margin gate is added after the domain
-  // review, S15's expected state must flip ESCALATE -> DO_NOT_PURSUE.
+  // Purpose: L3 (S15) is the key edge case — the system RECEIVES the margin/cost
+  // descriptions but the current contract does not semanticize them into an
+  // independent go/no-go gate; it fires on the registered authority contradiction
+  // (ESCALATE). When a Margin gate is added after the domain review, S15's
+  // expected state must flip ESCALATE -> DO_NOT_PURSUE.
   // That flip is the evidence of decision evolution.
   // =========================================================================
   {
@@ -280,7 +281,7 @@ const SCENARIOS = [
   },
   {
     id: "S15",
-    claim: "INBOUND L3 (end-customer custom equipment, 5% margin, certification costs on supplier, HQ committee decides): no decision authority at the contact point -> material contradiction -> ESCALATE. KEY EDGE CASE: engine sees the authority contradiction but NOT the commercial killer (5% margin + cost shift). PRE-MARGIN-GATE baseline: ESCALATE expected; after Margin gate lands this must flip to DO_NOT_PURSUE.",
+    claim: "INBOUND L3 (end-customer custom equipment, 5% margin, certification costs on supplier, HQ committee decides): no decision authority at the contact point -> material contradiction -> ESCALATE. KEY EDGE CASE: the system RECEIVES the margin/cost descriptions (commercialFeasibility LOW, '5% margin', 'certification costs on supplier') but the current contract does NOT convert them into an independent, explainable go/no-go gate — it fires on the registered authority contradiction instead. PRE-MARGIN-GATE baseline: ESCALATE expected; after a Margin gate lands this must flip to DO_NOT_PURSUE.",
     build: () => {
       const c = base();
       c.id = "LEAD-CUST-EQ";

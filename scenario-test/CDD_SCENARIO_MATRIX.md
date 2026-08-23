@@ -2,7 +2,9 @@
 
 **Repository under test:** `apchen1978/commercial-decision-desk`
 **Baseline commit:** `539f945` (HEAD at experiment start; working tree clean)
-**Post-fix commits:** `6141606` (experiment artifacts) → engine fixes + regression (see Git section)
+**Experiment artifacts:** `6141606` (scenario experiment, Level 2, verdict B)
+**Post-fix commits:** `7ecbe5c` (S10/S11 fixes + S08/S12 documentation + S10R/S11R regressions) → `fbe8548` (inbound lead scan S13–S15 + protocol examples + interview 001)
+**Current HEAD:** `fbe8548` (this matrix is synced to it)
 **Harness:** `scenario-test/run-scenarios.mjs` (isolated, reads `fixtures.js` + `decision-engine.js`, never modifies them)
 **Raw output:** `scenario-test/outputs/scenario-results.raw.json` (full mutated fixtures + actual states, verbatim)
 **Run log:** `scenario-test/outputs/run-log.txt`
@@ -39,6 +41,31 @@ authorized and executed:
 9. Paul OS rule **FEATURE DEPTH ≠ EVIDENCE DEPTH** adopted (see Paul OS principles).
 10. Document Parity Closing Rule evaluated — no public copy changes required
     (Level 2 evidence does not materially change any existing external claim).
+
+## INBOUND LEAD SCAN (owner task, commit `fbe8548`)
+
+Three real-shaped inbound-lead emails (L1/L2/L3, anonymized synthetic) were run
+through the contract and archived as **S13/S14/S15** (tags `SYNTHETIC` +
+`PRE-MARGIN-GATE`). Full matrix now: **17 scenarios — 15 PASS, 2
+BASELINE_FIX_CONFIRMED, 0 FAIL, deterministic**.
+
+| ID | Lead | Engine state | Finding |
+|---|---|---|---|
+| S13 | L1 — EU distributor $2M / OA-90 (cold inbound) | `HOLD_FOR_EVIDENCE` | Evidence-first discipline: unverified volume + OA-90 credit + unknown switch reason → HOLD, never pursuit from self-asserted claims |
+| S14 | L2 — industry referral, 500 A-302 samples by Sep 15, 30% T/T | `HOLD_FOR_EVIDENCE` | Guardrail: no quote without spec evidence — drawings/BOM not yet provided, the quoted object is UNKNOWN |
+| S15 | L3 — end-customer custom equipment, 5% margin, certification costs on supplier, HQ committee decides | `ESCALATE` | **KEY EDGE CASE** — see below |
+
+**S15 (L3) — the margin-blind edge case.** The system receives the relevant
+descriptions in the input (`commercialFeasibility: LOW`, "5% margin",
+"certification costs on supplier"), but the current contract does **not** convert
+margin / cost-burden into an independent, explainable go/no-go gate. The engine
+fires on the *registered* material contradiction (no decision authority at the
+contact point → `ESCALATE`), not on the commercial killer. Gross Margin Threshold
+and Compliance Cost Payer are candidates for a future Margin gate, pending
+Domain Review interview 001 (`docs/interviews/001_MARGIN_AND_COST_GATE.md`).
+**FUTURE FLIP (pre-declared, not current result):** after a Margin gate lands,
+S15's expected state must become `DO_NOT_PURSUE` — that flip is the measured
+evidence of decision evolution. **Margin gate is UNKNOWN until interview 001.**
 
 ### S10 before / after (malformed enum)
 
@@ -188,6 +215,31 @@ boundary the contract does not define** — see §4.
 - **Limitation discovered: YES.** The division of responsibility (human screens contradictions; engine reflects registered ones) is **undocumented**: the contract reads as if contradictions are auto-detected, but they are not.
 - **Follow-up:** owner decision — document the boundary explicitly ("engine reflects human-registered contradictions only"), or add a note-level conflict heuristic (feature expansion — not recommended without owner). **See §4.4.**
 
+### S13 — INBOUND L1 (EU distributor $2M / OA-90) — PRE-MARGIN-GATE
+- **Claim:** Cold inbound, all claims self-asserted (volume, OA-90 credit, switch reason). Evidence-first: HOLD, never a pursuit recommendation from unverified claims.
+- **Input:** base fixture mutated to lead L1: buyerFit MEDIUM, categoryFit HIGH, evidenceQuality LOW, terms INCOMPLETE, blocking unknowns (volume unverified, OA-90 credit unverified).
+- **Expected:** HOLD_FOR_EVIDENCE, availableNow false.
+- **Actual:** HOLD_FOR_EVIDENCE; reasons surface Rule 3 (terms incomplete), Rule 5 (exposure UNKNOWN), evidence-quality rule, blocking UNKNOWNs. **PASS**
+- **Invariant:** B-bucket (structurable) conditions insufficient ⇒ system refuses to reach A-bucket (gate) judgment. **UNKNOWN preserved:** yes. **Limitation:** none. **Follow-up:** none.
+- **Tags:** `SYNTHETIC`, `PRE-MARGIN-GATE`.
+
+### S14 — INBOUND L2 (referral, 500 A-302 samples, 30% T/T) — PRE-MARGIN-GATE
+- **Claim:** Real urgent need + acceptable payment terms, but drawings/BOM not yet provided — the quoted object is UNKNOWN. Guardrail: no quote without spec evidence.
+- **Input:** base fixture mutated to lead L2: buyerFit HIGH, categoryFit MEDIUM, evidenceQuality MEDIUM, terms INCOMPLETE (delivery deadline hard condition), blocking unknowns (drawings/BOM, 500-sample feasibility).
+- **Expected:** HOLD_FOR_EVIDENCE, availableNow false.
+- **Actual:** HOLD_FOR_EVIDENCE; blocking UNKNOWNs (UNK-1, UNK-2) gate pursuit; COND remains available once spec arrives. **PASS**
+- **Invariant:** no spec evidence ⇒ no quote; referral/urgency does not bypass the spec-unknown guardrail (C-bucket human instinct would rush to quote; the system blocks). **UNKNOWN preserved:** yes. **Limitation:** none. **Follow-up:** none.
+- **Tags:** `SYNTHETIC`, `PRE-MARGIN-GATE`.
+
+### S15 — INBOUND L3 (custom equipment, 5% margin, cost shift) — KEY EDGE CASE
+- **Claim:** No decision authority at the contact point (HQ committee decides) → material contradiction → ESCALATE. **Key finding:** the system receives the margin/cost descriptions in the input but the current contract does not semanticize them into an independent go/no-go gate.
+- **Input:** base fixture mutated to lead L3: buyerFit LOW, categoryFit MEDIUM, evidenceQuality LOW, commercialFeasibility LOW, terms INCOMPLETE (5% margin, certification costs on supplier), material contradiction CTR-1 (authority vs commitment), blocking unknowns (spec, budget/authority).
+- **Expected:** ESCALATE, availableNow false.
+- **Actual:** ESCALATE; Rule 2 fires on the registered authority contradiction. **PASS** (current contract)
+- **Invariant:** commercial killer (5% margin + certification-cost shift) is **not yet a gate** — the engine sees it only as descriptive input. Gross Margin Threshold / Compliance Cost Payer are A-bucket candidates pending interview 001.
+- **FUTURE FLIP (pre-declared, not current):** after a Margin gate lands, expected state must become `DO_NOT_PURSUE`. **Margin gate = UNKNOWN until interview 001.**
+- **Tags:** `SYNTHETIC`, `PRE-MARGIN-GATE`.
+
 ---
 
 ## 4. Classified decision-contract weaknesses (EVIDENCE_FOUND)
@@ -224,11 +276,17 @@ exposed a boundary the contract does not define. Classification per owner taxono
 | S03 | – | n/a | – | LOW evidence held |
 | S04 | – | yes (evidenceQuality) | – | held as UNKNOWN |
 | S05 | – | yes (UNK-X) | – | blocking gate held |
-| S10 | **should have been** (unparsable value) | **no** | – | malformed value consumed as if valid — §4.2 |
-| S12 | **should have been** (conflict) | **no** | – | conflict never surfaced — §4.4 |
+| S10 | **should have been** (unparsable value) | **no (pre-fix) / yes (post-fix)** | – | malformed value consumed as if valid — §4.2; fixed in `7ecbe5c` |
+| S12 | **should have been** (conflict) | **no** | – | conflict never surfaced — §4.4 (documented boundary) |
+| S13 | – | yes (volume, OA-90 credit, switch reason) | – | lead scan: HOLD on unverified claims |
+| S14 | – | yes (drawings/BOM, feasibility) | – | lead scan: spec-unknown guardrail |
+| S15 | – | yes (spec, budget/authority) | – | lead scan: ESCALATE on authority contradiction; **Margin gate UNKNOWN pending interview 001** |
 | All others | – | – | – | no UNKNOWN conversion observed |
 
-Net: 2 UNKNOWNs that should have been created (S10, S12) were not — both are consequences of the same class of boundary gap (unvalidated / unscreened inputs).
+Net: 2 UNKNOWNs that should have been created (S10, S12) were not under the
+pre-fix contract — both are consequences of the same class of boundary gap
+(unvalidated / unscreened inputs). S10 resolved post-fix; S12 documented. S15
+adds a third pending UNKNOWN: whether margin belongs in the contract at all.
 
 ## 6. Invariant summary (core invariants)
 
@@ -247,7 +305,8 @@ Net: 2 UNKNOWNs that should have been created (S10, S12) were not — both are c
 
 - **Before:** LEVEL 1 VERIFIED (23/23 verify.mjs hard-rule checks, deterministic).
 - **After experiment (pre-fix):** LEVEL 2 SCENARIO TESTED (12 scenarios + 1 boundary variant, 5/5 states, 8 adversarial types, deterministic across independent runs).
-- **After owner-review closing (current):** **LEVEL 2 SCENARIO TESTED** — same level, now with S10/S11 fixes and regression coverage (14 scenarios: 12 PASS + 2 baseline-confirmed; verify.mjs 38/38). **Not promoted beyond Level 2.**
+- **After owner-review closing:** **LEVEL 2 SCENARIO TESTED** — S10/S11 fixes + S10R/S11R regression coverage (14 scenarios: 12 PASS + 2 baseline-confirmed; verify.mjs 38/38).
+- **After inbound lead scan (current, HEAD `fbe8548`):** **LEVEL 2 SCENARIO TESTED** — S13/S14/S15 added (17 scenarios: 15 PASS + 2 BASELINE_FIX_CONFIRMED + 0 FAIL, deterministic). Lead-scan cases are synthetic; they prove decision-contract behavior on real-shaped inputs, nothing more. **Not promoted beyond Level 2.**
 - **Not claimed:** DOMAIN REVIEWED / WORKFLOW OBSERVED / REAL-WORLD EVIDENCE / OUTCOME EVIDENCE. Synthetic scenario coverage proves decision-contract behavior only — not adoption, real-deal accuracy, ROI, time saved, better decisions, or market demand.
 
 ## 8. Verdict

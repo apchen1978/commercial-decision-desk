@@ -1,8 +1,11 @@
-// cdd-lead-scan.mjs — scan three inbound-lead emails through the CDD contract.
+// lead-scan-source.mjs — scan three inbound-lead emails through the CDD contract.
 // Evidence-first: no opinion before the engine speaks. In-memory fixtures only;
 // nothing is written to the repo. SYNTHETIC ANALYSIS — emails treated as
 // anonymized test material, no real identifiers, no real commercial data.
-import { evaluateDecision, paymentExposure } from "./commercial-decision-desk/decision-engine.js";
+//
+// RUNNABLE archived source (canonical copy of cdd-lead-scan.mjs, commit fbe8548):
+//   node lead-scan-source.mjs   (run FROM scenario-test/ — import resolves to ../decision-engine.js)
+import { evaluateDecision, paymentExposure } from "../decision-engine.js";
 
 // ---------------------------------------------------------------------------
 // Pre-declared reading (before running) — what the contract SHOULD say per the

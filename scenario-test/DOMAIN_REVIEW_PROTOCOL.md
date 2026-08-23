@@ -100,9 +100,12 @@ SYNTHETIC 標記、無真實識別碼）；已歸檔為 S13/S14/S15。
   證據，絕對不准報價**——C 桶的人類直覺通常會想趕快報價搶單，但系統強制攔截。
 
 #### L3 — 終端定製 / 5% 毛利 / 認證費轉嫁 / 委員會決策（關鍵 Edge Case）
-- **Part C（引擎視角）**：要求報價卻無決策權 → 註冊為 material contradiction（CTR-1）。
-- **Part D（分類比對）**：引擎判定 `ESCALATE`。**商業真實死因是「5% 毛利 + 成本轉嫁」，
-  但系統只看到「決策權矛盾」**——證明當前 Contract 缺乏 Margin 維度（A 桶 gate 候選）。
+- **Part C（引擎視角）**：要求報價卻無決策權 → 註冊為 material contradiction（CTR-1）；
+  輸入中同時帶有 `commercialFeasibility: LOW` 與「5% 毛利、認證費轉嫁」的文字描述。
+- **Part D（分類比對）**：引擎判定 `ESCALATE`。**精準表述**：系統**收到**毛利/成本承擔的
+  相關描述，但目前沒有把它們**轉化為獨立、可解釋的 go/no-go gate**——引擎觸發的是
+  「決策權矛盾」，而非商業死因。這證明當前 Contract 尚未語意化
+  `Gross Margin Threshold` / `Compliance Cost Payer`（A 桶 gate 候選）。
   未來若 Margin gate 落地，預期此案例轉為 `DO_NOT_PURSUE`（S15 為其回歸基線）。
 
 ---
@@ -121,7 +124,7 @@ SYNTHETIC 標記、無真實識別碼）；已歸檔為 S13/S14/S15。
 |---|---|---|---|
 | L1（$2M 經銷商 / OA90） | `HOLD_FOR_EVIDENCE` | 證據不足不追；B 桶條件未滿足 → 不進入 A 桶判定 | B 桶優先（先取證） |
 | L2（同業介紹 / 500 樣品） | `HOLD_FOR_EVIDENCE` | 對象 UNKNOWN 不准報價（護欄） | C 桶直覺 vs 系統紀律 |
-| L3（終端定製 / 5% 毛利） | `ESCALATE` | 真實死因（毛利/成本轉嫁）系統看不到 → Margin gate 候選 | **A 桶候選**（待訪談確認） |
+| L3（終端定製 / 5% 毛利） | `ESCALATE` | 系統收到毛利/成本描述但尚未轉化為 gate → Margin gate 候選 | **A 桶候選**（待訪談確認） |
 
 ---
 

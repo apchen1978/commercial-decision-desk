@@ -2754,7 +2754,7 @@
   },
   {
     "id": "S15",
-    "claimUnderTest": "INBOUND L3 (end-customer custom equipment, 5% margin, certification costs on supplier, HQ committee decides): no decision authority at the contact point -> material contradiction -> ESCALATE. KEY EDGE CASE: engine sees the authority contradiction but NOT the commercial killer (5% margin + cost shift). PRE-MARGIN-GATE baseline: ESCALATE expected; after Margin gate lands this must flip to DO_NOT_PURSUE.",
+    "claimUnderTest": "INBOUND L3 (end-customer custom equipment, 5% margin, certification costs on supplier, HQ committee decides): no decision authority at the contact point -> material contradiction -> ESCALATE. KEY EDGE CASE: the system RECEIVES the margin/cost descriptions (commercialFeasibility LOW, '5% margin', 'certification costs on supplier') but the current contract does NOT convert them into an independent, explainable go/no-go gate — it fires on the registered authority contradiction instead. PRE-MARGIN-GATE baseline: ESCALATE expected; after a Margin gate lands this must flip to DO_NOT_PURSUE.",
     "inputCondition": {
       "id": "LEAD-CUST-EQ",
       "synthetic": true,

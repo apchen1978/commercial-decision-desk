@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Commercial Decision Desk — Decision Support Prototype</title>
+    <style>
+      :root {
+        --ink: #17271f;
+        --muted: #5c6b62;
+        --line: #d9ded4;
+        --bone: #f4f5f0;
+        --paper: #ecefe6;
+        --forest: #1f4d3a;
+        --pine: #0f2b23;
+        --moss: #3a6b52;
+        --amber: #a05a10;
+        --gold: #e8b04b;
+        --bad: #a33a2c;
+        --ok: #2f6b4f;
+        --unk: #8a6d1a;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Geist Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+        background: var(--bone);
+        color: var(--ink);
+        line-height: 1.55;
+      }
+      .wrap { max-width: 980px; margin: 0 auto; padding: 24px 18px 80px; }
+      header.hero { border-bottom: 1px solid var(--line); padding: 8px 0 22px; }
+      .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); }
+      h1 { font-size: 30px; margin: 10px 0 6px; letter-spacing: -0.01em; }
+      .sub { color: var(--muted); font-size: 15px; max-width: 720px; }
+      .synthetic-banner {
+        border: 1px solid var(--gold); border-left: 4px solid var(--amber);
+        background: #fdf6e4; border-radius: 10px; padding: 10px 14px; margin: 14px 0;
+        font-size: 13px; color: #6b5214; font-weight: 600;
+      }
+      section { margin-top: 26px; }
+      h2 { font-size: 19px; margin: 0 0 10px; letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
+      .card {
+        background: #fff; border: 1px solid var(--line); border-radius: 12px;
+        padding: 16px 18px; margin-top: 10px;
+      }
+      .card h3 { margin: 0 0 6px; font-size: 16px; }
+      .muted { color: var(--muted); font-size: 13.5px; }
+      .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px; margin-left: 6px; vertical-align: 1px; }
+      .tag.hi { background: #e2efe7; color: var(--ok); }
+      .tag.med { background: #f0e9d8; color: var(--unk); }
+      .tag.unk { background: #f6e4e0; color: var(--bad); }
+      .tag.flag { background: #f6e4e0; color: var(--bad); }
+      table.dims { width: 100%; border-collapse: collapse; margin-top: 8px; }
+      table.dims th, table.dims td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #ecece6; font-size: 13.5px; vertical-align: top; }
+      table.dims th { font-weight: 600; color: var(--muted); width: 34%; }
+      .evidence-item { border-top: 1px dashed #e6e6e6; padding: 8px 2px; font-size: 13.5px; }
+      .evidence-item:first-child { border-top: none; }
+      .tier { font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 6px; margin-left: 6px; white-space: nowrap; }
+      .tier.PRIMARY { background: #dcebe2; color: var(--ok); }
+      .tier.SUPPORTING { background: #e9e3cf; color: #7a5d12; }
+      .tier.VERIFICATION_REQUIRED { background: #f0ded8; color: #9c4433; }
+      details { border: 1px solid var(--line); border-radius: 10px; background: #fff; margin-top: 8px; }
+      summary { cursor: pointer; padding: 12px 16px; font-weight: 700; font-size: 14px; list-style: none; }
+      summary::after { content: "▸"; float: right; color: var(--muted); }
+      details[open] summary::after { content: "▾"; }
+      .details-body { padding: 4px 16px 16px; }
+      .flag-box { border: 1px solid #e0c0b8; border-left: 4px solid var(--bad); background: #fbf1ee; border-radius: 8px; padding: 10px 12px; margin-top: 10px; font-size: 13.5px; }
+      .unk-box { border: 1px solid #e5d9b8; border-left: 4px solid var(--unk); background: #f9f3e3; border-radius: 8px; padding: 10px 12px; margin-top: 10px; font-size: 13.5px; }
+      .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+      @media (max-width: 640px) { .why-grid { grid-template-columns: 1fr; } }
+      .why-col { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 12px 14px; font-size: 13.5px; }
+      .why-col.ok { border-left: 4px solid var(--ok); }
+      .why-col.bad { border-left: 4px solid var(--bad); }
+      .why-col h4 { margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; }
+      .why-col ul { margin: 0; padding-left: 16px; }
+      .why-col li { margin: 4px 0; }
+      .disclosure { border: 1px solid var(--line); border-left: 4px solid var(--amber); background: #fff; border-radius: 10px; padding: 10px 14px; font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+      .exposure-nums { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 10px; }
+      .num-box { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; min-width: 150px; }
+      .num-box .n { font-size: 24px; font-weight: 800; color: var(--forest); }
+      .num-box .l { font-size: 11.5px; color: var(--muted); }
+      .toggle-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+      button {
+        font: inherit; cursor: pointer; border: 1px solid var(--forest); background: var(--forest); color: var(--bone);
+        border-radius: 999px; padding: 9px 18px; font-weight: 700; font-size: 13.5px;
+      }
+      button.secondary { background: #fff; color: var(--forest); }
+      button:disabled { opacity: 0.45; cursor: not-allowed; }
+      .decision-area { border: 1px solid var(--forest); border-radius: 12px; background: #fff; padding: 16px 18px; margin-top: 10px; }
+      .rec-box { background: var(--forest); color: var(--bone); border-radius: 10px; padding: 12px 14px; margin-top: 10px; font-size: 13.5px; }
+      .rec-box b { color: var(--gold); }
+      .state-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+      .state-buttons button { background: #fff; color: var(--forest); border-color: var(--line); }
+      .state-buttons button.sel { background: var(--forest); color: var(--bone); border-color: var(--forest); }
+      .brief { border: 1px dashed var(--moss); border-radius: 10px; background: #fafbf7; padding: 14px 16px; margin-top: 12px; font-size: 13px; white-space: pre-wrap; }
+      .foot { margin-top: 30px; border-top: 1px solid var(--line); padding-top: 14px; font-size: 12px; color: var(--muted); }
+      .human-boundary { border: 1px solid var(--line); border-left: 4px solid var(--forest); background: #fff; border-radius: 10px; padding: 12px 14px; margin-top: 10px; font-size: 13.5px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <p class="eyebrow">Decision Support · Prototype</p>
+        <h1>Commercial Decision Desk</h1>
+        <p class="sub">Should we pursue this overseas commercial opportunity now? Evidence first, then a human decision. The desk recommends states — it never contacts, quotes, commits, or decides for you.</p>
+      </header>
+
+      <div class="synthetic-banner" id="synthetic-banner"></div>
+
+      <section id="opportunity">
+        <h2><span class="eyebrow">01 · Opportunity</span></h2>
+        <div class="card" id="opp-card"></div>
+      </section>
+
+      <section id="evidence">
+        <h2><span class="eyebrow">02 · Evidence Qualification</span></h2>
+        <details open>
+          <summary>Evidence by dimension (expand)</summary>
+          <div class="details-body" id="evidence-body"></div>
+          <div class="details-body">
+            <div class="flag-box" id="contradiction-box"></div>
+            <div class="unk-box" id="unknown-box"></div>
+          </div>
+        </details>
+      </section>
+
+      <section id="commercial">
+        <h2><span class="eyebrow">03 · Commercial Assessment</span></h2>
+        <div class="card">
+          <table class="dims" id="dims-table"></table>
+          <div class="muted" id="terms-line" style="margin-top:10px"></div>
+          <div class="muted" id="quotes-line" style="margin-top:6px"></div>
+        </div>
+      </section>
+
+      <section id="payment">
+        <h2><span class="eyebrow">04 · Payment Exposure</span></h2>
+        <div class="card">
+          <div class="toggle-row">
+            <button id="toggle-exposure" class="secondary" type="button">Toggle: include this opportunity in payment exposure</button>
+          </div>
+          <div id="exposure-nums" class="exposure-nums"></div>
+          <div class="disclosure" id="pay-disclosure"></div>
+        </div>
+      </section>
+
+      <section id="why">
+        <h2><span class="eyebrow">05 · WHY / WHY NOT / UNKNOWN</span></h2>
+        <div class="why-grid" id="why-grid"></div>
+      </section>
+
+      <section id="decision">
+        <h2><span class="eyebrow">06 · Decision Brief → Human Decision</span></h2>
+        <div class="decision-area">
+          <div id="engine-reasoning"></div>
+          <div class="human-boundary">
+            <b>Human decision boundary.</b> The final commercial decision always belongs to the human. The desk only narrows the options with evidence and deterministic rules.
+          </div>
+          <div class="state-buttons" id="state-buttons"></div>
+          <div style="margin-top:12px">
+            <button id="issue-brief" type="button">Issue Decision Brief</button>
+          </div>
+          <div class="brief" id="brief-output" hidden></div>
+        </div>
+      </section>
+
+      <footer class="foot">
+        SYNTHETIC FIXTURE — no real prospect data. No backend, no persistence, no network calls. Prototype for decision-support demonstration only.
+      </footer>
+    </div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

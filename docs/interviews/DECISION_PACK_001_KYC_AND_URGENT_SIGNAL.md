@@ -85,13 +85,20 @@
 
 ## 7. Owner adjudication table
 
+> **POST-DECISION UPDATE (2026-08-23):** since this pack was written, the owner
+> authorized the KYC gate (implemented `e1a8924`), the Margin gate (implemented
+> `edd9446` + `52042cb`), and the urgent-order caller-discipline rule (adopted
+> `d675708`, proposal 2 — zero engine change). This table is preserved as the
+> original adjudication record; the "Implementation authorized?" column below shows
+> the state AT PACK TIME, with the resolved status noted per row.
+
 | Question | Current evidence | Provisional owner position | Confidence | What would falsify it | Domain interview still needed? | Implementation authorized? |
 |---|---|---|---|---|---|---|
-| KYC gate worth an experiment? | E1 (one-vote veto claim); engine has no compliance field | **PROVISIONAL — NOT DOMAIN CONSENSUS**: worth a synthetic boundary test, not a gate | MEDIUM (issue exists) / LOW (gate semantics) | Second independent operator says sanctions are not a first-order veto | Yes (interview 002) | **NO** |
-| KYC trigger semantics | U2 unresolved | **PROVISIONAL**: start with (a) sanctions-hit → veto, (b) beneficial-owner unverified → HOLD | LOW | Operator defines different triggers | Yes (interview 002) | **NO** |
-| Urgent-order dual signal | E3 (F's red-flag claim); engine treats urgency as buyerFit HIGH | **PROVISIONAL**: direction is profile-dependent; do NOT flip global semantics on one SOHO sample | MEDIUM (conflict exists) / LOW (resolution) | A second trader with different profile confirms opposite direction; or interview 003 refutes | Yes (interview 003) | **NO** |
-| Margin vs KYC priority | U7 | **PROVISIONAL**: KYC ranks at/above margin (E's "company survival") — but both UNKNOWN | LOW | Owner rules otherwise | Yes (001 + 002) | **NO** |
-| Any production/portfolio claim change | None | **PROVISIONAL**: none | HIGH | — | No | **NO** |
+| KYC gate worth an experiment? | E1 (one-vote veto claim); engine has no compliance field | **PROVISIONAL — NOT DOMAIN CONSENSUS**: worth a synthetic boundary test, not a gate | MEDIUM (issue exists) / LOW (gate semantics) | Second independent operator says sanctions are not a first-order veto | Yes (interview 002) | At pack time: NO. **RESOLVED: experiment done → gate authorized & implemented (`e1a8924`)** |
+| KYC trigger semantics | U2 unresolved | **PROVISIONAL**: start with (a) sanctions-hit → veto, (b) beneficial-owner unverified → HOLD | LOW | Operator defines different triggers | Yes (interview 002) | At pack time: NO. **RESOLVED: (a)+(b) implemented per KYC experiment** |
+| Urgent-order dual signal | E3 (F's red-flag claim); engine treats urgency as buyerFit HIGH | **PROVISIONAL**: direction is profile-dependent; do NOT flip global semantics on one SOHO sample | MEDIUM (conflict exists) / LOW (resolution) | A second trader with different profile confirms opposite direction; or interview 003 refutes | Yes (interview 003) | At pack time: NO. **RESOLVED: proposal 2 adopted (`d675708`) — caller discipline, zero engine change; urgent field NOT implemented** |
+| Margin vs KYC priority | U7 | **PROVISIONAL**: KYC ranks at/above margin (E's "company survival") — but both UNKNOWN | LOW | Owner rules otherwise | Yes (001 + 002) | At pack time: NO. **RESOLVED: margin gate implemented (`edd9446`); priority chain sanctions > margin > KYC-incomplete** |
+| Any production/portfolio claim change | None | **PROVISIONAL**: none | HIGH | — | No | **NO (unchanged — no public claim change made)** |
 
 ---
 
@@ -99,6 +106,7 @@
 
 - **CDD MATURITY: LEVEL 2 — SCENARIO TESTED (CONFIRMED).**
 - LEVEL 3 DOMAIN REVIEWED: NOT CLAIMED (sample size 3 roles, no pre-registration).
-- KYC GATE: **UNKNOWN / OWNER REVIEW REQUIRED**.
-- URGENT SIGNAL SEMANTICS: **UNKNOWN / OWNER REVIEW REQUIRED**.
-- ENGINE: UNCHANGED. CONTRACT: UNCHANGED.
+- KYC GATE: **implemented (`e1a8924`)** — semantics provisional, interview 002 pending.
+- MARGIN GATE: **implemented (`edd9446` + `52042cb`)** — semantics provisional, interview 001 deferred.
+- URGENT SIGNAL: **caller-discipline rule adopted (`d675708`, proposal 2)** — engine field NOT implemented.
+- ENGINE: CHANGED since pack time (KYC + Margin gates added); URGENT handling unchanged.

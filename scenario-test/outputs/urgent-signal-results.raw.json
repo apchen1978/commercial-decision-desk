@@ -32,7 +32,7 @@
     "actual": {
       "base": "PURSUE_NOW",
       "gated": "HOLD_FOR_EVIDENCE",
-      "urgencyDirection": "SWITCH_REASON_UNKNOWN",
+      "urgencyDirection": "SWITCH_REASON_UNKNOWN_VIA_BLOCKING_UNKNOWN",
       "briefHumanBoundary": true
     },
     "urgency": {
@@ -71,7 +71,7 @@
   },
   {
     "id": "U-S4",
-    "label": "urgent + trusted referral + switch reason UNKNOWN (referral does NOT override)",
+    "label": "urgent + trusted referral + switch reason UNKNOWN (referral does NOT override the blocking treatment)",
     "expected": {
       "base": "PURSUE_NOW",
       "gated": "HOLD_FOR_EVIDENCE"
@@ -79,7 +79,7 @@
     "actual": {
       "base": "PURSUE_NOW",
       "gated": "HOLD_FOR_EVIDENCE",
-      "urgencyDirection": "SWITCH_REASON_UNKNOWN",
+      "urgencyDirection": "SWITCH_REASON_UNKNOWN_VIA_BLOCKING_UNKNOWN",
       "briefHumanBoundary": true
     },
     "urgency": {
@@ -174,7 +174,7 @@
     "actual": {
       "base": "HOLD_FOR_EVIDENCE",
       "gated": "HOLD_FOR_EVIDENCE",
-      "urgencyDirection": "SWITCH_REASON_UNKNOWN",
+      "urgencyDirection": "SWITCH_REASON_UNKNOWN_VIA_BLOCKING_UNKNOWN",
       "briefHumanBoundary": true
     },
     "urgency": {

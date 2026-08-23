@@ -11,21 +11,29 @@
 // remain C-bucket human judgment. F herself says the instinct "機器讀不出來".
 //
 // PRE-REGISTERED HYPOTHESES (declared before execution):
-//   H1: current engine treats urgency as buyerFit HIGH (positive) — benign AND
-//       suspicious urgent cases are indistinguishable (baseline confirmed by
-//       design-only-scan U-1..U-6 all PURSUE_NOW).
-//   H2: an unknown supplier-switch reason under urgency CAN be semanticized with
-//       the EXISTING blocking-UNKNOWN primitive -> HOLD_FOR_EVIDENCE, no new gate
-//       needed — but only when the caller supplies a structured urgency field.
+//   H1: the current engine IGNORES structured urgency entirely — when the fixture
+//       carries positive Buyer Fit, benign AND suspicious urgent cases are
+//       indistinguishable (both PURSUE_NOW). Causality: engine does not read
+//       urgency; the fixture's buyerFit drives the result. (Baseline confirmed by
+//       design-only-scan U-1..U-6.)
+//   H2: an unknown supplier-switch reason under urgency CAN be represented by
+//       INJECTING a blocking UNKNOWN into unknowns[] and letting the EXISTING
+//       engine rule produce HOLD_FOR_EVIDENCE naturally — no new gate needed.
+//       (Variant must actually exercise the primitive: push to unknowns[], then
+//       call evaluateDecision on the mutated fixture; it must NOT manually
+//       overlay recommended/available.)
 //   H3: repeated prior-vendor failure is surfaced as a risk signal, NOT an
 //       automatic veto — the direction judgment ("紅旗") is C-bucket human
 //       intuition (F: 機器讀不出來); the engine's job is to surface, not decide.
-//   H4: trusted referral is a positive evidence moderator (S14 used it) but does
-//       NOT override a blocking switch-reason UNKNOWN.
+//   H4: referral does NOT override the blocking treatment — an urgent case with
+//       unknown switch reason stays HOLD even when a trusted referral exists.
+//       (Claim is scoped to 'does not override'; referral-as-evidence-moderator
+//       is NOT tested here — fixture referral flag is recorded, not consumed.)
 //   H5: an already-fired margin veto (BELOW_THRESHOLD -> DO_NOT_PURSUE) takes
-//       priority over urgency-direction handling.
-//   H6: no new decision state and no new gate semantics are required — blocking
-//       UNKNOWN (existing) + surfaced reasons suffice for the representable part.
+//       priority over the urgency-unknown-switch HOLD (margin veto ranks 2nd in
+//       the priority chain, blocking-UNKNOWN ranks lower).
+//   H6: no new decision state and no new gate semantics are required — the
+//       existing blocking-UNKNOWN rule + surfaced reasons suffice.
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -66,14 +74,18 @@ function baseOpp(id, name) {
 }
 
 // ---------------------------------------------------------------------------
-// Experiment variant — additive urgency-direction layer on the current contract.
-// Models the SMALLEST faithful representation (H2/H6): blocking-UNKNOWN for
-// unknown switch reason under urgency; risk-signal surfacing for repeated
-// failure (H3); no auto-veto; referral moderates but does not override (H4);
-// margin veto keeps priority (H5).
+// Experiment variant — urgency-direction layer that ACTUALLY exercises the
+// existing blocking-UNKNOWN primitive: it mutates a COPY of the opportunity,
+// injects the unknown switch reason into unknowns[] (blocksPursue: true), then
+// re-runs the unmodified production evaluateDecision. It does NOT manually
+// overlay recommended/available — the existing engine rule produces the HOLD.
+// H3 (repeated failure) stays surfacing-only (reason appended), NOT injected —
+// that direction judgment is C-bucket. H5: margin veto naturally outranks the
+// injected blocking unknown (priority chain: sanctions > margin > ... > blocking
+// UNKNOWN).
 // ---------------------------------------------------------------------------
 export function evaluateWithUrgencyDirection(opp) {
-  const base = evaluateDecision(opp); // current contract, unmodified
+  const base = evaluateDecision(opp); // current contract, unmodified (baseline)
   const u = opp.urgency || {};
   const isUrgent = u.isUrgent === true;
   const switchReason = String(u.switchReason || "").toUpperCase();
@@ -87,17 +99,21 @@ export function evaluateWithUrgencyDirection(opp) {
     return { ...base, urgencyDirection: "MARGIN_VETO_PRIORITY" };
   }
 
-  // H2: urgent + unknown switch reason (not justified) -> blocking UNKNOWN -> HOLD.
+  // H2: urgent + unknown switch reason (not justified) -> INJECT a blocking
+  // UNKNOWN into unknowns[] and re-run the EXISTING engine. The engine's own
+  // blocking-UNKNOWN rule must produce HOLD_FOR_EVIDENCE naturally.
   if (isUrgent && switchUnknown && justification !== "JUSTIFIED") {
+    const mutated = JSON.parse(JSON.stringify(opp));
+    mutated.unknowns = [...(mutated.unknowns || []), { id: "U-SWITCH-REASON", label: "Supplier-switch reason", detail: "Unknown under urgency — switch motivation unverified (F-domain red-flag context); HOLD until verified.", blocksPursue: true, resolveWith: "Verified switch motivation from the buyer" }];
+    const eng = evaluateDecision(mutated); // unmodified engine on the injected fixture
     return {
-      ...base,
-      recommended: "HOLD_FOR_EVIDENCE",
-      available: { ...base.available, PURSUE_NOW: false, PURSUE_CONDITIONALLY: false },
+      ...eng,
       reasons: [
-        ...base.reasons,
-        "URGENCY SIGNAL: supplier-switch reason UNKNOWN under urgency — evidence-required; HOLD until the switch motivation is verified. Human judgment advised (F-domain).",
+        ...eng.reasons,
+        "URGENCY SIGNAL: injected blocking UNKNOWN 'Supplier-switch reason' — HOLD produced by the existing blocking-UNKNOWN rule (not a manual overlay).",
       ],
-      urgencyDirection: "SWITCH_REASON_UNKNOWN",
+      urgencyDirection: "SWITCH_REASON_UNKNOWN_VIA_BLOCKING_UNKNOWN",
+      injectedUnknown: true,
     };
   }
 
@@ -113,8 +129,8 @@ export function evaluateWithUrgencyDirection(opp) {
     };
   }
 
-  // H4/H1 default: referral moderates evidence (base already reflects), urgency
-  // without unknown switch passes through; justified urgency passes through.
+  // H4: referral is RECORDED but does NOT override; urgency without unknown
+  // switch reason passes through (referral-as-evidence-moderator is NOT tested).
   const direction = isUrgent ? (justification === "JUSTIFIED" ? "JUSTIFIED" : "URGENT_CLEAR") : "NON_URGENT";
   return { ...base, urgencyDirection: direction };
 }
@@ -144,7 +160,7 @@ const CASES = [
   },
   {
     id: "U-S4",
-    label: "urgent + trusted referral + switch reason UNKNOWN (referral does NOT override)",
+    label: "urgent + trusted referral + switch reason UNKNOWN (referral does NOT override the blocking treatment)",
     expected: { base: "PURSUE_NOW", gated: "HOLD_FOR_EVIDENCE" },
     build: () => { const o = baseOpp("U-S4", "Urgent, referral, unknown switch"); o.urgency = { isUrgent: true, switchReason: "UNKNOWN", justification: "ABSENT", referral: true }; return o; },
   },

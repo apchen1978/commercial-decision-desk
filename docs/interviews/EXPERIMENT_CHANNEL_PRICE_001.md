@@ -95,13 +95,20 @@ the priority chain (sanctions > margin > channel-price > KYC-incomplete > rules)
 is clearly expressible. This is the strongest pre-implementation evidence for a
 channel-price gate.
 
+**DOMAIN-VALIDATION STATUS (owner decision ②, 2026-08-23):** production
+implementation is NOT authorized. A bounded domain-validation phase is in progress
+(`DOMAIN_VALIDATION_CHANNEL_PRICE_001.md`): ≥3 different-role D-type interviewees
+pending owner scheduling. Verdict stays B (single domain source D); if no domain
+consensus emerges, verdict stays B or drops to C and the work stops. Level 3 is
+not claimed.
+
 **FIX PROPOSAL (NOT applied — 另案授權 required per charter §4/§5):**
 Smallest production change: add a structured `channelPrice` field
 (`status: CLEAR|DUMPING_RISK`, `dumpingRisk`, `policy`) and a gate check at the
 top of `evaluateDecision` — dumping risk → `DO_NOT_PURSUE` (after sanctions and
 margin checks, before KYC-incomplete). No scoring, no new states, no new
-dependencies; clean-input behavior unchanged. **Requires owner/Codex review —
-NOT authorized by this experiment.**
+dependencies; clean-input behavior unchanged. **Requires owner/Codex review AND
+domain validation — NOT authorized by this experiment.**
 
 ## 7. Maturity & status
 

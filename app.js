@@ -8,6 +8,7 @@ import { blankAssessmentDefaults, buildOpportunityFromInput, summarizeInput } fr
 import { DEFAULT_LANGUAGE, localizeEvidenceText, presentReason as localizeReason, stateLabels, t } from "./i18n.js";
 import { createDecisionPathExperiment } from "./decision-path.js";
 import { buildCommercialViewModel } from "./commercial-action-layer.js";
+import { buildTradeDealViewModel } from "./trade-deal-structure.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -60,6 +61,65 @@ function traceText(item) {
 
 function actionTitle(action) { return tx(`action.${action.actionType}`); }
 function actionWhy(action) { return tx(`action.why.${action.actionType}`); }
+
+function tradeTermLabel(term) {
+  return term === "UNKNOWN" || term === "notAssessed" ? tx("trade.notConfirmed") : term;
+}
+
+function tradeTraceText(item) {
+  const source = tx("trade.trace." + item.sourceType);
+  const label = item.sourceId === "DELIVERY_TERM"
+    ? tx("trade.deliveryTerm")
+    : item.sourceId === "CTR-1"
+      ? tx("trade.paymentContradiction")
+      : item.sourceId === "QUOTE_COMPARABILITY"
+        ? tx("trade.quoteComparability")
+        : item.label;
+  return source + ": " + label;
+}
+
+function tradeTermCopyKey(term) {
+  return term === "UNKNOWN" || term === "notAssessed" ? "UNKNOWN" : term;
+}
+
+function prepCopyKey(item, deliveryConfirmed) {
+  return item.type === "DELIVERY" ? (deliveryConfirmed ? "DELIVERY_CONFIRMED" : "DELIVERY_UNKNOWN") : item.type;
+}
+
+function renderTradeDeal(view) {
+  const p = view.structure.payment;
+  const d = view.structure.delivery;
+  const exposure = p.exposure === null ? tx("trade.unknown") : p.exposure.toLocaleString() + " " + tx("trade.cny");
+  const events = p.events.length ? p.events.map((event) => esc(event.label) + " · " + (event.status === "COMPLETE" ? tx("trade.confirmed") : tx("trade.unknown"))).join("<br>") : tx("trade.noPaymentEvents");
+  $("trade-deal-structure").innerHTML = [
+    '<div class="trade-grid">',
+    '<div class="trade-block"><h3>' + tx("trade.paymentHeading") + '</h3><dl>',
+    '<dt>' + tx("trade.paymentTerms") + '</dt><dd>' + (p.termsStatus === "COMPLETE" ? tx("trade.confirmed") : tx("trade.notConfirmed")) + '</dd>',
+    '<dt>' + tx("trade.paymentEvents") + '</dt><dd>' + events + '</dd>',
+    '<dt>' + tx("trade.exposure") + '</dt><dd>' + exposure + '</dd>',
+    '</dl></div>',
+    '<div class="trade-block"><h3>' + tx("trade.deliveryHeading") + '</h3><dl>',
+    '<dt>' + tx("trade.declaredTerm") + '</dt><dd>' + tradeTermLabel(d.declaredTerm) + '</dd>',
+    '<dt>' + tx("trade.responsibility") + '</dt><dd>' + tx("trade.boundary." + tradeTermCopyKey(d.declaredTerm)) + '</dd>',
+    '<dt>' + tx("trade.evidenceRequired") + '</dt><dd>' + tx("trade.evidence." + tradeTermCopyKey(d.declaredTerm)) + '</dd>',
+    '</dl></div></div>',
+    '<p class="trade-boundary">' + tx("trade.boundary") + '</p>',
+  ].join("");
+}
+
+function renderNegotiationPrep(view) {
+  $("negotiation-prep").innerHTML = view.negotiationPrep.length
+    ? view.negotiationPrep.map((item) => [
+      '<article class="prep-item"><div class="action-topline"><span class="action-priority">0' + item.priority + '</span><h3>' + tx("trade.prep." + item.type) + '</h3></div>',
+      '<p><strong>' + tx("trade.question") + '</strong> ' + tx("trade.prep.question." + prepCopyKey(item, view.structure.delivery.confirmed)) + '</p>',
+      '<p><strong>' + tx("trade.request") + '</strong> ' + tx("trade.prep.request." + prepCopyKey(item, view.structure.delivery.confirmed)) + '</p>',
+      '<p><strong>' + tx("trade.doNotCommit") + '</strong> ' + tx("trade.prep.avoid." + prepCopyKey(item, view.structure.delivery.confirmed)) + '</p>',
+      '<p><strong>' + tx("trade.ownerInput") + '</strong> ' + tx("trade.prep.owner." + prepCopyKey(item, view.structure.delivery.confirmed)) + '</p>',
+      '<p><strong>' + tx("trade.rerun") + '</strong> ' + tx("trade.prep.rerun." + prepCopyKey(item, view.structure.delivery.confirmed)) + '</p>',
+      '<p class="trade-trace"><strong>' + tx("trade.trace") + '</strong> ' + item.evidenceTrace.map(tradeTraceText).join(" · ") + '</p></article>',
+    ].join("")).join("")
+    : '<p class="muted">' + tx("trade.noPrep") + '</p>';
+}
 
 function renderCommercialStructure(view) {
   const s = view.structure;
@@ -175,6 +235,7 @@ function fillBlankIntake() {
   $("in-category").value = d.categoryFit;
   $("in-evidence").value = d.evidenceQuality;
   $("in-terms").value = d.termsStatus;
+  $("in-delivery-term").value = d.deliveryTerm || "notAssessed";
   $("in-terms-detail").value = d.termsDetail;
   $("in-kyc").value = d.kycStatus;
   $("in-margin-status").value = d.marginStatus;
@@ -202,6 +263,7 @@ function collectBlankInput() {
     categoryFit: $("in-category").value,
     evidenceQuality: $("in-evidence").value,
     termsStatus: $("in-terms").value,
+    deliveryTerm: $("in-delivery-term").value,
     termsDetail: $("in-terms-detail").value.trim(),
     kycStatus: $("in-kyc").value,
     marginStatus: $("in-margin-status").value,
@@ -314,6 +376,7 @@ function esc(s) {
 $("btn-run").addEventListener("click", () => {
   const input = collectBlankInput();
   current = buildOpportunityFromInput(input);
+  current.trade = { deliveryTerm: input.deliveryTerm };
   window.__lastInput = input;
   runAssessment();
   scrollToResult();
@@ -395,6 +458,9 @@ function renderResult() {
   const commercialView = buildCommercialViewModel(current, g, decisionPathExperiment);
   renderCommercialStructure(commercialView);
   renderPriorityActions(commercialView);
+  const tradeView = buildTradeDealViewModel(current, g);
+  renderTradeDeal(tradeView);
+  renderNegotiationPrep(tradeView);
 
   // human decision — separate from the engine recommendation
   $("human-state-buttons").innerHTML = DECISION_STATES.map(

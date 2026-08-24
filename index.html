@@ -143,8 +143,22 @@
       .action-item p strong { color:var(--ink); }
       .action-item .action-why { color:var(--ink); }
       .action-item .action-human { padding-top:7px; border-top:1px solid var(--line); }
+      .trade-detail { margin-top:18px; }
+      .trade-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+      .trade-block { background:#fafbf7; border:1px solid var(--line); border-radius:10px; padding:13px 14px; }
+      .trade-block h3 { margin:0 0 9px; color:var(--forest); font-size:15px; }
+      .trade-block dl { margin:0; display:grid; grid-template-columns:minmax(100px,.7fr) minmax(0,1.3fr); gap:6px 10px; font-size:12.5px; }
+      .trade-block dt { color:var(--muted); }
+      .trade-block dd { margin:0; color:var(--ink); overflow-wrap:anywhere; }
+      .trade-boundary { margin:12px 0 0; padding:9px 11px; border-left:3px solid var(--gold); color:var(--muted); font-size:12px; }
+      .negotiation-prep { display:grid; gap:10px; }
+      .prep-item { border-left:3px solid var(--amber); padding:12px 14px; background:#fafbf7; border-radius:0 10px 10px 0; }
+      .prep-item p { margin:7px 0 0; color:var(--muted); font-size:12.5px; line-height:1.55; }
+      .prep-item p strong { color:var(--ink); }
+      .prep-item .trade-trace { border-top:1px solid var(--line); padding-top:7px; }
       @media (max-width:760px) { .structure-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
       @media (max-width:420px) { .structure-grid { grid-template-columns:1fr 1fr; gap:7px; } .structure-item { padding:9px 10px; } .action-item { padding:11px 12px; } }
+      @media (max-width:640px) { .trade-grid { grid-template-columns:1fr; } .trade-block dl { grid-template-columns:1fr; gap:2px; } .trade-block dd { margin-bottom:5px; } }
     </style>
   </head>
   <body>
@@ -219,6 +233,16 @@
                 </select>
               </label>
             </div>
+            <details class="card trade-input-detail" style="margin-top:14px">
+              <summary data-i18n="trade.inputSummary">貿易細節（選填）</summary>
+              <p class="muted" data-i18n="trade.inputHelper">只填入已明確申報的交付條件；未確認就保留為 UNKNOWN。</p>
+              <label class="field"><span data-i18n="trade.declaredTerm">已申報交付條件（Incoterm）</span>
+                <select id="in-delivery-term">
+                  <option value="notAssessed" data-i18n="status.notAssessed">尚未評估</option>
+                  <option value="EXW">EXW</option><option value="FCA">FCA</option><option value="FOB">FOB</option><option value="CFR">CFR</option><option value="CIF">CIF</option><option value="CPT">CPT</option><option value="CIP">CIP</option><option value="DAP">DAP</option><option value="DPU">DPU</option><option value="DDP">DDP</option>
+                </select>
+              </label>
+            </details>
             <label class="field"><span data-i18n="input.evidenceQuality">證據品質：你對目前資訊有多大把握？</span>
               <select id="in-evidence">
                 <option value="unknown" data-i18n="status.unknown">未知</option>
@@ -322,6 +346,11 @@
             <div class="card" id="commercial-structure"></div>
           </section>
 
+          <section class="trade-detail" aria-live="polite">
+            <h2 data-i18n="trade.heading">貿易交易結構</h2>
+            <div class="card" id="trade-deal-structure"></div>
+          </section>
+
           <div class="card" id="result-rec"></div>
 
           <section class="decision-path" id="decision-path-area" hidden aria-live="polite">
@@ -338,6 +367,11 @@
           <section class="priority-actions" aria-live="polite">
             <h2 data-i18n="actions.heading">優先行動</h2>
             <div class="card" id="priority-actions"></div>
+          </section>
+
+          <section class="trade-detail" aria-live="polite">
+            <h2 data-i18n="trade.prepHeading">下一輪對話準備</h2>
+            <div class="card negotiation-prep" id="negotiation-prep"></div>
           </section>
 
           <h2 data-i18n="result.yourDecision">你的決定</h2>

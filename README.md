@@ -39,6 +39,7 @@ python -m http.server 8080
 - `fixtures.js` — the synthetic opportunity (clearly labeled)
 - `decision-engine.js` — pure, deterministic rules + payment math
 - `verify.mjs` — automated hard-rule + determinism checks
+- `docs/AI_INTAKE_VISION.md` — future AI-assisted intake architecture (design only, not implemented)
 
 ## Synthetic scenario (OPP-2026-008)
 

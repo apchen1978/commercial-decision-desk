@@ -110,6 +110,10 @@
       .scope-body { margin:0; color:var(--ink); font-size:14px; line-height:1.65; }
       .scope-disclosure { margin:10px 0 0; padding-left:11px; border-left:2px solid var(--gold); color:var(--muted); font-size:12px; line-height:1.6; }
       .scope-sequence { margin:10px 0 0; color:var(--muted); font-size:11px; letter-spacing:.03em; }
+      /* Evolution signal — subtle capability note, hairline hierarchy, no roadmap wall */
+      .evolution-note { max-width: 760px; margin: 20px 0 26px; padding-top: 16px; border-top: 1px solid var(--line); }
+      .evolution-eyebrow { margin: 0 0 6px; font-size: 11.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+      .evolution-body { margin: 0; font-size: 13.5px; line-height: 1.65; color: var(--muted); max-width: 64ch; }
       .decision-path { margin-top:18px; }
       .path-warning { margin:0 0 12px; padding:9px 11px; border-left:3px solid var(--gold); background:rgba(178,142,72,.10); color:var(--ink); font-size:12px; font-weight:700; letter-spacing:.02em; }
       .path-current { display:flex; flex-wrap:wrap; align-items:baseline; gap:9px; margin-bottom:10px; }
@@ -478,6 +482,10 @@
 
       <!-- MODE SCREEN -->
       <section id="mode-screen">
+        <div class="evolution-note">
+          <p class="evolution-eyebrow" data-i18n="evolution.eyebrow">可持續進化的商業決策系統</p>
+          <p class="evolution-body" data-i18n="evolution.body">目前以可追溯的商業規則與證據進行評估。未來可透過 AI API 與外部資料來源，進一步支援商務資訊理解、自動結構化、證據補強、情境分析與決策準備。</p>
+        </div>
         <h2 data-i18n="mode.heading">開始</h2>
         <div class="mode-row">
           <div class="mode-card mode-primary" id="mode-blank">

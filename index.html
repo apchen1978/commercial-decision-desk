@@ -377,6 +377,13 @@
       #result-area .glance-col h4 { color: var(--brass); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
       #result-area .glance-col li, #result-area .glance-col span { color: #4b4f45; font-size: 13px; }
       #result-area .glance-note { color: #8b887a; font-size: 12px; border-top: 1px solid var(--hairline); padding-top: 10px; margin-top: 14px; }
+      /* Next best action — one quiet container, right after position + why */
+      #result-area .dl-next-move {
+        margin-top: 18px; padding: 16px 18px; background: var(--ivory);
+        border: 1px solid var(--hairline); border-radius: 4px;
+      }
+      #result-area .dl-next-move .dl-label { display: block; color: var(--brass); font-size: 11px; letter-spacing: .12em; margin-bottom: 6px; }
+      #result-area .dl-next-move strong { display: block; font-size: 17px; line-height: 1.55; color: var(--charcoal); }
       /* Economics — ledger rows, executive figures */
       #result-area .economics-row { border-bottom: 1px solid var(--hairline); padding: 10px 0; }
       #result-area .economics-row span { color: #6b6a5e; font-size: 13px; }
@@ -385,21 +392,22 @@
       #result-area .economics-result strong { font-size: 24px; color: var(--forest); }
       #result-area .economics-owner-input { background: transparent; border: 0; border-top: 1px solid var(--hairline); border-radius: 0; padding: 12px 2px; }
       #result-area .economics-gap strong { color: var(--forest); }
-      /* Actions / negotiation / evidence — left ticks, hairline rules */
+      /* Actions / negotiation / evidence — hairline rules only (one colored line stays
+         on CURRENT POSITION; everything else uses numbering + hairlines + type hierarchy) */
       #result-area .action-item, #result-area .prep-item {
-        background: transparent; border-radius: 0; border-left: 2px solid var(--forest);
+        background: transparent; border-radius: 0; border-left: 0;
         border-bottom: 1px solid var(--hairline); padding: 12px 4px;
       }
-      #result-area .prep-item { border-left-color: var(--brass); }
       #result-area .action-priority { color: var(--brass); }
       #result-area .action-item p, #result-area .prep-item p { color: #4b4f45; }
       #result-area .trade-block { background: transparent; border-color: var(--hairline); border-radius: 0; }
       #result-area .trade-block h3 { color: var(--forest); }
       #result-area .structure-item, #result-area .context-grid > div { background: transparent; border-color: var(--hairline); border-radius: 0; }
-      #result-area .trade-boundary { border-left-color: var(--brass); }
+      #result-area .trade-boundary { border-left: 1px solid var(--hairline); color: #6b6a5e; }
+      #result-area .path-warning { border-left-color: var(--hairline); background: transparent; }
       /* Export + human decision */
       #result-area .deal-brief-export { border-top: 1px solid var(--hairline); }
-      #result-area .human-boundary { border: 0; border-left: 3px solid var(--forest); background: transparent; border-radius: 0; }
+      #result-area .human-boundary { border: 0; border-top: 1px solid var(--hairline); background: transparent; border-radius: 0; }
       #result-area .state-buttons button { background: transparent; border: 1px solid var(--hairline); color: var(--charcoal); }
       #result-area .state-buttons button.sel { background: var(--forest); color: var(--ivory); border-color: var(--forest); }
       /* Mobile — keep executive numerals from overflowing */

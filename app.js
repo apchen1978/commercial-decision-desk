@@ -653,8 +653,11 @@ function renderResult() {
   if (!wouldChange.length) wouldChange.push(tx("next.nothingBlocks"));
 
   // memo-style status counts (presentation only — derived from existing engine output)
-  const nBlocking = g.materialContradictions.length + (g.termsIncomplete ? 1 : 0) + g.blockingUnknowns.length + (g.weakEvidence || g.strongEvidence === false ? 1 : 0);
+  // "Control items" is precise: contradictions / weak evidence / UNKNOWNs govern the
+  // position but are not all vetoes — the term avoids implying every item blocks.
+  const nControl = g.materialContradictions.length + (g.termsIncomplete ? 1 : 0) + g.blockingUnknowns.length + (g.weakEvidence || g.strongEvidence === false ? 1 : 0);
   const nUnknown = g.blockingUnknowns.length;
+  const nextBestAction = next.length ? localizeEvidenceText(next[0], language) : tx("next.nothingBlocks");
 
   $("result-rec").innerHTML = `
     <div id="result-decision" class="dl-decision">
@@ -663,16 +666,20 @@ function renderResult() {
         <span class="rec-tag ${tagClass(g.recommended)}">${stateLabel(g.recommended)}</span>
         <span class="muted dl-deterministic">${tx("result.deterministic")}</span>
       </div>
-      <div class="dl-counts"><b>${nBlocking}</b> ${tx("result.blockers")} · <b>${nUnknown}</b> ${tx("status.unknown")}</div>
+      <div class="dl-counts"><b>${nControl}</b> ${tx("result.controlItems")} · <b>${nUnknown}</b> ${tx("status.unknown")}</div>
     </div>
     <div id="result-control" class="dl-grid">
       <div class="glance-col"><h4>${tx("result.why")}</h4><ul>${g.reasons.map((r) => `<li>${esc(localizeReason(r, language, current.quoteComparabilityAssessed !== false))}</li>`).join("")}</ul></div>
-      <div class="glance-col"><h4>${tx("result.blockers")}</h4>${g.materialContradictions.length || g.termsIncomplete || g.blockingUnknowns.length ? `<ul>${[
+      <div class="glance-col"><h4>${tx("result.controlItems")}</h4>${g.materialContradictions.length || g.termsIncomplete || g.blockingUnknowns.length ? `<ul>${[
         ...g.materialContradictions.map((c) => `<li>${tx("result.materialContradiction")}: ${esc(c.label)} (${tx("result.unresolved")})</li>`),
         ...(g.termsIncomplete ? [`<li>${tx("result.termsIncomplete")}</li>`] : []),
         ...g.blockingUnknowns.map((u) => `<li>${tx("result.blockingUnknown")}: ${esc(u.label)}</li>`),
         ...(g.weakEvidence ? [`<li>${tx("result.evidenceLow")}</li>`] : []),
       ].join("")}</ul>` : `<span class="muted">${tx("result.noBlockers")}</span>`}</div>
+    </div>
+    <div class="dl-next-move">
+      <span class="muted dl-label">${tx("result.nextBestAction")}</span>
+      <strong>${esc(nextBestAction)}</strong>
     </div>
     <div class="dl-grid">
       <div class="glance-col"><h4>${tx("result.missing")}</h4><ul>${[

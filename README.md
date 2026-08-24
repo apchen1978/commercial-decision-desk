@@ -1,10 +1,18 @@
 # Commercial Decision Desk
 
-Decision-support prototype for one question: **"Should we pursue this overseas
-commercial opportunity now?"**
+**NORTH STAR (owner, 2026-08-23):** Build the smallest credible **Commercial
+Decision Workbench** that a business owner can use **without an API key** to
+assess one opportunity from **input → evidence → recommendation → human decision**.
+
+Decision-support for one question: **"Should we pursue this overseas commercial
+opportunity now?"**
 
 A convergence proof — **not** a production product. No backend, no database,
-no persistence, no network calls, no real prospect data.
+no persistence, no network calls, no API keys, no real prospect data.
+
+> Every feature/gate decision is measured against the north star: does it make the
+> workbench *smaller* or *more credible* for a single-opportunity, owner-driven
+> assessment? **FEATURE DEPTH ≠ EVIDENCE DEPTH.**
 
 ## Core principle
 

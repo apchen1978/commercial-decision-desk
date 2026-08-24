@@ -652,6 +652,10 @@ function renderResult() {
   if (!wouldChange.length && g.recommended === "HOLD_FOR_EVIDENCE") wouldChange.push(tx("next.missing"));
   if (!wouldChange.length) wouldChange.push(tx("next.nothingBlocks"));
 
+  // memo-style status counts (presentation only — derived from existing engine output)
+  const nBlocking = g.materialContradictions.length + (g.termsIncomplete ? 1 : 0) + g.blockingUnknowns.length + (g.weakEvidence || g.strongEvidence === false ? 1 : 0);
+  const nUnknown = g.blockingUnknowns.length;
+
   $("result-rec").innerHTML = `
     <div id="result-decision" class="dl-decision">
       <div class="glance-rec">
@@ -659,6 +663,7 @@ function renderResult() {
         <span class="rec-tag ${tagClass(g.recommended)}">${stateLabel(g.recommended)}</span>
         <span class="muted dl-deterministic">${tx("result.deterministic")}</span>
       </div>
+      <div class="dl-counts"><b>${nBlocking}</b> ${tx("result.blockers")} · <b>${nUnknown}</b> ${tx("status.unknown")}</div>
     </div>
     <div id="result-control" class="dl-grid">
       <div class="glance-col"><h4>${tx("result.why")}</h4><ul>${g.reasons.map((r) => `<li>${esc(localizeReason(r, language, current.quoteComparabilityAssessed !== false))}</li>`).join("")}</ul></div>

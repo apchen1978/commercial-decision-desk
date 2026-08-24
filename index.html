@@ -7,18 +7,18 @@
     <title data-i18n="document.title">商務決策工作台 — 手動評估</title>
     <style>
       :root {
-        --ink: #17271f;
-        --muted: #5c6b62;
-        --line: #d9ded4;
-        --bone: #f4f5f0;
-        --paper: #ecefe6;
+        --ink: #22281f;
+        --muted: #6b6a5e;
+        --line: #e2d9c6;
+        --bone: #f6f2e9;
+        --paper: #efe9dc;
         --forest: #1f4d3a;
-        --pine: #0f2b23;
+        --pine: #14281f;
         --moss: #3a6b52;
         --amber: #a05a10;
-        --gold: #e8b04b;
-        --bad: #a33a2c;
-        --ok: #2f6b4f;
+        --gold: #b3924a;
+        --bad: #a14a32;
+        --ok: #33634a;
         --unk: #8a6d1a;
       }
       * { box-sizing: border-box; }
@@ -277,11 +277,138 @@
       .quantity-with-unit .unit-hint { flex: 0 0 auto; color: var(--muted); font-size: 12.5px; font-weight: 600; }
       .quantity-with-unit input[type="text"] { flex: 1 1 40%; margin-top: 0; }
       /* Reduce card-wall feel: keep cards for true groups, straighten inner rows */
-      .glance-col, .structure-item, .context-grid > div { background: #fafbf7; }
+      .glance-col, .structure-item, .context-grid > div { background: #faf6ec; }
       section { margin-top: 22px; }
       @media (max-width: 640px) {
         header.hero .hero-actions { width: 100%; justify-content: space-between; }
         .decision-lead { padding: 14px 14px; }
+      }
+
+      /* ===== EXECUTIVE BRIEF MODE — result page as a one-page deal memo =====
+         Visual language only (no logic / no feature changes):
+         warm ivory canvas · charcoal ink · deep forest · muted brass.
+         Assessment mode keeps its own form-oriented feel; only #result-area changes. */
+      #result-area {
+        --ivory: #fbf7ee;
+        --charcoal: #22281f;
+        --brass: #a3873f;
+        --rust: #a14a32;
+        --sage: #33634a;
+        --hairline: #e2d9c6;
+        color: var(--charcoal);
+      }
+      /* Page heading -> quiet executive kicker */
+      #result-area > h2[data-i18n="result.heading"] {
+        font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
+        color: var(--brass); margin: 6px 0 18px; padding-bottom: 12px;
+        border-bottom: 1px solid var(--hairline);
+      }
+      /* Result index — numbered, hairline, brass numerals */
+      #result-area .result-nav {
+        gap: 18px; border-bottom: 1px solid var(--hairline); padding: 10px 0 12px; margin-bottom: 8px;
+        counter-reset: execnav;
+      }
+      #result-area .result-nav a {
+        counter-increment: execnav; color: #6b6a5e; font-size: 12px; font-weight: 700;
+        letter-spacing: .04em; padding: 2px 0; border: 0; border-radius: 0;
+      }
+      #result-area .result-nav a::before { content: counter(execnav, decimal-leading-zero); color: var(--brass); font-weight: 800; margin-right: 5px; }
+      #result-area .result-nav a:hover { color: var(--forest); border: 0; }
+      /* Section headers — numbered kickers, hairline separators, no boxes */
+      #result-area section > h2 {
+        font-size: 12.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+        color: var(--charcoal); margin: 34px 0 10px; gap: 8px;
+      }
+      #blank-economics-result h2::before { content: "02"; }
+      #result-priority h2::before { content: "03"; }
+      #result-negotiation h2::before { content: "04"; }
+      #result-evidence h2::before { content: "05"; }
+      #blank-economics-result h2::before, #result-priority h2::before,
+      #result-negotiation h2::before, #result-evidence h2::before {
+        color: var(--brass); font-weight: 800; margin-right: 8px;
+      }
+      /* Neutralize inner boxes -> whitespace + thin rules */
+      #result-area .card { background: transparent; border: 0; border-radius: 0; padding: 0; margin-top: 12px; box-shadow: none; }
+      #result-area .card + .card { margin-top: 20px; }
+      /* Hero snapshot — the deal, five-second scan */
+      #result-area .executive-snapshot {
+        background: var(--ivory); border: 1px solid var(--hairline); border-top: 3px solid var(--forest);
+        border-radius: 4px; padding: 26px 28px 22px; margin: 10px 0 8px; box-shadow: none;
+      }
+      .snapshot-kicker { color: var(--brass); }
+      .snapshot-heading-row h2 { font-size: 28px; color: var(--charcoal); letter-spacing: -0.01em; }
+      .snapshot-state { border-left-color: var(--hairline); }
+      .snapshot-state span { color: var(--brass); }
+      .snapshot-state strong { font-size: 17px; text-transform: uppercase; letter-spacing: .05em; color: var(--charcoal); }
+      .snapshot-grid { border-color: var(--hairline); }
+      .snapshot-field { background: transparent; border-color: var(--hairline); padding: 12px 14px; }
+      .snapshot-field span { color: #8b887a; }
+      .snapshot-field strong { color: var(--charcoal); font-size: 14.5px; font-variant-numeric: tabular-nums; }
+      .snapshot-economics strong { color: var(--forest); font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
+      .snapshot-control { border-top: 1px solid var(--hairline); padding-top: 14px; margin-top: 16px; }
+      .snapshot-control span { color: var(--brass); }
+      .snapshot-control strong { color: var(--charcoal); font-size: 14px; line-height: 1.5; }
+      /* Decision lead — CURRENT POSITION with a left status line */
+      #result-area .decision-lead {
+        background: transparent; border: 0; border-left: 4px solid var(--brass);
+        border-radius: 0; padding: 8px 0 12px 22px; margin: 4px 0 10px; box-shadow: none;
+      }
+      #result-area .decision-lead:has(.rec-tag.now) { border-left-color: var(--sage); }
+      #result-area .decision-lead:has(.rec-tag.esc), #result-area .decision-lead:has(.rec-tag.drop) { border-left-color: var(--rust); }
+      #result-area .glance-rec { display: block; }
+      #result-area .dl-label { display: block; color: var(--brass); font-size: 11px; letter-spacing: .12em; margin-bottom: 4px; }
+      #result-area .dl-deterministic { display: block; margin-top: 6px; color: #8b887a; font-size: 11.5px; }
+      #result-area .rec-tag {
+        font-size: 24px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase;
+        padding: 0; border: 0; border-radius: 0; background: transparent;
+      }
+      #result-area .rec-tag.now { color: var(--sage); }
+      #result-area .rec-tag.cond, #result-area .rec-tag.hold { color: var(--brass); }
+      #result-area .rec-tag.esc, #result-area .rec-tag.drop { color: var(--rust); }
+      /* Blockers / unknowns counts — memo-style status line */
+      #result-area .dl-counts {
+        display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 12px 0 4px;
+        font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #8b887a;
+      }
+      #result-area .dl-counts b { color: var(--charcoal); font-weight: 800; font-variant-numeric: tabular-nums; }
+      /* Decision columns — ruled, not boxed */
+      #result-area .dl-grid { grid-template-columns: 1fr 1fr; gap: 0 28px; margin-top: 8px; }
+      #result-area .glance-col { background: transparent; border: 0; border-top: 1px solid var(--hairline); border-radius: 0; padding: 12px 2px 4px; }
+      #result-area .glance-col h4 { color: var(--brass); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+      #result-area .glance-col li, #result-area .glance-col span { color: #4b4f45; font-size: 13px; }
+      #result-area .glance-note { color: #8b887a; font-size: 12px; border-top: 1px solid var(--hairline); padding-top: 10px; margin-top: 14px; }
+      /* Economics — ledger rows, executive figures */
+      #result-area .economics-row { border-bottom: 1px solid var(--hairline); padding: 10px 0; }
+      #result-area .economics-row span { color: #6b6a5e; font-size: 13px; }
+      #result-area .economics-row strong { font-size: 16px; font-variant-numeric: tabular-nums; color: var(--charcoal); }
+      #result-area .economics-divider { border-top-color: var(--forest); }
+      #result-area .economics-result strong { font-size: 24px; color: var(--forest); }
+      #result-area .economics-owner-input { background: transparent; border: 0; border-top: 1px solid var(--hairline); border-radius: 0; padding: 12px 2px; }
+      #result-area .economics-gap strong { color: var(--forest); }
+      /* Actions / negotiation / evidence — left ticks, hairline rules */
+      #result-area .action-item, #result-area .prep-item {
+        background: transparent; border-radius: 0; border-left: 2px solid var(--forest);
+        border-bottom: 1px solid var(--hairline); padding: 12px 4px;
+      }
+      #result-area .prep-item { border-left-color: var(--brass); }
+      #result-area .action-priority { color: var(--brass); }
+      #result-area .action-item p, #result-area .prep-item p { color: #4b4f45; }
+      #result-area .trade-block { background: transparent; border-color: var(--hairline); border-radius: 0; }
+      #result-area .trade-block h3 { color: var(--forest); }
+      #result-area .structure-item, #result-area .context-grid > div { background: transparent; border-color: var(--hairline); border-radius: 0; }
+      #result-area .trade-boundary { border-left-color: var(--brass); }
+      /* Export + human decision */
+      #result-area .deal-brief-export { border-top: 1px solid var(--hairline); }
+      #result-area .human-boundary { border: 0; border-left: 3px solid var(--forest); background: transparent; border-radius: 0; }
+      #result-area .state-buttons button { background: transparent; border: 1px solid var(--hairline); color: var(--charcoal); }
+      #result-area .state-buttons button.sel { background: var(--forest); color: var(--ivory); border-color: var(--forest); }
+      /* Mobile — keep executive numerals from overflowing */
+      @media (max-width: 640px) {
+        #result-area .snapshot-heading-row h2 { font-size: 24px; }
+        #result-area .snapshot-economics strong { font-size: 22px; }
+        #result-area .rec-tag { font-size: 20px; }
+        #result-area .dl-grid { grid-template-columns: 1fr; gap: 0; }
+        #result-area .executive-snapshot { padding: 20px 18px; }
       }
     </style>
   </head>
@@ -544,7 +671,7 @@
             <div class="card" id="priority-actions"></div>
           </section>
 
-          <section class="trade-detail" aria-live="polite">
+          <section id="result-negotiation" class="trade-detail" aria-live="polite">
             <h2 data-i18n="trade.prepHeading">下一輪對話準備</h2>
             <div class="card negotiation-prep" id="negotiation-prep"></div>
           </section>

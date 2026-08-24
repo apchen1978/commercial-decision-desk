@@ -51,6 +51,7 @@ export function buildTradeDealStructure(opportunity, engine) {
 export function buildNegotiationPrep(opportunity, engine, tradeStructure) {
   const prep = [];
   const payment = tradeStructure.payment;
+  const context = opportunity.commercialContext || null;
   if (engine.materialContradictions?.length || engine.termsIncomplete || payment.exposureStatus === "UNKNOWN") {
     prep.push({
       type: "PAYMENT",
@@ -88,7 +89,7 @@ export function buildNegotiationPrep(opportunity, engine, tradeStructure) {
       evidenceTrace: tradeStructure.delivery.trace,
     });
   }
-  if (opportunity.quoteComparabilityAssessed === false || engine.quoteBasesComparable === false) {
+  if ((opportunity.quotes || []).length > 0 && (opportunity.quoteComparabilityAssessed === false || engine.quoteBasesComparable === false)) {
     prep.push({
       type: "QUOTE",
       priority: 2,
@@ -98,6 +99,18 @@ export function buildNegotiationPrep(opportunity, engine, tradeStructure) {
       ownerInput: "Owner decides which scope is commercially relevant before comparing offers.",
       rerunWhen: "Rerun after the quote comparison basis is confirmed.",
       evidenceTrace: [trace("evidence", "QUOTE_COMPARABILITY", "Quote comparison basis is not confirmed")],
+    });
+  }
+  if (context && (context.purchasingAuthority === "unknown" || context.finalApprover === "unknown" || context.accessDecisionMaker === "unknown")) {
+    prep.push({
+      type: "AUTHORITY",
+      priority: 2,
+      question: "Who can approve the purchase, technical scope, and final commercial commitment?",
+      request: "Request the buyer's decision roles and a path to the final approver.",
+      avoidCommitment: "Do not treat a contact's interest as proof of purchasing authority or final approval.",
+      ownerInput: "Owner decides whether access to the decision maker is sufficient to continue investing.",
+      rerunWhen: "Rerun after decision authority and access evidence are confirmed.",
+      evidenceTrace: [trace("unknown", "BUYER_AUTHORITY", "Buyer decision authority is UNKNOWN")],
     });
   }
   return prep.sort((a, b) => a.priority - b.priority).slice(0, 3).map((item, index) => ({ ...item, priority: index + 1, evidenceTrace: clone(item.evidenceTrace) }));

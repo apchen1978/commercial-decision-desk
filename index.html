@@ -151,6 +151,27 @@
       .trade-block dt { color:var(--muted); }
       .trade-block dd { margin:0; color:var(--ink); overflow-wrap:anywhere; }
       .trade-boundary { margin:12px 0 0; padding:9px 11px; border-left:3px solid var(--gold); color:var(--muted); font-size:12px; }
+      .intake-section { margin-top:14px; }
+      .intake-section summary, .context-authority summary { cursor:pointer; color:var(--forest); font-weight:700; }
+      .context-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+      .context-grid > div { min-width:0; padding:10px 11px; border:1px solid var(--line); border-radius:9px; background:#fafbf7; }
+      .context-grid span { display:block; color:var(--muted); font-size:11px; }
+      .context-grid strong { display:block; margin-top:3px; color:var(--ink); overflow-wrap:anywhere; font-size:13px; }
+      .context-authority { margin-top:13px; padding-top:11px; border-top:1px solid var(--line); }
+      .authority-grid { margin-top:10px; grid-template-columns:repeat(3,minmax(0,1fr)); }
+      .economics-flow { padding:2px 0; }
+      .economics-row { display:grid; grid-template-columns:minmax(0,1fr) auto 16px; gap:10px; align-items:center; padding:8px 0; border-bottom:1px solid var(--line); }
+      .economics-row span { color:var(--muted); font-size:13px; }
+      .economics-row strong { color:var(--ink); font-size:14px; text-align:right; }
+      .economics-row small { color:var(--muted); font-size:14px; }
+      .economics-divider { border-top:2px solid var(--forest); margin-top:5px; }
+      .economics-result { border-bottom:0; padding-top:11px; }
+      .economics-result span, .economics-result strong { color:var(--forest); font-weight:800; }
+      .economics-owner-input { display:flex; justify-content:space-between; gap:12px; margin-top:12px; padding:10px 12px; background:#fdf6e4; border:1px solid var(--gold); border-radius:9px; font-size:12px; }
+      .economics-owner-input span { color:var(--muted); }
+      .economics-owner-input strong { color:var(--ink); text-align:right; }
+      .economics-gap { margin:10px 0 0; color:var(--ink); font-size:13px; }
+      .economics-note, .economics-trace { margin:9px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
       .negotiation-prep { display:grid; gap:10px; }
       .prep-item { border-left:3px solid var(--amber); padding:12px 14px; background:#fafbf7; border-radius:0 10px 10px 0; }
       .prep-item p { margin:7px 0 0; color:var(--muted); font-size:12.5px; line-height:1.55; }
@@ -159,6 +180,8 @@
       @media (max-width:760px) { .structure-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
       @media (max-width:420px) { .structure-grid { grid-template-columns:1fr 1fr; gap:7px; } .structure-item { padding:9px 10px; } .action-item { padding:11px 12px; } }
       @media (max-width:640px) { .trade-grid { grid-template-columns:1fr; } .trade-block dl { grid-template-columns:1fr; gap:2px; } .trade-block dd { margin-bottom:5px; } }
+      @media (max-width:760px) { .context-grid, .authority-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+      @media (max-width:420px) { .context-grid, .authority-grid { grid-template-columns:1fr 1fr; gap:7px; } .economics-owner-input { display:block; } .economics-owner-input strong { display:block; text-align:left; margin-top:4px; } }
     </style>
   </head>
   <body>
@@ -214,6 +237,53 @@
             <h3 data-i18n="input.heading">你目前知道這個商機的哪些事？</h3>
             <label class="field"><span data-i18n="input.opportunityName">商機名稱</span></label>
             <input type="text" id="in-name" data-i18n-placeholder="input.opportunityNamePlaceholder" placeholder="例如：杜拜飯店集團 — 窗簾供應" />
+            <details class="card intake-section" open>
+              <summary data-i18n="context.quickSummary">Quick commercial context</summary>
+              <p class="muted" data-i18n="context.quickHelper">先建立交易骨架；不知道就保留 UNKNOWN，之後仍可補充。</p>
+              <div class="field-row">
+                <label class="field"><span data-i18n="context.product">產品／服務</span><input type="text" id="in-product" /></label>
+                <label class="field"><span data-i18n="context.buyerCompany">買方／公司</span><input type="text" id="in-buyer-company" /></label>
+              </div>
+              <div class="field-row">
+                <label class="field"><span data-i18n="context.market">國家／市場</span><input type="text" id="in-market" /></label>
+                <label class="field"><span data-i18n="context.quantity">預估數量</span><input type="number" id="in-quantity" min="0" /></label>
+              </div>
+              <div class="field-row">
+                <label class="field"><span data-i18n="context.revenue">預估訂單收入</span><input type="number" id="in-revenue" min="0" /></label>
+                <label class="field"><span data-i18n="context.currency">幣別</span><select id="in-currency"><option value="CNY">CNY</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="TWD">TWD</option><option value="OTHER">Other</option></select></label>
+              </div>
+              <div class="field-row">
+                <label class="field"><span data-i18n="context.timing">預計時程</span><input type="text" id="in-timing" /></label>
+                <label class="field"><span data-i18n="context.relationship">買方關係</span><select id="in-relationship"><option value="unknown" data-i18n="context.unknown">UNKNOWN</option><option value="new" data-i18n="context.newBuyer">新買方</option><option value="existing" data-i18n="context.existingBuyer">既有買方</option></select></label>
+              </div>
+              <label class="field"><span data-i18n="context.source">商機來源</span><input type="text" id="in-source" /></label>
+            </details>
+            <details class="card intake-section">
+              <summary data-i18n="context.authoritySummary">Buyer & decision authority</summary>
+              <p class="muted" data-i18n="context.authorityHelper">這些資料只用來整理決策鏈與準備下一輪對話，不會自動判斷買方。</p>
+              <div class="field-row">
+                <label class="field"><span data-i18n="context.contactRole">目前聯絡人角色</span><input type="text" id="in-contact-role" /></label>
+                <label class="field"><span data-i18n="context.purchasingAuthority">採購權限已知？</span><select id="in-purchasing-authority"><option value="unknown" data-i18n="context.unknown">UNKNOWN</option><option value="yes" data-i18n="context.yes">是</option><option value="no" data-i18n="context.no">否</option></select></label>
+              </div>
+              <div class="field-row">
+                <label class="field"><span data-i18n="context.technicalAuthority">技術決策者已知？</span><select id="in-technical-authority"><option value="unknown" data-i18n="context.unknown">UNKNOWN</option><option value="yes" data-i18n="context.yes">是</option><option value="no" data-i18n="context.no">否</option></select></label>
+                <label class="field"><span data-i18n="context.finalApprover">最終核准者已知？</span><select id="in-final-approver"><option value="unknown" data-i18n="context.unknown">UNKNOWN</option><option value="yes" data-i18n="context.yes">是</option><option value="no" data-i18n="context.no">否</option></select></label>
+              </div>
+              <label class="field"><span data-i18n="context.accessDecisionMaker">能接觸決策者？</span><select id="in-access-decision-maker"><option value="unknown" data-i18n="context.unknown">UNKNOWN</option><option value="yes" data-i18n="context.yes">是</option><option value="no" data-i18n="context.no">否</option></select></label>
+            </details>
+            <details class="card intake-section">
+              <summary data-i18n="economics.inputSummary">Deal Economics Bridge（選填）</summary>
+              <p class="muted" data-i18n="economics.inputHelper">只填入已有數字；缺少任何必要項目時，Expected Net Contribution 不計算。</p>
+              <div class="field-row">
+                <label class="field"><span data-i18n="economics.directCost">直接產品成本</span><input type="number" id="in-direct-cost" min="0" /></label>
+                <label class="field"><span data-i18n="economics.tradeCost">Trade／物流成本</span><input type="number" id="in-trade-cost" min="0" /></label>
+              </div>
+              <div class="field-row">
+                <label class="field"><span data-i18n="economics.dealSpecificCost">Deal-specific 商務成本</span><input type="number" id="in-deal-cost" min="0" /></label>
+                <label class="field"><span data-i18n="economics.contingency">Risk／Contingency</span><input type="number" id="in-contingency" min="0" /></label>
+              </div>
+              <label class="field"><span data-i18n="economics.minimum">Owner 最低可接受 Net Contribution</span><input type="number" id="in-min-net" min="0" /></label>
+            </details>
             <div class="field-row">
               <label class="field"><span data-i18n="input.buyerFit">買方契合度</span>
                 <select id="in-buyer">
@@ -341,6 +411,17 @@
         <!-- result -->
         <div id="result-area" hidden>
           <h2 data-i18n="result.heading">工作台建議</h2>
+          <section id="blank-context-result" class="commercial-structure" hidden aria-live="polite">
+            <h2 data-i18n="context.resultHeading">商機骨架</h2>
+            <div class="card" id="blank-commercial-context"></div>
+          </section>
+          <section id="blank-economics-result" class="trade-detail" hidden aria-live="polite">
+            <h2 data-i18n="economics.heading">Deal Economics Bridge</h2>
+            <div class="card">
+              <div id="economics-bridge"></div>
+              <p class="economics-trace" id="economics-trace"></p>
+            </div>
+          </section>
           <section class="commercial-structure" aria-live="polite">
             <h2 data-i18n="structure.heading">交易結構</h2>
             <div class="card" id="commercial-structure"></div>

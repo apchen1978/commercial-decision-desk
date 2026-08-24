@@ -9,6 +9,7 @@ import { DEFAULT_LANGUAGE, localizeEvidenceText, presentReason as localizeReason
 import { createDecisionPathExperiment } from "./decision-path.js";
 import { buildCommercialViewModel } from "./commercial-action-layer.js";
 import { buildTradeDealViewModel } from "./trade-deal-structure.js";
+import { buildEconomicsBridge, economicsEvidenceTrace } from "./economics-bridge.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -72,8 +73,12 @@ function tradeTraceText(item) {
     ? tx("trade.deliveryTerm")
     : item.sourceId === "CTR-1"
       ? tx("trade.paymentContradiction")
-      : item.sourceId === "QUOTE_COMPARABILITY"
-        ? tx("trade.quoteComparability")
+    : item.sourceId === "QUOTE_COMPARABILITY"
+      ? tx("trade.quoteComparability")
+      : item.sourceId === "PAYMENT"
+        ? tx("trade.paymentIncomplete")
+        : item.sourceId === "BUYER_AUTHORITY"
+          ? tx("trade.authorityUnknown")
         : item.label;
   return source + ": " + label;
 }
@@ -84,6 +89,71 @@ function tradeTermCopyKey(term) {
 
 function prepCopyKey(item, deliveryConfirmed) {
   return item.type === "DELIVERY" ? (deliveryConfirmed ? "DELIVERY_CONFIRMED" : "DELIVERY_UNKNOWN") : item.type;
+}
+
+function economicsValue(value, currency) {
+  return value === null ? tx("economics.unknown") : value.toLocaleString() + " " + currency;
+}
+
+function renderEconomicsBridge(bridge, currency) {
+  $("blank-economics-result").hidden = mode !== "blank";
+  const rows = [
+    ["economics.revenue", bridge.revenue],
+    ["economics.directCost", bridge.directCost],
+    ["economics.tradeCost", bridge.tradeCost],
+    ["economics.dealSpecificCost", bridge.dealSpecificCost],
+    ["economics.contingency", bridge.contingency],
+  ];
+  $("economics-bridge").innerHTML = [
+    '<div class="economics-flow">',
+    rows.map((row, index) => '<div class="economics-row"><span>' + tx(row[0]) + '</span><strong>' + economicsValue(row[1], currency) + '</strong>' + (index === 0 ? "" : '<small>−</small>') + '</div>').join(""),
+    '<div class="economics-divider"></div>',
+    '<div class="economics-row economics-result"><span>' + tx("economics.netContribution") + '</span><strong>' + (bridge.expectedNetContribution === null ? tx("economics.notCalculated") : economicsValue(bridge.expectedNetContribution, currency)) + '</strong></div>',
+    '</div>',
+    '<div class="economics-owner-input"><span>' + tx("economics.minimum") + '</span><strong>' + economicsValue(bridge.minimumNetContribution, currency) + '</strong></div>',
+    '<p class="economics-gap"><strong>' + tx("economics.gap") + '</strong> ' + (bridge.gap === null ? tx("economics.notCalculated") : economicsValue(bridge.gap, currency)) + '</p>',
+    '<p class="economics-note">' + tx("economics.note") + '</p>',
+  ].join("");
+  $("economics-trace").innerHTML = economicsEvidenceTrace(bridge).length
+    ? tx("economics.missing") + ": " + economicsEvidenceTrace(bridge).map((key) => tx("economics." + key)).join(" · ")
+    : tx("economics.complete");
+}
+
+function contextDisplay(value) {
+  return value === "" || value === undefined || value === null || value === "unknown" ? tx("context.unknown") : value;
+}
+
+function contextStatus(value) {
+  if (value === "yes") return tx("context.yes");
+  if (value === "no") return tx("context.no");
+  if (value === "new") return tx("context.newBuyer");
+  if (value === "existing") return tx("context.existingBuyer");
+  return tx("context.unknown");
+}
+
+function renderCommercialContext(context = {}) {
+  $("blank-context-result").hidden = mode !== "blank";
+  if (mode !== "blank") return;
+  $("blank-commercial-context").innerHTML = [
+    '<div class="context-grid">',
+    '<div><span>' + tx("context.product") + '</span><strong>' + contextDisplay(context.product) + '</strong></div>',
+    '<div><span>' + tx("context.buyerCompany") + '</span><strong>' + contextDisplay(context.buyerCompany) + '</strong></div>',
+    '<div><span>' + tx("context.market") + '</span><strong>' + contextDisplay(context.market) + '</strong></div>',
+    '<div><span>' + tx("context.quantity") + '</span><strong>' + contextDisplay(context.quantity) + '</strong></div>',
+    '<div><span>' + tx("context.revenue") + '</span><strong>' + contextDisplay(context.revenue) + ' ' + contextDisplay(context.currency) + '</strong></div>',
+    '<div><span>' + tx("context.timing") + '</span><strong>' + contextDisplay(context.timing) + '</strong></div>',
+    '<div><span>' + tx("context.relationship") + '</span><strong>' + contextStatus(context.relationship) + '</strong></div>',
+    '<div><span>' + tx("context.source") + '</span><strong>' + contextDisplay(context.source) + '</strong></div>',
+    '</div>',
+    '<details class="context-authority"><summary>' + tx("context.authoritySummary") + '</summary>',
+    '<div class="context-grid authority-grid">',
+    '<div><span>' + tx("context.contactRole") + '</span><strong>' + contextDisplay(context.contactRole) + '</strong></div>',
+    '<div><span>' + tx("context.purchasingAuthority") + '</span><strong>' + contextStatus(context.purchasingAuthority) + '</strong></div>',
+    '<div><span>' + tx("context.technicalAuthority") + '</span><strong>' + contextStatus(context.technicalAuthority) + '</strong></div>',
+    '<div><span>' + tx("context.finalApprover") + '</span><strong>' + contextStatus(context.finalApprover) + '</strong></div>',
+    '<div><span>' + tx("context.accessDecisionMaker") + '</span><strong>' + contextStatus(context.accessDecisionMaker) + '</strong></div>',
+    '</div></details>',
+  ].join("");
 }
 
 function renderTradeDeal(view) {
@@ -231,6 +301,25 @@ $("mode-blank").addEventListener("click", () => {
 function fillBlankIntake() {
   const d = blankAssessmentDefaults();
   $("in-name").value = d.name;
+  $("in-product").value = "";
+  $("in-buyer-company").value = "";
+  $("in-market").value = "";
+  $("in-quantity").value = "";
+  $("in-revenue").value = "";
+  $("in-currency").value = "CNY";
+  $("in-timing").value = "";
+  $("in-relationship").value = "unknown";
+  $("in-source").value = "";
+  $("in-contact-role").value = "";
+  $("in-purchasing-authority").value = "unknown";
+  $("in-technical-authority").value = "unknown";
+  $("in-final-approver").value = "unknown";
+  $("in-access-decision-maker").value = "unknown";
+  $("in-direct-cost").value = "";
+  $("in-trade-cost").value = "";
+  $("in-deal-cost").value = "";
+  $("in-contingency").value = "";
+  $("in-min-net").value = "";
   $("in-buyer").value = d.buyerFit;
   $("in-category").value = d.categoryFit;
   $("in-evidence").value = d.evidenceQuality;
@@ -259,6 +348,29 @@ function fillBlankIntake() {
 function collectBlankInput() {
   return {
     name: $("in-name").value.trim() || tx("input.untitled"),
+    commercialContext: {
+      product: $("in-product").value.trim(),
+      buyerCompany: $("in-buyer-company").value.trim(),
+      market: $("in-market").value.trim(),
+      quantity: $("in-quantity").value,
+      timing: $("in-timing").value.trim(),
+      relationship: $("in-relationship").value,
+      source: $("in-source").value.trim(),
+      contactRole: $("in-contact-role").value.trim(),
+      purchasingAuthority: $("in-purchasing-authority").value,
+      technicalAuthority: $("in-technical-authority").value,
+      finalApprover: $("in-final-approver").value,
+      accessDecisionMaker: $("in-access-decision-maker").value,
+    },
+    economics: {
+      revenue: $("in-revenue").value,
+      currency: $("in-currency").value,
+      directCost: $("in-direct-cost").value,
+      tradeCost: $("in-trade-cost").value,
+      dealSpecificCost: $("in-deal-cost").value,
+      contingency: $("in-contingency").value,
+      minimumNetContribution: $("in-min-net").value,
+    },
     buyerFit: $("in-buyer").value,
     categoryFit: $("in-category").value,
     evidenceQuality: $("in-evidence").value,
@@ -377,6 +489,8 @@ $("btn-run").addEventListener("click", () => {
   const input = collectBlankInput();
   current = buildOpportunityFromInput(input);
   current.trade = { deliveryTerm: input.deliveryTerm };
+  current.commercialContext = input.commercialContext;
+  current.economics = input.economics;
   window.__lastInput = input;
   runAssessment();
   scrollToResult();
@@ -458,9 +572,17 @@ function renderResult() {
   const commercialView = buildCommercialViewModel(current, g, decisionPathExperiment);
   renderCommercialStructure(commercialView);
   renderPriorityActions(commercialView);
+  renderCommercialContext({
+    ...(current.commercialContext || {}),
+    revenue: current.economics?.revenue,
+    currency: current.economics?.currency,
+  });
   const tradeView = buildTradeDealViewModel(current, g);
   renderTradeDeal(tradeView);
   renderNegotiationPrep(tradeView);
+  const economicsInput = current.economics || {};
+  const economics = buildEconomicsBridge(economicsInput);
+  renderEconomicsBridge(economics, economicsInput.currency || "CNY");
 
   // human decision — separate from the engine recommendation
   $("human-state-buttons").innerHTML = DECISION_STATES.map(

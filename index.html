@@ -189,6 +189,27 @@
       @media (max-width:420px) { .context-grid, .authority-grid { grid-template-columns:1fr 1fr; gap:7px; } .economics-owner-input { display:block; } .economics-owner-input strong { display:block; text-align:left; margin-top:4px; } }
       @media (max-width:640px) { .export-heading-row { flex-direction:column; } .export-actions { width:100%; } .export-actions button { flex:1; } }
 
+      /* Executive deal snapshot: existing evidence, grouped for a five-second scan. */
+      .executive-snapshot {
+        margin: 14px 0 18px; padding: 18px 20px; background: #fff;
+        border: 1px solid var(--line); border-top: 3px solid var(--forest);
+        border-radius: 12px; box-shadow: 0 14px 34px -28px rgba(23,39,31,.46);
+      }
+      .snapshot-heading-row { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
+      .snapshot-kicker { display:block; color:var(--amber); font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+      .snapshot-heading-row h2 { margin:3px 0 0; font-size:21px; color:var(--pine); }
+      .snapshot-state { min-width:190px; padding-left:16px; border-left:1px solid var(--line); }
+      .snapshot-state span, .snapshot-field span, .snapshot-control span { display:block; color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
+      .snapshot-state strong { display:block; margin-top:4px; font-size:16px; }
+      .snapshot-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); margin-top:16px; border-top:1px solid var(--line); border-left:1px solid var(--line); }
+      .snapshot-field { min-width:0; padding:11px 12px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); background:#fafbf7; }
+      .snapshot-field strong { display:block; margin-top:3px; color:var(--ink); font-size:13.5px; line-height:1.4; overflow-wrap:anywhere; }
+      .snapshot-economics strong { color:var(--forest); font-size:14.5px; }
+      .snapshot-control { display:grid; grid-template-columns:170px minmax(0,1fr); gap:12px; align-items:baseline; margin-top:14px; }
+      .snapshot-control strong { color:var(--forest); font-size:13.5px; line-height:1.5; }
+      @media (max-width:760px) { .snapshot-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+      @media (max-width:540px) { .executive-snapshot { padding:14px; } .snapshot-heading-row { display:block; } .snapshot-state { min-width:0; padding:12px 0 0; margin-top:12px; border-left:0; border-top:1px solid var(--line); } .snapshot-control { grid-template-columns:1fr; gap:3px; } }
+
       /* ===== COMMERCIAL WORKSPACE REFINEMENT (bounded visual layer, no semantics change) ===== */
       .wrap { max-width: 1080px; }
       /* App shell — deliberate top bar */
@@ -496,16 +517,37 @@
         <!-- result -->
         <div id="result-area" hidden>
           <div class="result-nav" aria-label="結果導覽">
+            <a href="#executive-deal-snapshot" data-i18n="result.navDeal">商機</a>
             <a href="#result-decision" data-i18n="result.navDecision">決策</a>
-            <a href="#result-control" data-i18n="result.navControl">控制因素</a>
-            <a href="#result-actions" data-i18n="result.navActions">下一步</a>
+            <a href="#blank-economics-result" data-i18n="result.navEconomics">經濟</a>
+            <a href="#result-priority" data-i18n="result.navActions">下一步</a>
             <a href="#result-evidence" data-i18n="result.navEvidence">證據</a>
             <a href="#result-export" data-i18n="result.navExport">匯出</a>
           </div>
           <h2 data-i18n="result.heading">工作台建議</h2>
 
+          <section id="executive-deal-snapshot" class="executive-snapshot" hidden aria-live="polite"></section>
+
           <!-- Decision lead: recommendation + control + next + do-not-commit + human status -->
           <div id="result-rec" class="decision-lead" aria-live="polite"></div>
+
+          <section id="blank-economics-result" class="trade-detail" hidden aria-live="polite">
+            <h2 data-i18n="economics.heading">Deal Economics Bridge</h2>
+            <div class="card">
+              <div id="economics-bridge"></div>
+              <p class="economics-trace" id="economics-trace"></p>
+            </div>
+          </section>
+
+          <section id="result-priority" class="priority-actions" aria-live="polite">
+            <h2 data-i18n="actions.heading">優先行動</h2>
+            <div class="card" id="priority-actions"></div>
+          </section>
+
+          <section class="trade-detail" aria-live="polite">
+            <h2 data-i18n="trade.prepHeading">下一輪對話準備</h2>
+            <div class="card negotiation-prep" id="negotiation-prep"></div>
+          </section>
 
           <section id="result-evidence" class="commercial-structure" aria-live="polite">
             <h2 data-i18n="structure.heading">交易結構</h2>
@@ -517,31 +559,9 @@
             <div class="card" id="blank-commercial-context"></div>
           </section>
 
-          <section id="blank-economics-result" class="trade-detail" hidden aria-live="polite">
-            <h2 data-i18n="economics.heading">Deal Economics Bridge</h2>
-            <div class="card">
-              <div id="economics-bridge"></div>
-              <p class="economics-trace" id="economics-trace"></p>
-            </div>
-          </section>
-
           <section class="trade-detail" aria-live="polite">
             <h2 data-i18n="trade.heading">貿易交易結構</h2>
             <div class="card" id="trade-deal-structure"></div>
-          </section>
-
-          <section id="result-actions" class="deal-brief-export" aria-live="polite">
-            <div class="export-heading-row">
-              <div>
-                <h2 data-i18n="export.heading">匯出 Deal Brief</h2>
-                <p class="muted" data-i18n="export.helper">把這筆商機整理成可獨立閱讀的 Markdown 或純文字 brief。</p>
-              </div>
-              <div class="btn-row export-actions">
-                <button type="button" class="secondary" id="btn-export-md" data-i18n="export.markdown">下載 Markdown</button>
-                <button type="button" class="secondary" id="btn-export-txt" data-i18n="export.text">下載純文字</button>
-              </div>
-            </div>
-            <p class="export-status muted" id="export-status"></p>
           </section>
 
           <section class="decision-path" id="decision-path-area" hidden aria-live="polite">
@@ -555,14 +575,18 @@
             <div class="card path-detail" id="decision-path-detail" hidden></div>
           </section>
 
-          <section id="result-priority" class="priority-actions" aria-live="polite">
-            <h2 data-i18n="actions.heading">優先行動</h2>
-            <div class="card" id="priority-actions"></div>
-          </section>
-
-          <section class="trade-detail" aria-live="polite">
-            <h2 data-i18n="trade.prepHeading">下一輪對話準備</h2>
-            <div class="card negotiation-prep" id="negotiation-prep"></div>
+          <section id="result-export" class="deal-brief-export" aria-live="polite">
+            <div class="export-heading-row">
+              <div>
+                <h2 data-i18n="export.heading">匯出 Deal Brief</h2>
+                <p class="muted" data-i18n="export.helper">把這筆商機整理成可獨立閱讀的 Markdown 或純文字 brief。</p>
+              </div>
+              <div class="btn-row export-actions">
+                <button type="button" class="secondary" id="btn-export-md" data-i18n="export.markdown">下載 Markdown</button>
+                <button type="button" class="secondary" id="btn-export-txt" data-i18n="export.text">下載純文字</button>
+              </div>
+            </div>
+            <p class="export-status muted" id="export-status"></p>
           </section>
 
           <h2 data-i18n="result.yourDecision">你的決定</h2>

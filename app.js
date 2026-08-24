@@ -149,6 +149,47 @@ function contextStatus(value) {
   return tx("context.unknown");
 }
 
+function snapshotValue(value) {
+  return esc(value === "" || value === undefined || value === null ? tx("context.unknown") : value);
+}
+
+function renderExecutiveSnapshot({ economics, tradeView, control }) {
+  const context = current.commercialContext || {};
+  const buyer = context.buyerCompany || current.buyers?.[0]?.label || tx("context.unknown");
+  const currency = current.economics?.currency || "CNY";
+  const revenue = economics.revenue === null ? tx("context.unknown") : economicsValue(economics.revenue, currency);
+  const netContribution = economics.expectedNetContribution === null
+    ? tx("snapshot.notCalculated")
+    : economicsValue(economics.expectedNetContribution, currency);
+  const delivery = tradeTermLabel(tradeView.structure.delivery.declaredTerm);
+  const fields = [
+    ["snapshot.buyer", buyer],
+    ["snapshot.market", context.market || tx("context.unknown")],
+    ["snapshot.product", context.product || tx("context.unknown")],
+    ["snapshot.quantity", contextQuantityDisplay(context.quantity, context.quantityUnit)],
+    ["snapshot.dealValue", revenue],
+    ["snapshot.delivery", delivery],
+  ];
+  $("executive-deal-snapshot").hidden = false;
+  $("executive-deal-snapshot").innerHTML = `
+    <div class="snapshot-heading-row">
+      <div>
+        <span class="snapshot-kicker">${tx("snapshot.heading")}</span>
+        <h2>${snapshotValue(current.name || tx("context.unknown"))}</h2>
+      </div>
+      <div class="snapshot-state">
+        <span>${tx("snapshot.decision")}</span>
+        <strong class="rec-tag ${tagClass(engine.recommended)}">${stateLabel(engine.recommended)}</strong>
+      </div>
+    </div>
+    <div class="snapshot-grid">
+      ${fields.map(([label, value]) => `<div class="snapshot-field"><span>${tx(label)}</span><strong>${snapshotValue(value)}</strong></div>`).join("")}
+      <div class="snapshot-field snapshot-economics"><span>${tx("snapshot.netContribution")}</span><strong>${snapshotValue(netContribution)}</strong></div>
+    </div>
+    <div class="snapshot-control"><span>${tx("snapshot.control")}</span><strong>${snapshotValue(control)}</strong></div>
+  `;
+}
+
 function renderCommercialContext(context = {}) {
   $("blank-context-result").hidden = mode !== "blank";
   if (mode !== "blank") return;
@@ -638,21 +679,26 @@ function renderResult() {
     <p class="glance-note dl-note">${tx("boundary.note")}</p>
   `;
 
-  renderDecisionPath();
   const commercialView = buildCommercialViewModel(current, g, decisionPathExperiment);
-  renderCommercialStructure(commercialView);
+  const tradeView = buildTradeDealViewModel(current, g);
+  const economicsInput = current.economics || {};
+  const economics = buildEconomicsBridge(economicsInput);
+  renderExecutiveSnapshot({
+    economics,
+    tradeView,
+    control: g.reasons.length ? localizeReason(g.reasons[0], language, current.quoteComparabilityAssessed !== false) : tx("context.unknown"),
+  });
+  renderEconomicsBridge(economics, economicsInput.currency || "CNY");
   renderPriorityActions(commercialView);
+  renderNegotiationPrep(tradeView);
+  renderCommercialStructure(commercialView);
   renderCommercialContext({
     ...(current.commercialContext || {}),
     revenue: current.economics?.revenue,
     currency: current.economics?.currency,
   });
-  const tradeView = buildTradeDealViewModel(current, g);
   renderTradeDeal(tradeView);
-  renderNegotiationPrep(tradeView);
-  const economicsInput = current.economics || {};
-  const economics = buildEconomicsBridge(economicsInput);
-  renderEconomicsBridge(economics, economicsInput.currency || "CNY");
+  renderDecisionPath();
   $("export-status").textContent = tx("export.ready") + " " + current.name;
 
   // human decision — separate from the engine recommendation

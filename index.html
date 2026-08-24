@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Commercial Decision Desk — Decision Support Prototype</title>
+    <link rel="icon" href="data:," />
+    <title>Commercial Decision Workbench — Manual Assessment</title>
     <style>
       :root {
         --ink: #17271f;
@@ -44,149 +45,244 @@
         background: #fff; border: 1px solid var(--line); border-radius: 12px;
         padding: 16px 18px; margin-top: 10px;
       }
-      .card h3 { margin: 0 0 6px; font-size: 16px; }
+      .card h3 { margin: 0 0 10px; font-size: 16px; }
       .muted { color: var(--muted); font-size: 13.5px; }
-      .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px; margin-left: 6px; vertical-align: 1px; }
-      .tag.hi { background: #e2efe7; color: var(--ok); }
-      .tag.med { background: #f0e9d8; color: var(--unk); }
-      .tag.unk { background: #f6e4e0; color: var(--bad); }
-      .tag.flag { background: #f6e4e0; color: var(--bad); }
-      table.dims { width: 100%; border-collapse: collapse; margin-top: 8px; }
-      table.dims th, table.dims td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #ecece6; font-size: 13.5px; vertical-align: top; }
-      table.dims th { font-weight: 600; color: var(--muted); width: 34%; }
-      .evidence-item { border-top: 1px dashed #e6e6e6; padding: 8px 2px; font-size: 13.5px; }
-      .evidence-item:first-child { border-top: none; }
-      .tier { font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 6px; margin-left: 6px; white-space: nowrap; }
-      .tier.PRIMARY { background: #dcebe2; color: var(--ok); }
-      .tier.SUPPORTING { background: #e9e3cf; color: #7a5d12; }
-      .tier.VERIFICATION_REQUIRED { background: #f0ded8; color: #9c4433; }
-      details { border: 1px solid var(--line); border-radius: 10px; background: #fff; margin-top: 8px; }
-      summary { cursor: pointer; padding: 12px 16px; font-weight: 700; font-size: 14px; list-style: none; }
-      summary::after { content: "▸"; float: right; color: var(--muted); }
-      details[open] summary::after { content: "▾"; }
-      .details-body { padding: 4px 16px 16px; }
-      .flag-box { border: 1px solid #e0c0b8; border-left: 4px solid var(--bad); background: #fbf1ee; border-radius: 8px; padding: 10px 12px; margin-top: 10px; font-size: 13.5px; }
-      .unk-box { border: 1px solid #e5d9b8; border-left: 4px solid var(--unk); background: #f9f3e3; border-radius: 8px; padding: 10px 12px; margin-top: 10px; font-size: 13.5px; }
-      .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-      @media (max-width: 640px) { .why-grid { grid-template-columns: 1fr; } }
-      .why-col { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 12px 14px; font-size: 13.5px; }
-      .why-col.ok { border-left: 4px solid var(--ok); }
-      .why-col.bad { border-left: 4px solid var(--bad); }
-      .why-col h4 { margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; }
-      .why-col ul { margin: 0; padding-left: 16px; }
-      .why-col li { margin: 4px 0; }
-      .disclosure { border: 1px solid var(--line); border-left: 4px solid var(--amber); background: #fff; border-radius: 10px; padding: 10px 14px; font-size: 12.5px; color: var(--muted); margin-top: 10px; }
-      .exposure-nums { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 10px; }
-      .num-box { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; min-width: 150px; }
-      .num-box .n { font-size: 24px; font-weight: 800; color: var(--forest); }
-      .num-box .l { font-size: 11.5px; color: var(--muted); }
-      .toggle-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+      .mode-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+      @media (max-width: 640px) { .mode-row { grid-template-columns: 1fr; } }
+      .mode-card {
+        border: 1px solid var(--line); border-radius: 14px; background: #fff;
+        padding: 20px 20px 16px; cursor: pointer; transition: border-color .12s, box-shadow .12s;
+      }
+      .mode-card:hover { border-color: var(--forest); box-shadow: 0 2px 10px rgba(31,77,58,.10); }
+      .mode-card h3 { margin: 0 0 6px; font-size: 17px; }
+      .mode-card p { margin: 0 0 12px; color: var(--muted); font-size: 13.5px; }
+      .mode-card .cta { font-weight: 700; color: var(--forest); font-size: 13.5px; }
+      label.field { display: block; margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--muted); }
+      input[type="text"], input[type="number"], textarea, select {
+        font: inherit; width: 100%; margin-top: 4px; padding: 9px 11px;
+        border: 1px solid var(--line); border-radius: 9px; background: #fff; color: var(--ink);
+      }
+      textarea { min-height: 64px; resize: vertical; }
+      .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      @media (max-width: 640px) { .field-row { grid-template-columns: 1fr; } }
+      .list-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: center; margin-top: 8px; }
+      @media (max-width: 640px) { .list-row { grid-template-columns: 1fr; } }
+      .list-row label { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+      .list-row input[type="checkbox"] { width: auto; margin: 0 4px 0 0; vertical-align: -1px; }
+      .list-row .x { background: none; border: 1px solid var(--line); color: var(--muted); padding: 4px 9px; border-radius: 8px; }
+      .list-row .x:hover { color: var(--bad); border-color: var(--bad); }
       button {
         font: inherit; cursor: pointer; border: 1px solid var(--forest); background: var(--forest); color: var(--bone);
         border-radius: 999px; padding: 9px 18px; font-weight: 700; font-size: 13.5px;
       }
       button.secondary { background: #fff; color: var(--forest); }
       button:disabled { opacity: 0.45; cursor: not-allowed; }
-      .decision-area { border: 1px solid var(--forest); border-radius: 12px; background: #fff; padding: 16px 18px; margin-top: 10px; }
-      .rec-box { background: var(--forest); color: var(--bone); border-radius: 10px; padding: 12px 14px; margin-top: 10px; font-size: 13.5px; }
-      .rec-box b { color: var(--gold); }
-      .state-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-      .state-buttons button { background: #fff; color: var(--forest); border-color: var(--line); }
-      .state-buttons button.sel { background: var(--forest); color: var(--bone); border-color: var(--forest); }
-      .brief { border: 1px dashed var(--moss); border-radius: 10px; background: #fafbf7; padding: 14px 16px; margin-top: 12px; font-size: 13px; white-space: pre-wrap; }
-      .foot { margin-top: 30px; border-top: 1px solid var(--line); padding-top: 14px; font-size: 12px; color: var(--muted); }
-      .human-boundary { border: 1px solid var(--line); border-left: 4px solid var(--forest); background: #fff; border-radius: 10px; padding: 12px 14px; margin-top: 10px; font-size: 13.5px; }
+      .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; align-items: center; }
+      .human-boundary { border: 1px solid var(--line); border-left: 4px solid var(--forest); background: #fff; border-radius: 10px; padding: 12px 14px; margin-top: 12px; font-size: 13.5px; }
+      .glance-rec { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+      .glance-rec .rec-tag { font-weight: 800; letter-spacing: 0.04em; }
+      .glance-rec .rec-tag.esc, .glance-rec .rec-tag.drop { color: var(--bad); }
+      .glance-rec .rec-tag.now { color: var(--ok); }
+      .glance-rec .rec-tag.cond { color: var(--amber); }
+      .glance-rec .rec-tag.hold { color: var(--unk); }
+      .glance-hr { border: 0; border-top: 1px solid var(--line); margin: 10px 0 0; }
       .glance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
       @media (max-width: 640px) { .glance-grid { grid-template-columns: 1fr; } }
       .glance-col { border: 1px solid var(--line); border-radius: 10px; background: #fafbf7; padding: 12px 14px; font-size: 13px; }
       .glance-col h4 { margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
       .glance-col ul { margin: 0; padding-left: 16px; }
       .glance-col li { margin: 4px 0; }
-      .glance-rec { display: flex; align-items: center; gap: 10px; }
-      .glance-rec .rec-tag { font-weight: 800; letter-spacing: 0.04em; }
-      .glance-rec .rec-tag.esc { color: var(--bad); }
-      .glance-rec .rec-tag.now { color: var(--ok); }
-      .glance-rec .rec-tag.cond { color: var(--amber); }
-      .glance-rec .rec-tag.hold { color: var(--unk); }
-      .glance-rec .rec-tag.drop { color: var(--bad); }
       .glance-note { margin-top: 10px; font-size: 12px; color: var(--muted); }
-      .glance-hr { border: 0; border-top: 1px solid var(--line); margin: 10px 0 0; }
+      .state-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+      .state-buttons button { background: #fff; color: var(--forest); border-color: var(--line); }
+      .state-buttons button.sel { background: var(--forest); color: var(--bone); border-color: var(--forest); }
+      .ok-tag { font-weight: 700; color: var(--forest); }
+      .human-note-area { margin-top: 12px; }
+      .foot { margin-top: 30px; border-top: 1px solid var(--line); padding-top: 14px; font-size: 12px; color: var(--muted); }
+      .rec-box { background: var(--forest); color: var(--bone); border-radius: 10px; padding: 14px 16px; margin-top: 12px; font-size: 14px; }
+      .rec-box b { color: var(--gold); }
     </style>
   </head>
   <body>
     <div class="wrap">
       <header class="hero">
-        <p class="eyebrow">Decision Support · Prototype</p>
-        <h1>Commercial Decision Desk</h1>
-        <p class="sub">Should we pursue this overseas commercial opportunity now? Evidence first, then a human decision. The desk recommends states — it never contacts, quotes, commits, or decides for you.</p>
+        <p class="eyebrow">Commercial Decision Workbench · Manual</p>
+        <h1>Commercial Decision Workbench</h1>
+        <p class="sub">Assess one opportunity: input what you know → review evidence and unknowns → get a desk recommendation → record your own decision. No AI, no API key.</p>
       </header>
 
-      <div class="synthetic-banner" id="synthetic-banner"></div>
+      <div class="synthetic-banner" id="synthetic-note"></div>
 
-      <section id="opportunity">
-        <h2><span class="eyebrow">01 · Opportunity</span></h2>
-        <div class="card" id="opp-card"></div>
-      </section>
-
-      <section id="glance">
-        <h2><span class="eyebrow">Decision at a glance</span></h2>
-        <div class="card glance" id="glance-panel"></div>
-      </section>
-
-      <section id="evidence">
-        <h2><span class="eyebrow">02 · Evidence Qualification</span></h2>
-        <details>
-          <summary>Full evidence by dimension (expand)</summary>
-          <div class="details-body" id="evidence-body"></div>
-          <div class="details-body">
-            <div class="flag-box" id="contradiction-box"></div>
-            <div class="unk-box" id="unknown-box"></div>
+      <!-- MODE SCREEN -->
+      <section id="mode-screen">
+        <h2>Start</h2>
+        <div class="mode-row">
+          <div class="mode-card" id="mode-sample">
+            <h3>Try the sample</h3>
+            <p>Walk through a ready-made synthetic case (a Gulf-region hotel window-treatment inquiry) end to end — about 3–5 minutes.</p>
+            <span class="cta">Open sample →</span>
           </div>
-        </details>
-      </section>
-
-      <section id="commercial">
-        <h2><span class="eyebrow">03 · Commercial Assessment</span></h2>
-        <div class="card">
-          <table class="dims" id="dims-table"></table>
-          <div class="muted" id="terms-line" style="margin-top:10px"></div>
-          <div class="muted" id="quotes-line" style="margin-top:6px"></div>
+          <div class="mode-card" id="mode-blank">
+            <h3>Start a blank assessment</h3>
+            <p>Enter what you know about your own opportunity. Leave anything unknown as Unknown — nothing is assumed.</p>
+            <span class="cta">Start blank →</span>
+          </div>
         </div>
       </section>
 
-      <section id="payment">
-        <h2><span class="eyebrow">04 · Payment Exposure</span></h2>
-        <div class="card">
-          <div class="toggle-row">
-            <button id="toggle-exposure" class="secondary" type="button">Toggle: include this opportunity in payment exposure</button>
-          </div>
-          <div id="exposure-nums" class="exposure-nums"></div>
-          <div class="disclosure" id="pay-disclosure"></div>
+      <!-- WORKBENCH -->
+      <section id="workbench" hidden>
+        <div class="btn-row">
+          <button type="button" class="secondary" id="btn-home">← Choose mode</button>
+          <button type="button" class="secondary" id="btn-reset">Reset</button>
         </div>
-      </section>
+        <h2 id="workbench-title" style="margin-top:18px">Opportunity</h2>
+        <p class="muted" id="workbench-sub"></p>
 
-      <section id="why">
-        <h2><span class="eyebrow">05 · WHY / WHY NOT / UNKNOWN</span></h2>
-        <div class="why-grid" id="why-grid"></div>
-      </section>
+        <!-- blank intake -->
+        <div id="intake-area" hidden>
+          <div class="card">
+            <h3>What do you know about this opportunity?</h3>
+            <label class="field">Opportunity name</label>
+            <input type="text" id="in-name" placeholder="e.g. Hotel chain in Dubai — curtain supply" />
+            <div class="field-row">
+              <label class="field">Buyer fit
+                <select id="in-buyer">
+                  <option value="unknown">Unknown</option>
+                  <option value="strong">Strong signal</option>
+                  <option value="some">Some signal</option>
+                  <option value="weak">Weak signal</option>
+                </select>
+              </label>
+              <label class="field">Category fit
+                <select id="in-category">
+                  <option value="unknown">Unknown</option>
+                  <option value="strong">Strong — core product</option>
+                  <option value="partial">Partial — adjacent</option>
+                  <option value="weak">Weak</option>
+                  <option value="notOurCategory">Not our category</option>
+                </select>
+              </label>
+            </div>
+            <label class="field">Evidence quality — how confident are you in what you know?
+              <select id="in-evidence">
+                <option value="unknown">Unknown</option>
+                <option value="strong">High confidence (verified)</option>
+                <option value="some">Some confidence</option>
+                <option value="weak">Low confidence</option>
+              </select>
+            </label>
+            <div class="field-row">
+              <label class="field">Commercial terms
+                <select id="in-terms">
+                  <option value="unknown">Unknown</option>
+                  <option value="agreed">Agreed in writing</option>
+                  <option value="notAgreed">Not yet agreed</option>
+                </select>
+              </label>
+              <label class="field">Customer verification (KYC / sanctions)
+                <select id="in-kyc">
+                  <option value="notAssessed">Not assessed</option>
+                  <option value="clear">Verified clear</option>
+                  <option value="incomplete">Incomplete</option>
+                  <option value="sanctionsConcern">Sanctions / adverse concern</option>
+                </select>
+              </label>
+            </div>
+            <label class="field">Terms detail (optional)</label>
+            <input type="text" id="in-terms-detail" placeholder="e.g. 30% advance, balance before shipment" />
+            <div class="field-row">
+              <label class="field">Margin policy
+                <select id="in-margin-status">
+                  <option value="notAssessed">Not assessed</option>
+                  <option value="assessed">Assessed — I have figures</option>
+                </select>
+              </label>
+              <label class="field">Quote comparability
+                <select id="in-quotes-comp">
+                  <option value="notAssessed">Not assessed</option>
+                  <option value="yes">All quotes comparable</option>
+                  <option value="no">Not comparable</option>
+                </select>
+              </label>
+            </div>
+            <div class="field-row">
+              <label class="field">Expected gross margin (basis points, e.g. 500 = 5%)</label>
+              <input type="number" id="in-margin-bps" placeholder="e.g. 500" />
+              <label class="field">Minimum viable margin (your call, basis points)</label>
+              <input type="number" id="in-margin-thr" placeholder="e.g. 800" />
+            </div>
 
-      <section id="decision">
-        <h2><span class="eyebrow">06 · Decision Brief → Human Decision</span></h2>
-        <div class="decision-area">
-          <div id="engine-reasoning"></div>
-          <div class="human-boundary">
-            <b>Human decision boundary.</b> The final commercial decision always belongs to the human. The desk only narrows the options with evidence and deterministic rules.
+            <div id="contradiction-rows-wrap" style="margin-top:14px">
+              <div class="card" style="margin-top:0">
+                <h3>Contradictions</h3>
+                <div id="contradiction-rows"></div>
+                <div style="margin-top:10px"><button type="button" class="secondary" data-add="c">+ Add contradiction</button></div>
+              </div>
+            </div>
+            <div style="margin-top:14px">
+              <div class="card" style="margin-top:0">
+                <h3>Unknowns</h3>
+                <div id="unknown-rows"></div>
+                <div style="margin-top:10px"><button type="button" class="secondary" data-add="u">+ Add unknown</button></div>
+              </div>
+            </div>
+            <div style="margin-top:14px">
+              <div class="card" style="margin-top:0">
+                <h3>Payment commitments (optional)</h3>
+                <div id="payment-rows"></div>
+                <div style="margin-top:10px"><button type="button" class="secondary" data-add="p">+ Add payment</button></div>
+              </div>
+            </div>
+            <div style="margin-top:14px">
+              <div class="card" style="margin-top:0">
+                <h3>Quotes (optional)</h3>
+                <div id="quote-rows"></div>
+                <div style="margin-top:10px"><button type="button" class="secondary" data-add="q">+ Add quote</button></div>
+              </div>
+            </div>
+            <label class="field">Why pursue? (one per line)</label>
+            <textarea id="in-why"></textarea>
+            <label class="field">Why not / concerns? (one per line)</label>
+            <textarea id="in-whynot"></textarea>
+            <label class="field">Notes (optional)</label>
+            <textarea id="in-note"></textarea>
           </div>
-          <div class="state-buttons" id="state-buttons"></div>
-          <div style="margin-top:12px">
-            <button id="issue-brief" type="button">Issue Decision Brief</button>
+        </div>
+
+        <!-- run -->
+        <div id="run-area" hidden>
+          <div class="btn-row">
+            <button type="button" id="btn-run">Run assessment</button>
           </div>
-          <div class="brief" id="brief-output" hidden></div>
+        </div>
+
+        <!-- result -->
+        <div id="result-area" hidden>
+          <h2>Desk recommendation</h2>
+          <div class="card" id="result-rec"></div>
+
+          <h2>Your decision</h2>
+          <div class="card">
+            <div class="human-boundary">
+              <b>Human decision boundary.</b> The recommendation above comes from deterministic rules over your evidence. It is <b>not</b> your decision — record your own, even if it disagrees.
+            </div>
+            <div class="state-buttons" id="human-state-buttons"></div>
+            <div class="human-note-area">
+              <label class="field">Your note (optional)</label>
+              <input type="text" id="human-note" placeholder="e.g. Hold but keep warm — wait for the spec" />
+            </div>
+            <div style="margin-top:12px" id="human-decision-status"></div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="secondary" id="btn-reset-2">Reset</button>
         </div>
       </section>
 
       <footer class="foot">
-        SYNTHETIC FIXTURE — no real prospect data. No backend, no persistence, no network calls. Prototype for decision-support demonstration only.
+        Manual-first decision support. No AI, no API key, no backend, no persistence, no network calls. All sample data is synthetic.
       </footer>
     </div>
     <script type="module" src="./app.js"></script>

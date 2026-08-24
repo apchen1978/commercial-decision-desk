@@ -10,7 +10,7 @@ import { createDecisionPathExperiment } from "./decision-path.js";
 import { buildCommercialViewModel } from "./commercial-action-layer.js";
 import { buildTradeDealViewModel } from "./trade-deal-structure.js";
 import { buildEconomicsBridge, economicsEvidenceTrace } from "./economics-bridge.js";
-import { buildCommercialMomentum, buildEvidenceCoverage } from "./commercial-momentum.js";
+import { buildCommercialMomentum, buildEvidenceCoverage, momentumPresentationBand } from "./commercial-momentum.js";
 import { buildDealBriefViewModel, downloadDealBrief } from "./deal-brief.js";
 
 const $ = (id) => document.getElementById(id);
@@ -165,7 +165,7 @@ function momentumValueLabel(value) {
   return tx(labels[value] || "context.unknown");
 }
 
-function renderExecutiveSnapshot({ economics, tradeView, control, momentum, coverage }) {
+function renderExecutiveSnapshot({ economics, tradeView, control, momentum, coverage, nextBestAction }) {
   const context = current.commercialContext || {};
   const buyer = context.buyerCompany || current.buyers?.[0]?.label || tx("context.unknown");
   const currency = current.economics?.currency || "CNY";
@@ -184,12 +184,11 @@ function renderExecutiveSnapshot({ economics, tradeView, control, momentum, cove
   ];
   $("executive-deal-snapshot").hidden = false;
   const momentumValue = momentum.score === null ? "—" : String(momentum.score);
+  const momentumBand = momentumPresentationBand(momentum.score);
   const momentumStatus = momentum.status === "CALCULATED" ? tx("momentum.definition") : tx("momentum.notEnough");
-  const positiveDrivers = momentum.drivers.filter((driver) => driver.direction === "UP").slice(0, 2);
-  const limitingDrivers = [
-    ...momentum.drivers.filter((driver) => driver.direction !== "UP"),
-    ...momentum.unknownDimensions.slice(0, 2).map((dimension) => ({ ...dimension, direction: "UNKNOWN", value: "UNKNOWN" })),
-  ].slice(0, 2);
+  const positiveDrivers = momentum.drivers.filter((driver) => driver.direction === "UP").slice(0, 3);
+  const limitingDrivers = momentum.drivers.filter((driver) => driver.direction !== "UP").slice(0, 2);
+  const coverageGaps = momentum.unknownDimensions.slice(0, 2);
   const driverLine = (driver) => {
     const symbol = driver.direction === "UP" ? "↑" : driver.direction === "DOWN" ? "↓" : "?";
     const value = driver.direction === "UNKNOWN" ? tx("status.unknown") : momentumValueLabel(driver.value);
@@ -203,13 +202,15 @@ function renderExecutiveSnapshot({ economics, tradeView, control, momentum, cove
       </div>
     </div>
     <div class="snapshot-signals" aria-label="${tx("momentum.ariaLabel")}">
-      <div class="snapshot-signal snapshot-momentum"><span>${tx("momentum.label")}</span><strong>${momentumValue}<small>/ 100</small></strong><p>${momentumStatus}</p></div>
-      <div class="snapshot-signal"><span>${tx("coverage.label")}</span><strong>${coverage.score}<small>%</small></strong><p>${tx("coverage.definition")}</p></div>
+      <div class="snapshot-signal snapshot-momentum"><span>${tx("momentum.label")}</span><strong>${momentumValue}<small>/ 100</small></strong><em class="momentum-band ${momentumBand.toLowerCase()}">${tx(`momentum.band.${momentumBand}`)}</em><p>${momentumStatus}</p><details class="snapshot-method"><summary>${tx("momentum.methodSummary")}</summary><p>${tx("momentum.methodDetail")}</p></details></div>
+      <div class="snapshot-signal snapshot-coverage"><span>${tx("coverage.label")}</span><strong>${coverage.score}<small>%</small></strong><div class="snapshot-coverage-track" aria-hidden="true"><i style="width:${coverage.score}%"></i></div><p>${tx("coverage.definition")}</p></div>
       <div class="snapshot-signal snapshot-position"><span>${tx("snapshot.decision")}</span><strong class="rec-tag ${tagClass(engine.recommended)}">${stateLabel(engine.recommended)}</strong><p>${tx("momentum.positionNote")}</p></div>
     </div>
+    <p class="snapshot-story">${pathText(`momentum.story.${momentumBand}`, { position: stateLabel(engine.recommended) })}</p>
+    <div class="snapshot-next-action"><span>${tx("result.nextBestAction")}</span><strong>${esc(nextBestAction)}</strong></div>
     <div class="snapshot-drivers">
       <div><span>${tx("momentum.supports")}</span><ul>${positiveDrivers.map(driverLine).join("") || `<li>${tx("momentum.noKnownDrivers")}</li>`}</ul></div>
-      <div><span>${tx("momentum.limits")}</span><ul>${limitingDrivers.map(driverLine).join("") || `<li>${tx("momentum.noKnownLimits")}</li>`}</ul></div>
+      <div><span>${tx("momentum.limits")}</span><ul>${limitingDrivers.map(driverLine).join("") || `<li>${tx("momentum.noKnownLimits")}</li>`}</ul>${coverageGaps.length ? `<p class="snapshot-coverage-gap"><b>${tx("coverage.gaps")}</b> ${coverageGaps.map((dimension) => momentumDimensionLabel(dimension.id)).join(" · ")}</p>` : ""}</div>
     </div>
     <div class="snapshot-grid">
       ${fields.map(([label, value]) => `<div class="snapshot-field"><span>${tx(label)}</span><strong>${snapshotValue(value)}</strong></div>`).join("")}
@@ -738,6 +739,7 @@ function renderResult() {
     tradeView,
     momentum,
     coverage,
+    nextBestAction,
     control: g.reasons.length ? localizeReason(g.reasons[0], language, current.quoteComparabilityAssessed !== false) : tx("context.unknown"),
   });
   renderEconomicsBridge(economics, economicsInput.currency || "CNY");

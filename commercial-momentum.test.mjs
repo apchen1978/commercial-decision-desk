@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { opportunity } from "./fixtures.js";
 import { buildEconomicsBridge } from "./economics-bridge.js";
 import { evaluateDecision } from "./decision-engine.js";
-import { buildCommercialMomentum, buildEvidenceCoverage } from "./commercial-momentum.js";
+import { buildCommercialMomentum, buildEvidenceCoverage, momentumPresentationBand } from "./commercial-momentum.js";
 
 function completeEconomics(net = 100) {
   return buildEconomicsBridge({ revenue: 1000, directCost: 500, tradeCost: 100, dealSpecificCost: 100, contingency: 100 + (200 - net) });
@@ -75,7 +75,14 @@ check("F same evidence produces the same score and trace", () => {
 check("G sample score is model-generated and remains compatible with ESCALATE", () => {
   const momentum = buildCommercialMomentum(opportunity, buildEconomicsBridge({}));
   assert.equal(momentum.score, 92);
+  assert.equal(momentumPresentationBand(momentum.score), "STRONG");
   assert.equal(evaluateDecision(opportunity).recommended, "ESCALATE");
+});
+
+check("presentation bands do not alter the frozen model", () => {
+  assert.equal(momentumPresentationBand(null), "NOT_ASSESSED");
+  assert.equal(momentumPresentationBand(79), "DEVELOPING");
+  assert.equal(momentumPresentationBand(49), "LIMITED");
 });
 
 check("H a known signal change has a bounded, traceable score movement", () => {
@@ -93,4 +100,4 @@ const source = await readFile(new URL("./commercial-momentum.js", import.meta.ur
 assert.doesNotMatch(source, /from\s+["']\.\/decision-engine\.js["']/);
 console.log("PASS model stays separate from the frozen Decision Core");
 
-console.log("COMMERCIAL MOMENTUM RESULT: 9/9 PASS");
+console.log("COMMERCIAL MOMENTUM RESULT: 10/10 PASS");

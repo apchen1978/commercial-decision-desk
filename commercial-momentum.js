@@ -16,6 +16,14 @@ export const MOMENTUM_DIMENSIONS = Object.freeze([
   { id: "knownEconomics", label: "Known economics", weight: 10 },
 ]);
 
+// Presentation bands only. They label a calculated score for human scanning;
+// they never enter the Decision Core or alter any model dimension or weight.
+export const MOMENTUM_PRESENTATION_BANDS = Object.freeze([
+  { min: 80, id: "STRONG" },
+  { min: 50, id: "DEVELOPING" },
+  { min: 0, id: "LIMITED" },
+]);
+
 export const COVERAGE_DIMENSIONS = Object.freeze([
   { id: "buyerFit", label: "Buyer fit", weight: 12 },
   { id: "categoryFit", label: "Product fit", weight: 12 },
@@ -31,6 +39,11 @@ export const COVERAGE_DIMENSIONS = Object.freeze([
 
 const VALUE_POINTS = Object.freeze({ HIGH: 100, STRONG: 100, MEDIUM: 65, CONDITIONAL: 50, LOW: 25, WEAK: 0, NONE: 0, IRRELEVANT: 0 });
 const clone = (value) => JSON.parse(JSON.stringify(value));
+
+export function momentumPresentationBand(score) {
+  if (!Number.isFinite(score)) return "NOT_ASSESSED";
+  return MOMENTUM_PRESENTATION_BANDS.find((band) => score >= band.min)?.id || "NOT_ASSESSED";
+}
 
 function valueOf(opportunity, id) {
   return String(opportunity?.dimensions?.[id]?.value || "UNKNOWN").toUpperCase();

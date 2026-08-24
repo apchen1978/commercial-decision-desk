@@ -56,13 +56,27 @@ function snapshotData(opportunity) {
     product: valueOrUnknown(context.product),
     buyer: valueOrUnknown(context.buyerCompany),
     market: valueOrUnknown(context.market),
-    quantity: valueOrUnknown(context.quantity),
+    quantity: quantityDisplay(context.quantity, context.quantityUnit),
     revenue: valueOrUnknown(economics.revenue),
     currency: valueOrUnknown(economics.currency),
     timing: valueOrUnknown(context.timing),
     relationship: valueOrUnknown(context.relationship),
     source: valueOrUnknown(context.source),
   };
+}
+
+// Quantity + unit presentation semantics for the Deal Brief (MD and TXT):
+//   quantity + unit      -> "120 metres"
+//   quantity, no unit    -> "120 (unit UNKNOWN)"
+//   unit, no quantity    -> UNKNOWN
+//   neither              -> UNKNOWN
+// Presentation evidence only; never a Decision Core input.
+function quantityDisplay(qty, unit) {
+  const hasQty = qty !== "" && qty !== null && qty !== undefined;
+  const hasUnit = unit !== "" && unit !== null && unit !== undefined;
+  if (hasQty && hasUnit) return String(qty) + " " + String(unit);
+  if (hasQty) return String(qty) + " (unit UNKNOWN)";
+  return UNKNOWN;
 }
 
 function economicsData(opportunity, bridge) {
@@ -215,6 +229,7 @@ export function serializeDealBriefMarkdown(brief, language = "zh-TW") {
     line(label("market", language), s.market),
     line(label("buyer", language), s.buyer),
     line(label("product", language), s.product),
+    line(label("quantity", language), s.quantity),
     line(label("generated", language), generated),
     "",
     `## ${label("executiveSnapshot", language)}`,

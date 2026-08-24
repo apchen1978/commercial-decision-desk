@@ -124,6 +124,20 @@ function contextDisplay(value) {
   return value === "" || value === undefined || value === null || value === "unknown" ? tx("context.unknown") : value;
 }
 
+// Quantity + unit presentation semantics (Commercial Context evidence only):
+//   quantity + unit      -> "120 metres"
+//   quantity, no unit    -> "120 (unit UNKNOWN)"
+//   unit, no quantity    -> UNKNOWN
+//   neither              -> UNKNOWN
+// Never inferred into a value; never enters Decision Core.
+function contextQuantityDisplay(qty, unit) {
+  const hasQty = qty !== "" && qty !== undefined && qty !== null;
+  const hasUnit = unit !== "" && unit !== undefined && unit !== null;
+  if (hasQty && hasUnit) return qty + " " + unit;
+  if (hasQty) return qty + " (" + tx("context.unitUnknown") + ")";
+  return tx("context.unknown");
+}
+
 function contextStatus(value) {
   if (value === "yes") return tx("context.yes");
   if (value === "no") return tx("context.no");
@@ -140,7 +154,7 @@ function renderCommercialContext(context = {}) {
     '<div><span>' + tx("context.product") + '</span><strong>' + contextDisplay(context.product) + '</strong></div>',
     '<div><span>' + tx("context.buyerCompany") + '</span><strong>' + contextDisplay(context.buyerCompany) + '</strong></div>',
     '<div><span>' + tx("context.market") + '</span><strong>' + contextDisplay(context.market) + '</strong></div>',
-    '<div><span>' + tx("context.quantity") + '</span><strong>' + contextDisplay(context.quantity) + '</strong></div>',
+    '<div><span>' + tx("context.quantity") + '</span><strong>' + contextQuantityDisplay(context.quantity, context.quantityUnit) + '</strong></div>',
     '<div><span>' + tx("context.revenue") + '</span><strong>' + contextDisplay(context.revenue) + ' ' + contextDisplay(context.currency) + '</strong></div>',
     '<div><span>' + tx("context.timing") + '</span><strong>' + contextDisplay(context.timing) + '</strong></div>',
     '<div><span>' + tx("context.relationship") + '</span><strong>' + contextStatus(context.relationship) + '</strong></div>',
@@ -335,6 +349,7 @@ function fillBlankIntake() {
   $("in-buyer-company").value = "";
   $("in-market").value = "";
   $("in-quantity").value = "";
+  $("in-quantity-unit").value = "";
   $("in-revenue").value = "";
   $("in-currency").value = "CNY";
   $("in-timing").value = "";
@@ -383,6 +398,7 @@ function collectBlankInput() {
       buyerCompany: $("in-buyer-company").value.trim(),
       market: $("in-market").value.trim(),
       quantity: $("in-quantity").value,
+      quantityUnit: $("in-quantity-unit").value.trim(),
       timing: $("in-timing").value.trim(),
       relationship: $("in-relationship").value,
       source: $("in-source").value.trim(),
@@ -566,13 +582,14 @@ function renderResult() {
   if (!wouldChange.length) wouldChange.push(tx("next.nothingBlocks"));
 
   $("result-rec").innerHTML = `
-    <div class="glance-rec">
-      <span class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.08em">${tx("result.recommendation")}</span>
-      <span class="rec-tag ${tagClass(g.recommended)}">${stateLabel(g.recommended)}</span>
-      <span class="muted" style="font-size:12px">${tx("result.deterministic")}</span>
+    <div id="result-decision" class="dl-decision">
+      <div class="glance-rec">
+        <span class="muted dl-label">${tx("result.recommendation")}</span>
+        <span class="rec-tag ${tagClass(g.recommended)}">${stateLabel(g.recommended)}</span>
+        <span class="muted dl-deterministic">${tx("result.deterministic")}</span>
+      </div>
     </div>
-    <hr class="glance-hr">
-    <div class="glance-grid">
+    <div id="result-control" class="dl-grid">
       <div class="glance-col"><h4>${tx("result.why")}</h4><ul>${g.reasons.map((r) => `<li>${esc(localizeReason(r, language, current.quoteComparabilityAssessed !== false))}</li>`).join("")}</ul></div>
       <div class="glance-col"><h4>${tx("result.blockers")}</h4>${g.materialContradictions.length || g.termsIncomplete || g.blockingUnknowns.length ? `<ul>${[
         ...g.materialContradictions.map((c) => `<li>${tx("result.materialContradiction")}: ${esc(c.label)} (${tx("result.unresolved")})</li>`),
@@ -581,7 +598,7 @@ function renderResult() {
         ...(g.weakEvidence ? [`<li>${tx("result.evidenceLow")}</li>`] : []),
       ].join("")}</ul>` : `<span class="muted">${tx("result.noBlockers")}</span>`}</div>
     </div>
-    <div class="glance-grid">
+    <div class="dl-grid">
       <div class="glance-col"><h4>${tx("result.missing")}</h4><ul>${[
         ...g.blockingUnknowns.map((u) => `<li>${esc(u.label)}</li>`),
         ...(g.weakEvidence || g.strongEvidence === false ? [`<li>Evidence quality not strong</li>`] : []),
@@ -591,11 +608,11 @@ function renderResult() {
       ].join("") || `<span class="muted">${tx("result.none")}</span>`}</ul></div>
       <div class="glance-col"><h4>${tx("result.contradictions")}</h4>${current.contradictions.length ? `<ul>${current.contradictions.map((c) => `<li>${esc(c.label)}${c.material ? ` (${tx("input.material")})` : ""} — ${c.status === "RESOLVED" ? tx("input.resolved") : tx("result.unresolved")}</li>`).join("")}</ul>` : `<span class="muted">${tx("result.noneRecorded")}</span>`}</div>
     </div>
-    <div class="glance-grid">
+    <div class="dl-grid dl-next">
       <div class="glance-col"><h4>${tx("result.verifyNext")}</h4>${next.length ? `<ul>${next.map((n) => `<li>${esc(localizeEvidenceText(n, language))}</li>`).join("")}</ul>` : `<span class="muted">${tx("result.noFurtherEvidence")}</span>`}</div>
       <div class="glance-col"><h4>${tx("result.wouldChange")}</h4><ul>${wouldChange.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>
     </div>
-    <p class="glance-note">${tx("boundary.note")}</p>
+    <p class="glance-note dl-note">${tx("boundary.note")}</p>
   `;
 
   renderDecisionPath();

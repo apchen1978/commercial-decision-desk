@@ -188,19 +188,97 @@
       @media (max-width:760px) { .context-grid, .authority-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
       @media (max-width:420px) { .context-grid, .authority-grid { grid-template-columns:1fr 1fr; gap:7px; } .economics-owner-input { display:block; } .economics-owner-input strong { display:block; text-align:left; margin-top:4px; } }
       @media (max-width:640px) { .export-heading-row { flex-direction:column; } .export-actions { width:100%; } .export-actions button { flex:1; } }
+
+      /* ===== COMMERCIAL WORKSPACE REFINEMENT (bounded visual layer, no semantics change) ===== */
+      .wrap { max-width: 1080px; }
+      /* App shell — deliberate top bar */
+      header.hero {
+        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 20px;
+        padding: 14px 0 18px; margin-bottom: 6px;
+      }
+      header.hero .hero-ident { min-width: 0; }
+      header.hero h1 { font-size: 26px; margin: 0; }
+      header.hero .sub { font-size: 14px; margin-top: 4px; }
+      header.hero .hero-actions { display: flex; align-items: center; gap: 12px; }
+      .language-switch { margin-bottom: 0; }
+      /* Mode cards — primary (work) vs secondary (guided tour) */
+      .mode-row { gap: 16px; margin-top: 18px; }
+      .mode-card { padding: 24px 22px 18px; }
+      .mode-card.mode-primary {
+        border: 2px solid var(--forest); background: #fff;
+        box-shadow: 0 8px 24px -14px rgba(31,77,58,.35);
+      }
+      .mode-card.mode-primary h3 { font-size: 19px; color: var(--forest); }
+      .mode-card.mode-primary .cta { font-size: 14.5px; }
+      .mode-card.mode-secondary { border-style: dashed; opacity: .96; }
+      .mode-card.mode-secondary h3 { font-size: 15.5px; }
+      .mode-badge {
+        display: inline-block; margin-bottom: 8px; padding: 3px 10px;
+        border: 1px solid var(--gold); border-radius: 999px;
+        background: #fdf6e4; color: #6b5214; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+      }
+      /* Result navigation anchors */
+      .result-nav {
+        display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px;
+        padding: 8px 0; border-bottom: 1px solid var(--line);
+      }
+      .result-nav a {
+        color: var(--muted); text-decoration: none; font-size: 12.5px; font-weight: 600;
+        padding: 3px 10px; border-radius: 999px; border: 1px solid transparent;
+      }
+      .result-nav a:hover { color: var(--forest); border-color: var(--line); }
+      /* Decision lead — the commercial operating record */
+      .decision-lead {
+        background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--forest);
+        border-radius: 12px; padding: 18px 20px; margin: 4px 0 18px;
+        box-shadow: 0 12px 30px -22px rgba(23,39,31,.4);
+      }
+      .dl-decision { margin-bottom: 12px; }
+      .dl-label { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
+      .dl-deterministic { font-size: 12px; }
+      .glance-rec .rec-tag { font-size: 18px; padding: 3px 12px; border-radius: 8px; }
+      .dl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+      @media (max-width: 720px) { .dl-grid { grid-template-columns: 1fr; } }
+      .dl-grid .glance-col {
+        border-left: 3px solid var(--forest); border-radius: 0 10px 10px 0; background: #fafbf7;
+      }
+      .dl-grid .glance-col h4 { color: var(--forest); font-size: 11.5px; }
+      .dl-next .glance-col { border-left-color: var(--amber); }
+      .dl-note { margin-top: 14px; }
+      /* Body/typography lift */
+      h2 { font-size: 20px; }
+      .card { border-radius: 12px; }
+      .card h3 { font-size: 16.5px; }
+      .muted, .scope-body, .trade-block p, .glance-col li, .action-item p, .prep-item p { font-size: 13.5px; }
+      /* Quantity + unit inline */
+      .quantity-with-unit { display: flex; gap: 8px; margin-top: 4px; align-items: center; }
+      .quantity-with-unit input[type="number"] { flex: 1 1 45%; margin-top: 0; }
+      .quantity-with-unit .unit-hint { flex: 0 0 auto; color: var(--muted); font-size: 12.5px; font-weight: 600; }
+      .quantity-with-unit input[type="text"] { flex: 1 1 40%; margin-top: 0; }
+      /* Reduce card-wall feel: keep cards for true groups, straighten inner rows */
+      .glance-col, .structure-item, .context-grid > div { background: #fafbf7; }
+      section { margin-top: 22px; }
+      @media (max-width: 640px) {
+        header.hero .hero-actions { width: 100%; justify-content: space-between; }
+        .decision-lead { padding: 14px 14px; }
+      }
     </style>
   </head>
   <body>
     <div class="wrap">
       <header class="hero">
-        <div class="language-switch" role="group" data-i18n-aria-label="header.language">
-          <span class="language-label" data-i18n="header.language">語言</span>
-          <button type="button" class="language-button active" id="lang-zh" aria-pressed="true">繁中</button>
-          <button type="button" class="language-button" id="lang-en" aria-pressed="false">EN</button>
+        <div class="hero-ident">
+          <p class="eyebrow" data-i18n="header.eyebrow">商務決策工作台 · 手動評估</p>
+          <h1 data-i18n="header.title">商務決策工作台</h1>
+          <p class="sub" data-i18n="header.subtitle">評估一個商機：輸入已知資訊 → 檢視證據與未知 → 取得工作台建議 → 記錄你自己的決定。無需 AI 或 API 金鑰。</p>
         </div>
-        <p class="eyebrow" data-i18n="header.eyebrow">商務決策工作台 · 手動評估</p>
-        <h1 data-i18n="header.title">商務決策工作台</h1>
-        <p class="sub" data-i18n="header.subtitle">評估一個商機：輸入已知資訊 → 檢視證據與未知 → 取得工作台建議 → 記錄你自己的決定。無需 AI 或 API 金鑰。</p>
+        <div class="hero-actions">
+          <div class="language-switch" role="group" data-i18n-aria-label="header.language">
+            <span class="language-label" data-i18n="header.language">語言</span>
+            <button type="button" class="language-button active" id="lang-zh" aria-pressed="true">繁中</button>
+            <button type="button" class="language-button" id="lang-en" aria-pressed="false">EN</button>
+          </div>
+        </div>
       </header>
 
       <div class="synthetic-banner" id="synthetic-note" data-i18n="header.synthetic">無 AI、無 API 金鑰、無後端。以人工輸入為主的決策支援。</div>
@@ -209,15 +287,16 @@
       <section id="mode-screen">
         <h2 data-i18n="mode.heading">開始</h2>
         <div class="mode-row">
-          <div class="mode-card" id="mode-sample">
-            <h3 data-i18n="mode.sample.title">試用範例</h3>
-            <p data-i18n="mode.sample.description">查看一個預先整理的合成案例，完整走過評估流程，約需 3–5 分鐘。</p>
-            <span class="cta" data-i18n="mode.sample.cta">開啟範例 →</span>
+          <div class="mode-card mode-primary" id="mode-blank">
+            <h3 data-i18n="mode.blank.title">建立新的商機評估</h3>
+            <p data-i18n="mode.blank.description">用你目前知道的資訊開始。未知就保留為「未知」，不會被推測。</p>
+            <span class="cta" data-i18n="mode.blank.cta">建立評估 →</span>
           </div>
-          <div class="mode-card" id="mode-blank">
-            <h3 data-i18n="mode.blank.title">開始空白評估</h3>
-            <p data-i18n="mode.blank.description">輸入你目前知道的商機資訊。未知就保留為「未知」，系統不會自行假設。</p>
-            <span class="cta" data-i18n="mode.blank.cta">開始輸入 →</span>
+          <div class="mode-card mode-secondary" id="mode-sample">
+            <span class="mode-badge" data-i18n="mode.sample.badge">合成 · 僅供導覽</span>
+            <h3 data-i18n="mode.sample.title">查看完成範例</h3>
+            <p data-i18n="mode.sample.description">看 CDD 如何把證據變成建議與會議簡報。這是合成教學案例，不會影響你的評估。</p>
+            <span class="cta" data-i18n="mode.sample.cta">查看範例 →</span>
           </div>
         </div>
       </section>
@@ -225,7 +304,7 @@
       <!-- WORKBENCH -->
       <section id="workbench" hidden>
         <div class="btn-row">
-          <button type="button" class="secondary" id="btn-home" data-i18n="nav.chooseMode">← 選擇模式</button>
+          <button type="button" class="secondary" id="btn-home" data-i18n="nav.backToStart">← 返回開始</button>
           <button type="button" class="secondary" id="btn-reset" data-i18n="nav.reset">重設</button>
         </div>
         <h2 id="workbench-title" style="margin-top:18px">商機</h2>
@@ -252,7 +331,7 @@
               </div>
               <div class="field-row">
                 <label class="field"><span data-i18n="context.market">國家／市場</span><input type="text" id="in-market" /></label>
-                <label class="field"><span data-i18n="context.quantity">預估數量</span><input type="number" id="in-quantity" min="0" /></label>
+                <label class="field"><span data-i18n="context.quantity">預估數量</span><span class="quantity-with-unit"><input type="number" id="in-quantity" min="0" /><span class="unit-hint" data-i18n="context.quantityUnit">單位</span><input type="text" id="in-quantity-unit" data-i18n-placeholder="context.quantityUnitPlaceholder" placeholder="例如：米、片、組、平方公尺" /></span></label>
               </div>
               <div class="field-row">
                 <label class="field"><span data-i18n="context.revenue">預估訂單收入</span><input type="number" id="in-revenue" min="0" /></label>
@@ -416,11 +495,28 @@
 
         <!-- result -->
         <div id="result-area" hidden>
+          <div class="result-nav" aria-label="結果導覽">
+            <a href="#result-decision" data-i18n="result.navDecision">決策</a>
+            <a href="#result-control" data-i18n="result.navControl">控制因素</a>
+            <a href="#result-actions" data-i18n="result.navActions">下一步</a>
+            <a href="#result-evidence" data-i18n="result.navEvidence">證據</a>
+            <a href="#result-export" data-i18n="result.navExport">匯出</a>
+          </div>
           <h2 data-i18n="result.heading">工作台建議</h2>
+
+          <!-- Decision lead: recommendation + control + next + do-not-commit + human status -->
+          <div id="result-rec" class="decision-lead" aria-live="polite"></div>
+
+          <section id="result-evidence" class="commercial-structure" aria-live="polite">
+            <h2 data-i18n="structure.heading">交易結構</h2>
+            <div class="card" id="commercial-structure"></div>
+          </section>
+
           <section id="blank-context-result" class="commercial-structure" hidden aria-live="polite">
             <h2 data-i18n="context.resultHeading">商機骨架</h2>
             <div class="card" id="blank-commercial-context"></div>
           </section>
+
           <section id="blank-economics-result" class="trade-detail" hidden aria-live="polite">
             <h2 data-i18n="economics.heading">Deal Economics Bridge</h2>
             <div class="card">
@@ -428,19 +524,13 @@
               <p class="economics-trace" id="economics-trace"></p>
             </div>
           </section>
-          <section class="commercial-structure" aria-live="polite">
-            <h2 data-i18n="structure.heading">交易結構</h2>
-            <div class="card" id="commercial-structure"></div>
-          </section>
 
           <section class="trade-detail" aria-live="polite">
             <h2 data-i18n="trade.heading">貿易交易結構</h2>
             <div class="card" id="trade-deal-structure"></div>
           </section>
 
-          <div class="card" id="result-rec"></div>
-
-          <section class="deal-brief-export" aria-live="polite">
+          <section id="result-actions" class="deal-brief-export" aria-live="polite">
             <div class="export-heading-row">
               <div>
                 <h2 data-i18n="export.heading">匯出 Deal Brief</h2>
@@ -465,7 +555,7 @@
             <div class="card path-detail" id="decision-path-detail" hidden></div>
           </section>
 
-          <section class="priority-actions" aria-live="polite">
+          <section id="result-priority" class="priority-actions" aria-live="polite">
             <h2 data-i18n="actions.heading">優先行動</h2>
             <div class="card" id="priority-actions"></div>
           </section>

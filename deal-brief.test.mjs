@@ -75,4 +75,66 @@ pass("sample keeps synthetic marker and Decision Path", () => {
   assert.equal(brief.decisionPath.available, true);
 });
 
-console.log("DEAL BRIEF RESULT: 6/6 PASS");
+/* ---- Quantity + Unit (Commercial Context presentation evidence only) ---- */
+
+function qtyOpportunity(qty, unit) {
+  return {
+    ...structuredClone(opportunity),
+    id: "QTY-TEST",
+    name: "QTY-TEST",
+    commercialContext: {
+      ...opportunity.commercialContext,
+      quantity: qty,
+      quantityUnit: unit,
+    },
+  };
+}
+
+function qtyBrief(op) {
+  return buildDealBriefViewModel({
+    opportunity: op,
+    engine: evaluateDecision(op),
+    commercialView: buildCommercialViewModel(op, evaluateDecision(op), null),
+    tradeView: buildTradeDealViewModel(op, evaluateDecision(op)),
+    economicsBridge: buildEconomicsBridge({}),
+    decisionPathExperiment: null,
+    humanDecision: "HOLD_FOR_EVIDENCE",
+    humanNote: "",
+    language: "en",
+    generatedAt: "2026-08-24T10:00:00.000Z",
+  });
+}
+
+pass("quantity + unit renders as combined value", () => {
+  const md = serializeDealBriefMarkdown(qtyBrief(qtyOpportunity("120", "metres")), "en");
+  assert.match(md, /120 metres/);
+});
+
+pass("quantity without unit keeps unit UNKNOWN", () => {
+  const md = serializeDealBriefMarkdown(qtyBrief(qtyOpportunity("120", "")), "en");
+  assert.match(md, /120 \(unit UNKNOWN\)/);
+});
+
+pass("unit without quantity stays UNKNOWN", () => {
+  const md = serializeDealBriefMarkdown(qtyBrief(qtyOpportunity("", "metres")), "en");
+  assert.match(md, /Estimated quantity.*UNKNOWN/);
+  assert.doesNotMatch(md, /metres/);
+});
+
+pass("quantity unit appears in plain-text export too", () => {
+  const text = serializeDealBriefText(qtyBrief(qtyOpportunity("120", "metres")), "en");
+  assert.match(text, /120 metres/);
+});
+
+pass("quantity unit never enters Decision Core", () => {
+  // Decision Core receives the same opportunity shape; unit is presentation-only.
+  const op = qtyOpportunity("120", "metres");
+  const withUnit = evaluateDecision(op);
+  const opNoUnit = qtyOpportunity("120", "");
+  const withoutUnit = evaluateDecision(opNoUnit);
+  // Same numeric quantity -> identical engine outcome regardless of unit text.
+  assert.equal(withUnit.recommended, withoutUnit.recommended);
+  assert.deepEqual(withUnit.reasons, withoutUnit.reasons);
+});
+
+console.log("DEAL BRIEF RESULT: 11/11 PASS");

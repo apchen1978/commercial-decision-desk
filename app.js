@@ -406,6 +406,13 @@ $("mode-blank").addEventListener("click", () => {
 });
 
 // --- blank intake form -------------------------------------------------------
+// Locale decides the INITIAL default currency for a new blank assessment only
+// (ZH -> TWD, else USD). Language switching never touches the user's choice,
+// and Sample data keeps its own currency.
+function defaultCurrency() {
+  return language === "zh-TW" ? "TWD" : "USD";
+}
+
 function fillBlankIntake() {
   const d = blankAssessmentDefaults();
   $("in-name").value = d.name;
@@ -415,7 +422,7 @@ function fillBlankIntake() {
   $("in-quantity").value = "";
   $("in-quantity-unit").value = "";
   $("in-revenue").value = "";
-  $("in-currency").value = "CNY";
+  $("in-currency").value = defaultCurrency();
   $("in-timing").value = "";
   $("in-relationship").value = "unknown";
   $("in-source").value = "";

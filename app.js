@@ -7,6 +7,7 @@ import { DECISION_STATES, dedupePreserveOrder, evaluateDecision, buildBrief, pay
 import { blankAssessmentDefaults, buildOpportunityFromInput, summarizeInput } from "./workbench-adapter.js";
 import { DEFAULT_LANGUAGE, localizeEvidenceText, presentReason as localizeReason, stateLabels, t } from "./i18n.js";
 import { createDecisionPathExperiment } from "./decision-path.js";
+import { buildCommercialViewModel } from "./commercial-action-layer.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -26,6 +27,71 @@ const pathText = (key, values = {}) => Object.entries(values).reduce((text, [nam
 
 function tagClass(s) {
   return { ESCALATE: "esc", PURSUE_NOW: "now", PURSUE_CONDITIONALLY: "cond", HOLD_FOR_EVIDENCE: "hold", DO_NOT_PURSUE: "drop" }[s] || "";
+}
+
+function structureLabel(value) {
+  const labels = {
+    INCOMPLETE: "structure.incomplete", CONFIRMED: "status.agreed", COMPARABLE: "structure.comparable",
+    NOT_COMPARABLE: "structure.notComparable", NOT_ASSESSED: "structure.notAssessed", UNKNOWN: "structure.unknown",
+    ABSENT: "structure.kycAbsent", KYC_INCOMPLETE: "structure.kycIncomplete", CLEAR: "structure.kycClear",
+    SANCTIONS_VETO: "structure.kycVeto", BELOW_THRESHOLD: "structure.marginBelow", COST_SHIFT: "reason.marginShift",
+  };
+  return tx(labels[value] || "structure.unknown");
+}
+
+function structureFit(value) {
+  return { HIGH: tx("status.strongSignal"), MEDIUM: tx("status.someSignal"), LOW: tx("status.weakSignal"), WEAK: tx("status.weakSignal"), UNKNOWN: tx("structure.unknown") }[value] || tx("structure.unknown");
+}
+
+function structureQuality(value) {
+  return { HIGH: tx("status.highConfidence"), MEDIUM: tx("status.someConfidence"), LOW: tx("status.lowConfidence"), UNKNOWN: tx("structure.unknown") }[value] || tx("structure.unknown");
+}
+
+function traceText(item) {
+  const source = tx(`trace.${item.sourceType}`);
+  const label = localizeEvidenceText(item.label, language);
+  const generic = {
+    KYC: tx("structure.kyc"), MARGIN: tx("structure.margin"), COMMERCIAL_TERMS: tx("structure.terms"),
+    QUOTES: tx("structure.quotes"), QUOTE_COMPARABILITY: tx("structure.quotes"), EVIDENCE_QUALITY: tx("structure.evidence"), PAYMENT_EXPOSURE: tx("structure.payment"),
+    "SANCTIONS": tx("structure.kyc"),
+  }[item.label] || label;
+  return `${source}: ${generic}`;
+}
+
+function actionTitle(action) { return tx(`action.${action.actionType}`); }
+function actionWhy(action) { return tx(`action.why.${action.actionType}`); }
+
+function renderCommercialStructure(view) {
+  const s = view.structure;
+  const exposure = s.paymentExposure === null ? tx("structure.exposureUnknown") : `${s.paymentExposure.toLocaleString()} ${tx("structure.exposureUnit")}`;
+  $("commercial-structure").innerHTML = `
+    <p class="muted structure-intro">${tx("structure.intro")}</p>
+    <div class="structure-grid">
+      <div class="structure-item"><span>${tx("structure.terms")}</span><strong>${structureLabel(s.terms)}</strong></div>
+      <div class="structure-item"><span>${tx("structure.quotes")}</span><strong>${structureLabel(s.quoteComparability)}</strong><small>${s.quoteCount} ${tx("input.quotes")}</small></div>
+      <div class="structure-item"><span>${tx("structure.payment")}</span><strong>${exposure}</strong><small>${s.paymentEventStatus === "UNKNOWN" ? tx("structure.notAssessed") : `${s.paymentEventStatus} ${tx("input.payments")}`}</small></div>
+      <div class="structure-item"><span>${tx("structure.kyc")}</span><strong>${structureLabel(s.kyc)}</strong></div>
+      <div class="structure-item"><span>${tx("structure.margin")}</span><strong>${structureLabel(s.margin)}</strong></div>
+      <div class="structure-item"><span>${tx("structure.evidence")}</span><strong>${structureQuality(s.evidenceQuality)}</strong></div>
+      <div class="structure-item"><span>${tx("structure.buyer")}</span><strong>${structureFit(s.buyerFit)}</strong></div>
+      <div class="structure-item"><span>${tx("structure.category")}</span><strong>${structureFit(s.categoryFit)}</strong></div>
+    </div>
+    <p class="structure-open-items">${tx("structure.openItems")}: ${s.unknownCount} ${tx("structure.unknown")} · ${s.contradictionCount} ${tx("result.contradictions")}</p>
+  `;
+}
+
+function renderPriorityActions(view) {
+  const actions = view.actions;
+  $("priority-actions").innerHTML = actions.length
+    ? actions.map((item) => `
+      <article class="action-item">
+        <div class="action-topline"><span class="action-priority">0${item.priority}</span><h3>${actionTitle(item)}</h3></div>
+        <p class="action-why"><strong>${tx("actions.why")}</strong> ${actionWhy(item)}</p>
+        <p><strong>${tx("actions.trace")}</strong> ${item.evidenceTrace.map(traceText).join(" · ")}</p>
+        <p><strong>${tx("actions.rerun")}</strong> ${tx(`action.rerun.${item.actionType}`)}</p>
+        <p class="action-human"><strong>${tx("actions.human")}</strong> ${tx("action.humanBoundary")}</p>
+      </article>`).join("")
+    : `<p class="muted">${tx("result.noneRequired")}</p>`;
 }
 
 // --- entry ------------------------------------------------------------------
@@ -326,6 +392,9 @@ function renderResult() {
   `;
 
   renderDecisionPath();
+  const commercialView = buildCommercialViewModel(current, g, decisionPathExperiment);
+  renderCommercialStructure(commercialView);
+  renderPriorityActions(commercialView);
 
   // human decision — separate from the engine recommendation
   $("human-state-buttons").innerHTML = DECISION_STATES.map(

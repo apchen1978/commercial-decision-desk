@@ -127,6 +127,24 @@
       .path-trace summary { cursor:pointer; color:var(--ink); }
       @media (max-width:640px) { .path-options, .path-columns { grid-template-columns:1fr; } }
       @media (max-width:640px) { .language-switch { justify-content:flex-start; } }
+      .structure-intro { margin:0 0 12px; }
+      .structure-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+      .structure-item { min-width:0; padding:11px 12px; border:1px solid var(--line); border-radius:10px; background:#fafbf7; }
+      .structure-item span { display:block; color:var(--muted); font-size:11px; letter-spacing:.05em; text-transform:uppercase; }
+      .structure-item strong { display:block; margin-top:3px; color:var(--forest); font-size:14px; overflow-wrap:anywhere; }
+      .structure-item small { display:block; margin-top:3px; color:var(--muted); font-size:11px; overflow-wrap:anywhere; }
+      .structure-open-items { margin:12px 0 0; color:var(--muted); font-size:12px; }
+      .priority-actions { display:grid; gap:10px; }
+      .action-item { border-left:3px solid var(--forest); padding:12px 14px; background:#fafbf7; border-radius:0 10px 10px 0; }
+      .action-topline { display:flex; align-items:baseline; gap:10px; }
+      .action-topline h3 { margin:0; font-size:15px; color:var(--forest); }
+      .action-priority { color:var(--amber); font-size:11px; letter-spacing:.1em; font-weight:800; }
+      .action-item p { margin:7px 0 0; color:var(--muted); font-size:12.5px; line-height:1.55; }
+      .action-item p strong { color:var(--ink); }
+      .action-item .action-why { color:var(--ink); }
+      .action-item .action-human { padding-top:7px; border-top:1px solid var(--line); }
+      @media (max-width:760px) { .structure-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+      @media (max-width:420px) { .structure-grid { grid-template-columns:1fr 1fr; gap:7px; } .structure-item { padding:9px 10px; } .action-item { padding:11px 12px; } }
     </style>
   </head>
   <body>
@@ -299,6 +317,11 @@
         <!-- result -->
         <div id="result-area" hidden>
           <h2 data-i18n="result.heading">工作台建議</h2>
+          <section class="commercial-structure" aria-live="polite">
+            <h2 data-i18n="structure.heading">交易結構</h2>
+            <div class="card" id="commercial-structure"></div>
+          </section>
+
           <div class="card" id="result-rec"></div>
 
           <section class="decision-path" id="decision-path-area" hidden aria-live="polite">
@@ -310,6 +333,11 @@
               <p class="muted" id="decision-path-empty" data-i18n="path.noSelection">選擇一個假設的證據變化，查看同一套規則會如何重新判斷。</p>
             </div>
             <div class="card path-detail" id="decision-path-detail" hidden></div>
+          </section>
+
+          <section class="priority-actions" aria-live="polite">
+            <h2 data-i18n="actions.heading">優先行動</h2>
+            <div class="card" id="priority-actions"></div>
           </section>
 
           <h2 data-i18n="result.yourDecision">你的決定</h2>

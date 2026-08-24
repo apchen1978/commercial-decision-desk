@@ -209,6 +209,21 @@ function esc(s) {
   return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+function presentReason(reason) {
+  let text = String(reason || "")
+    .replace(/^Rule \d+:\s*/, "")
+    .replace(/^Rule:\s*/, "")
+    .replace(/\bPURSUE_NOW\b/g, "Pursue now")
+    .replace(/\bPURSUE_CONDITIONALLY\b/g, "Pursue with conditions")
+    .replace(/\bHOLD_FOR_EVIDENCE\b/g, "Hold for evidence")
+    .replace(/\bDO_NOT_PURSUE\b/g, "Do not pursue")
+    .replace(/\bESCALATE\b/g, "Escalate for review");
+  if (current?.quoteComparabilityAssessed === false && text.startsWith("Quote bases are not comparable")) {
+    return "Quote comparability is not assessed — quotes are not ranked.";
+  }
+  return text;
+}
+
 // --- run ---------------------------------------------------------------------
 $("btn-run").addEventListener("click", () => {
   const input = collectBlankInput();
@@ -240,17 +255,19 @@ function renderResult() {
     ...g.blockingUnknowns.map((u) => u.resolveWith),
     ...(g.termsIncomplete && current.commercialTerms.resolveWith ? [current.commercialTerms.resolveWith] : []),
     ...(g.weakEvidence ? ["Upgrade evidence to primary sources (spec review / site visit)"] : []),
+    ...(current.quoteComparabilityAssessed === false ? ["Compare quote bases before ranking them."] : []),
   ].filter(Boolean));
 
   // what would change this decision — derived from blockers, business language
   const wouldChange = [];
-  if (g.materialContradictions.length) wouldChange.push("Resolve the material contradiction(s) — then PURSUE_NOW may open.");
+  if (g.materialContradictions.length) wouldChange.push("Resolve the material contradiction(s) — then the option to pursue now may open.");
   if (g.blockingUnknowns.length) wouldChange.push("Verify the blocking UNKNOWN(s) — they currently gate pursuit.");
   if (g.termsIncomplete) wouldChange.push("Finalize the commercial terms in writing.");
   if (g.weakEvidence || g.strongEvidence === false) wouldChange.push("Raise evidence quality (spec review / direct confirmation).");
   if (g.kycGate === "SANCTIONS_VETO") wouldChange.push("Resolve the sanctions/adverse finding — this is a hard veto.");
   if (g.kycGate === "KYC_INCOMPLETE") wouldChange.push("Complete customer verification — until then, hold.");
   if (g.marginGate === "BELOW_THRESHOLD") wouldChange.push("Re-check the margin figure against the declared threshold — currently below it.");
+  if (!wouldChange.length && g.recommended === "HOLD_FOR_EVIDENCE") wouldChange.push("Provide the missing evidence needed to reassess this opportunity.");
   if (!wouldChange.length) wouldChange.push("Nothing blocks pursuit under the current evidence — the desk sees no open gate.");
 
   $("result-rec").innerHTML = `
@@ -261,7 +278,7 @@ function renderResult() {
     </div>
     <hr class="glance-hr">
     <div class="glance-grid">
-      <div class="glance-col"><h4>Why</h4><ul>${g.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></div>
+      <div class="glance-col"><h4>Why</h4><ul>${g.reasons.map((r) => `<li>${esc(presentReason(r))}</li>`).join("")}</ul></div>
       <div class="glance-col"><h4>Blockers</h4>${g.materialContradictions.length || g.termsIncomplete || g.blockingUnknowns.length ? `<ul>${[
         ...g.materialContradictions.map((c) => `<li>Material contradiction: ${esc(c.label)} (unresolved)</li>`),
         ...(g.termsIncomplete ? [`<li>Commercial terms incomplete</li>`] : []),
@@ -275,6 +292,7 @@ function renderResult() {
         ...(g.weakEvidence || g.strongEvidence === false ? [`<li>Evidence quality not strong</li>`] : []),
         ...(g.kycGate === "ABSENT" && mode === "blank" ? [`<li>Customer verification — not assessed</li>`] : []),
         ...(g.marginGate === "ABSENT" && mode === "blank" ? [`<li>Margin policy — not assessed</li>`] : []),
+        ...(current.quoteComparabilityAssessed === false ? [`<li>Quote comparability — not assessed</li>`] : []),
       ].join("") || `<span class="muted">None.</span>`}</ul></div>
       <div class="glance-col"><h4>Contradictions</h4>${current.contradictions.length ? `<ul>${current.contradictions.map((c) => `<li>${esc(c.label)}${c.material ? " (material)" : ""} — ${c.status === "RESOLVED" ? "resolved" : "unresolved"}</li>`).join("")}</ul>` : `<span class="muted">None recorded.</span>`}</div>
     </div>
@@ -305,6 +323,9 @@ function renderHumanDecision() {
   $("human-decision-status").innerHTML = humanDecision
     ? `<span class="ok-tag">Your decision: ${STATE_LABELS[humanDecision]}${note ? " — " + esc(note) : ""}</span>`
     : `<span class="muted">No human decision recorded yet. The desk recommendation above is NOT your decision.</span>`;
+  $("human-state-buttons").querySelectorAll("button").forEach((button) => {
+    button.classList.toggle("sel", button.dataset.hstate === humanDecision);
+  });
 }
 
 $("human-note").addEventListener("input", (e) => { humanNote = e.target.value; renderHumanDecision(); });

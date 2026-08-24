@@ -91,8 +91,8 @@ export function buildOpportunityFromInput(input) {
   // contradiction records — user-supplied only, never inferred
   const contradictions = (in_.contradictions || [])
     .filter((c) => c && c.label && String(c.label).trim())
-    .map((c) => ({
-      id: c.id || `CTR-${Math.random().toString(36).slice(2, 7)}`,
+    .map((c, i) => ({
+      id: c.id || `CTR-${i + 1}`,
       label: String(c.label),
       detail: String(c.detail || ""),
       material: c.material === true,
@@ -102,8 +102,8 @@ export function buildOpportunityFromInput(input) {
   // unknowns — user-supplied only
   const unknowns = (in_.unknowns || [])
     .filter((u) => u && u.label && String(u.label).trim())
-    .map((u) => ({
-      id: u.id || `UNK-${Math.random().toString(36).slice(2, 7)}`,
+    .map((u, i) => ({
+      id: u.id || `UNK-${i + 1}`,
       label: String(u.label),
       detail: String(u.detail || ""),
       blocksPursue: u.blocks === true,
@@ -112,8 +112,8 @@ export function buildOpportunityFromInput(input) {
   // payment events — completeness normalized: only COMPLETE + finite counts
   const paymentEvents = (in_.paymentEvents || [])
     .filter((e) => e && e.label && String(e.label).trim())
-    .map((e) => ({
-      id: e.id || `PE-${Math.random().toString(36).slice(2, 7)}`,
+    .map((e, i) => ({
+      id: e.id || `PE-${i + 1}`,
       label: String(e.label),
       amountCny: fin(e.amountCny),
       daysFromSign: fin(e.daysFromSign),
@@ -169,6 +169,7 @@ export function buildOpportunityFromInput(input) {
     },
     quotes,
     quoteBasesComparable,
+    quoteComparabilityAssessed: in_.quotesComparable !== "notAssessed",
     paymentEvents,
     buyers: [{ id: "B1", label: "Manual buyer entry" }],
     paymentDisclosure: PAYMENT_DISCLOSURE,

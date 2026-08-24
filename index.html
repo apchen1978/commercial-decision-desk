@@ -105,6 +105,11 @@
       .language-label { color:var(--muted); font-size:12px; }
       button.language-button { background:transparent; color:var(--muted); border:1px solid var(--line); padding:5px 10px; font-size:12px; }
       button.language-button.active { background:var(--forest); color:var(--bone); border-color:var(--forest); }
+      .scope-intro { margin:18px 0 22px; max-width:760px; }
+      .scope-title { margin:0 0 5px; color:var(--forest); font-size:17px; letter-spacing:.01em; }
+      .scope-body { margin:0; color:var(--ink); font-size:14px; line-height:1.65; }
+      .scope-disclosure { margin:10px 0 0; padding-left:11px; border-left:2px solid var(--gold); color:var(--muted); font-size:12px; line-height:1.6; }
+      .scope-sequence { margin:10px 0 0; color:var(--muted); font-size:11px; letter-spacing:.03em; }
       @media (max-width:640px) { .language-switch { justify-content:flex-start; } }
     </style>
   </head>
@@ -148,6 +153,12 @@
         </div>
         <h2 id="workbench-title" style="margin-top:18px">商機</h2>
         <p class="muted" id="workbench-sub"></p>
+        <div class="scope-intro" data-i18n-aria-label="scope.aria">
+          <h3 class="scope-title" data-i18n="scope.primaryTitle">快速商機評估</h3>
+          <p class="scope-body" data-i18n="scope.primaryBody">用最少必要資訊，判斷現在該推進、補證據、升級判斷，還是停止投入。</p>
+          <p class="scope-disclosure" data-i18n="scope.disclosure">用於前期商業篩選，不取代完整的財務、法務、合規或交易盡職調查。</p>
+          <p class="scope-sequence" data-i18n="scope.sequence">評估範圍：快速評估 → 證據檢視 → 人的決定</p>
+        </div>
 
         <!-- blank intake -->
         <div id="intake-area" hidden>

@@ -84,6 +84,32 @@ still required in every case.
   function of the fixture — identical output on every run.
 - Recommendation: pure rule evaluation (`decision-engine.js`).
 
+## Commercial Momentum v0.1 (owner-governed heuristic, not calibrated)
+
+The result snapshot presents three deliberately separate signals:
+
+- **Commercial Momentum (0–100 when at least two signals are known)** — a
+  deterministic, reviewable heuristic showing how supportive the currently
+  known commercial signals are. It uses only Buyer Fit (30), Product Fit (30),
+  Import Openness (15), Commercial Feasibility (15), and fully calculated Known
+  Economics (10). UNKNOWN dimensions are excluded rather than penalized; with
+  fewer than two known signals the index is not formed.
+- **Evidence Coverage (0–100%)** — how much of a defined commercial evidence
+  set is recorded or partially recorded: Buyer Fit (12), Product Fit (12),
+  Import Openness (10), Commercial Feasibility (10), Terms (14), Payment
+  Structure (12), Quote Comparability (10), KYC status (8), Economics (8), and
+  Buyer Authority (4). Incomplete terms and payment events can receive partial
+  coverage; a recorded adverse finding still counts as covered evidence, not as
+  a favourable outcome. Coverage is distinct from Momentum and evidence quality.
+- **Current Position** — the existing deterministic recommendation from
+  `evaluateDecision()`.
+
+Commercial Momentum is **not** a close probability, win rate, credit score,
+approval, or recommendation. It does not consume KYC, margin, contradictions,
+blocking UNKNOWNs, or the current decision state; those remain visible through
+the frozen Decision Core. Therefore high Momentum can coexist with a low
+Coverage score or `DO_NOT_PURSUE` (for example, a verified KYC veto).
+
 ## Validation
 
 ```bash

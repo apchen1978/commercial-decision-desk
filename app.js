@@ -10,6 +10,7 @@ import { createDecisionPathExperiment } from "./decision-path.js";
 import { buildCommercialViewModel } from "./commercial-action-layer.js";
 import { buildTradeDealViewModel } from "./trade-deal-structure.js";
 import { buildEconomicsBridge, economicsEvidenceTrace } from "./economics-bridge.js";
+import { buildCommercialMomentum, buildEvidenceCoverage } from "./commercial-momentum.js";
 import { buildDealBriefViewModel, downloadDealBrief } from "./deal-brief.js";
 
 const $ = (id) => document.getElementById(id);
@@ -153,7 +154,18 @@ function snapshotValue(value) {
   return esc(value === "" || value === undefined || value === null ? tx("context.unknown") : value);
 }
 
-function renderExecutiveSnapshot({ economics, tradeView, control }) {
+function momentumDimensionLabel(id) { return tx(`momentum.dimension.${id}`); }
+
+function momentumValueLabel(value) {
+  const labels = {
+    HIGH: "status.strongSignal", STRONG: "status.strongSignal", MEDIUM: "status.someSignal",
+    CONDITIONAL: "momentum.conditional", LOW: "status.weakSignal", WEAK: "status.weakSignal",
+    POSITIVE: "momentum.positiveEconomics", BREAK_EVEN: "momentum.breakEvenEconomics", NEGATIVE: "momentum.negativeEconomics",
+  };
+  return tx(labels[value] || "context.unknown");
+}
+
+function renderExecutiveSnapshot({ economics, tradeView, control, momentum, coverage }) {
   const context = current.commercialContext || {};
   const buyer = context.buyerCompany || current.buyers?.[0]?.label || tx("context.unknown");
   const currency = current.economics?.currency || "CNY";
@@ -171,16 +183,33 @@ function renderExecutiveSnapshot({ economics, tradeView, control }) {
     ["snapshot.delivery", delivery],
   ];
   $("executive-deal-snapshot").hidden = false;
+  const momentumValue = momentum.score === null ? "—" : String(momentum.score);
+  const momentumStatus = momentum.status === "CALCULATED" ? tx("momentum.definition") : tx("momentum.notEnough");
+  const positiveDrivers = momentum.drivers.filter((driver) => driver.direction === "UP").slice(0, 2);
+  const limitingDrivers = [
+    ...momentum.drivers.filter((driver) => driver.direction !== "UP"),
+    ...momentum.unknownDimensions.slice(0, 2).map((dimension) => ({ ...dimension, direction: "UNKNOWN", value: "UNKNOWN" })),
+  ].slice(0, 2);
+  const driverLine = (driver) => {
+    const symbol = driver.direction === "UP" ? "↑" : driver.direction === "DOWN" ? "↓" : "?";
+    const value = driver.direction === "UNKNOWN" ? tx("status.unknown") : momentumValueLabel(driver.value);
+    return `<li class="snapshot-driver ${driver.direction.toLowerCase()}"><b>${symbol}</b> ${momentumDimensionLabel(driver.id)}: ${value}</li>`;
+  };
   $("executive-deal-snapshot").innerHTML = `
     <div class="snapshot-heading-row">
       <div>
         <span class="snapshot-kicker">${tx("snapshot.heading")}</span>
         <h2>${snapshotValue(current.name || tx("context.unknown"))}</h2>
       </div>
-      <div class="snapshot-state">
-        <span>${tx("snapshot.decision")}</span>
-        <strong class="rec-tag ${tagClass(engine.recommended)}">${stateLabel(engine.recommended)}</strong>
-      </div>
+    </div>
+    <div class="snapshot-signals" aria-label="${tx("momentum.ariaLabel")}">
+      <div class="snapshot-signal snapshot-momentum"><span>${tx("momentum.label")}</span><strong>${momentumValue}<small>/ 100</small></strong><p>${momentumStatus}</p></div>
+      <div class="snapshot-signal"><span>${tx("coverage.label")}</span><strong>${coverage.score}<small>%</small></strong><p>${tx("coverage.definition")}</p></div>
+      <div class="snapshot-signal snapshot-position"><span>${tx("snapshot.decision")}</span><strong class="rec-tag ${tagClass(engine.recommended)}">${stateLabel(engine.recommended)}</strong><p>${tx("momentum.positionNote")}</p></div>
+    </div>
+    <div class="snapshot-drivers">
+      <div><span>${tx("momentum.supports")}</span><ul>${positiveDrivers.map(driverLine).join("") || `<li>${tx("momentum.noKnownDrivers")}</li>`}</ul></div>
+      <div><span>${tx("momentum.limits")}</span><ul>${limitingDrivers.map(driverLine).join("") || `<li>${tx("momentum.noKnownLimits")}</li>`}</ul></div>
     </div>
     <div class="snapshot-grid">
       ${fields.map(([label, value]) => `<div class="snapshot-field"><span>${tx(label)}</span><strong>${snapshotValue(value)}</strong></div>`).join("")}
@@ -702,9 +731,13 @@ function renderResult() {
   const tradeView = buildTradeDealViewModel(current, g);
   const economicsInput = current.economics || {};
   const economics = buildEconomicsBridge(economicsInput);
+  const momentum = buildCommercialMomentum(current, economics);
+  const coverage = buildEvidenceCoverage(current, economics);
   renderExecutiveSnapshot({
     economics,
     tradeView,
+    momentum,
+    coverage,
     control: g.reasons.length ? localizeReason(g.reasons[0], language, current.quoteComparabilityAssessed !== false) : tx("context.unknown"),
   });
   renderEconomicsBridge(economics, economicsInput.currency || "CNY");

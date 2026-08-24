@@ -348,6 +348,22 @@
       .snapshot-control { border-top: 1px solid var(--hairline); padding-top: 14px; margin-top: 16px; }
       .snapshot-control span { color: var(--brass); }
       .snapshot-control strong { color: var(--charcoal); font-size: 14px; line-height: 1.5; }
+      /* Momentum and Coverage are evidence descriptors, never recommendation controls. */
+      #result-area .snapshot-signals { display:grid; grid-template-columns:1.2fr .9fr 1fr; margin-top:22px; border-top:1px solid var(--hairline); border-bottom:1px solid var(--hairline); }
+      #result-area .snapshot-signal { min-width:0; padding:15px 18px 14px; border-right:1px solid var(--hairline); }
+      #result-area .snapshot-signal:last-child { border-right:0; }
+      #result-area .snapshot-signal > span, #result-area .snapshot-drivers > div > span { display:block; color:var(--brass); font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+      #result-area .snapshot-signal > strong { display:block; margin-top:2px; color:var(--charcoal); font-size:34px; line-height:1.1; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:-.025em; }
+      #result-area .snapshot-signal > strong small { margin-left:3px; color:#8b887a; font-size:14px; letter-spacing:0; }
+      #result-area .snapshot-signal > p { margin:6px 0 0; color:#6b6a5e; font-size:11.5px; line-height:1.45; }
+      #result-area .snapshot-position > strong { font-size:18px; letter-spacing:.015em; }
+      #result-area .snapshot-drivers { display:grid; grid-template-columns:1fr 1fr; gap:24px; padding:13px 0 1px; border-bottom:1px solid var(--hairline); }
+      #result-area .snapshot-drivers > div { min-width:0; }
+      #result-area .snapshot-drivers ul { list-style:none; margin:6px 0 10px; padding:0; color:#4c5049; font-size:12px; line-height:1.55; }
+      #result-area .snapshot-driver { overflow-wrap:anywhere; }
+      #result-area .snapshot-driver b { display:inline-block; width:14px; color:var(--forest); }
+      #result-area .snapshot-driver.down b { color:var(--rust); }
+      #result-area .snapshot-driver.conditional b, #result-area .snapshot-driver.unknown b { color:var(--brass); }
       /* Decision lead — CURRENT POSITION with a left status line */
       #result-area .decision-lead {
         background: transparent; border: 0; border-left: 4px solid var(--brass);
@@ -417,6 +433,12 @@
         #result-area .rec-tag { font-size: 20px; }
         #result-area .dl-grid { grid-template-columns: 1fr; gap: 0; }
         #result-area .executive-snapshot { padding: 20px 18px; }
+        #result-area .snapshot-signals { grid-template-columns:1fr 1fr; margin-top:18px; }
+        #result-area .snapshot-signal { padding:13px 12px; }
+        #result-area .snapshot-signal:nth-child(2) { border-right:0; }
+        #result-area .snapshot-position { grid-column:1 / -1; border-top:1px solid var(--hairline); }
+        #result-area .snapshot-signal > strong { font-size:29px; }
+        #result-area .snapshot-drivers { grid-template-columns:1fr; gap:0; }
       }
     </style>
   </head>

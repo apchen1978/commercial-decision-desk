@@ -5,6 +5,7 @@
 import { opportunity, dimensions, SYNTHETIC_LABEL } from "./fixtures.js";
 import { DECISION_STATES, dedupePreserveOrder, evaluateDecision, buildBrief, paymentExposure } from "./decision-engine.js";
 import { blankAssessmentDefaults, buildOpportunityFromInput, summarizeInput } from "./workbench-adapter.js";
+import { DEFAULT_LANGUAGE, localizeEvidenceText, presentReason as localizeReason, stateLabels, t } from "./i18n.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -14,15 +15,10 @@ let current = null; // current normalized opportunity
 let engine = null;
 let humanDecision = null;
 let humanNote = "";
+let language = DEFAULT_LANGUAGE;
 
-// Business labels for the 5 states (avoid exposing engine internals).
-const STATE_LABELS = {
-  PURSUE_NOW: "Pursue now",
-  PURSUE_CONDITIONALLY: "Pursue with conditions",
-  HOLD_FOR_EVIDENCE: "Hold for evidence",
-  ESCALATE: "Escalate for review",
-  DO_NOT_PURSUE: "Do not pursue",
-};
+const tx = (key) => t(key, language);
+const stateLabel = (state) => stateLabels(language)[state] || state;
 
 function tagClass(s) {
   return { ESCALATE: "esc", PURSUE_NOW: "now", PURSUE_CONDITIONALLY: "cond", HOLD_FOR_EVIDENCE: "hold", DO_NOT_PURSUE: "drop" }[s] || "";
@@ -38,10 +34,43 @@ function showWorkbench() {
   $("workbench").hidden = false;
 }
 
+function applyLanguage() {
+  document.documentElement.lang = language === "zh-TW" ? "zh-Hant" : "en";
+  document.title = tx("document.title");
+  document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = tx(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+    el.innerHTML = `<b>${tx("result.humanBoundaryTitle")}</b>${tx("result.humanBoundary")}`;
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => { el.placeholder = tx(el.dataset.i18nPlaceholder); });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((el) => { el.setAttribute("aria-label", tx(el.dataset.i18nAriaLabel)); });
+  $("lang-zh").classList.toggle("active", language === "zh-TW");
+  $("lang-en").classList.toggle("active", language === "en");
+  $("lang-zh").setAttribute("aria-pressed", String(language === "zh-TW"));
+  $("lang-en").setAttribute("aria-pressed", String(language === "en"));
+  if (mode === "sample") {
+    $("workbench-title").textContent = tx("workbench.sampleTitle");
+    $("workbench-sub").textContent = tx("workbench.sampleSubtitle");
+  } else if (mode === "blank") {
+    $("workbench-title").textContent = tx("workbench.blankTitle");
+    $("workbench-sub").textContent = tx("workbench.blankSubtitle");
+    rerenderLists();
+  }
+  if (engine) renderResult();
+}
+
+function setLanguage(nextLanguage) {
+  if (nextLanguage === language) return;
+  language = nextLanguage;
+  applyLanguage();
+}
+
+$("lang-zh").addEventListener("click", () => setLanguage("zh-TW"));
+$("lang-en").addEventListener("click", () => setLanguage("en"));
+
 $("mode-sample").addEventListener("click", () => {
   mode = "sample";
-  $("workbench-title").textContent = "Sample opportunity — OPP-2026-008";
-  $("workbench-sub").textContent = "A ready-made synthetic case. Walk through the flow, then make your own call.";
+  $("workbench-title").textContent = tx("workbench.sampleTitle");
+  $("workbench-sub").textContent = tx("workbench.sampleSubtitle");
   // sample mode: reuse the existing synthetic opportunity exactly as-is
   current = JSON.parse(JSON.stringify(opportunity));
   $("intake-area").hidden = true;
@@ -53,8 +82,8 @@ $("mode-sample").addEventListener("click", () => {
 
 $("mode-blank").addEventListener("click", () => {
   mode = "blank";
-  $("workbench-title").textContent = "Blank assessment";
-  $("workbench-sub").textContent = "Start from what you know. Leave anything unknown as Unknown — nothing is assumed.";
+  $("workbench-title").textContent = tx("workbench.blankTitle");
+  $("workbench-sub").textContent = tx("workbench.blankSubtitle");
   current = null;
   engine = null;
   humanDecision = null;
@@ -96,7 +125,7 @@ function fillBlankIntake() {
 
 function collectBlankInput() {
   return {
-    name: $("in-name").value.trim() || "Untitled opportunity",
+    name: $("in-name").value.trim() || tx("input.untitled"),
     buyerFit: $("in-buyer").value,
     categoryFit: $("in-category").value,
     evidenceQuality: $("in-evidence").value,
@@ -130,11 +159,11 @@ function listTemplate(title, rows, addLabel, addId) {
 function renderContradictionList() {
   const rows = (window.__contradictions || []).map((c, i) => `
     <div class="list-row">
-      <input placeholder="What contradicts?" value="${esc(c.label)}" data-c-label="${i}">
-      <input placeholder="Detail" value="${esc(c.detail)}" data-c-detail="${i}">
-      <label><input type="checkbox" data-c-material="${i}" ${c.material ? "checked" : ""}> material</label>
-      <label><input type="checkbox" data-c-resolved="${i}" ${c.resolved ? "checked" : ""}> resolved</label>
-      <button type="button" class="x" data-c-del="${i}">✕</button>
+      <input placeholder="${tx("input.whatContradicts")}" value="${esc(c.label)}" data-c-label="${i}">
+      <input placeholder="${tx("input.detail")}" value="${esc(c.detail)}" data-c-detail="${i}">
+      <label><input type="checkbox" data-c-material="${i}" ${c.material ? "checked" : ""}> ${tx("input.material")}</label>
+      <label><input type="checkbox" data-c-resolved="${i}" ${c.resolved ? "checked" : ""}> ${tx("input.resolved")}</label>
+      <button type="button" class="x" data-c-del="${i}" aria-label="${tx("input.delete")}">✕</button>
     </div>`).join("");
   $("contradiction-rows").innerHTML = rows;
   wireList("c", ["label", "detail", "material", "resolved", "del"]);
@@ -143,10 +172,10 @@ function renderContradictionList() {
 function renderUnknownList() {
   const rows = (window.__unknowns || []).map((u, i) => `
     <div class="list-row">
-      <input placeholder="What is unknown?" value="${esc(u.label)}" data-u-label="${i}">
-      <input placeholder="Detail" value="${esc(u.detail)}" data-u-detail="${i}">
-      <label><input type="checkbox" data-u-blocks="${i}" ${u.blocks ? "checked" : ""}> blocks pursuit</label>
-      <button type="button" class="x" data-u-del="${i}">✕</button>
+      <input placeholder="${tx("input.whatUnknown")}" value="${esc(u.label)}" data-u-label="${i}">
+      <input placeholder="${tx("input.detail")}" value="${esc(u.detail)}" data-u-detail="${i}">
+      <label><input type="checkbox" data-u-blocks="${i}" ${u.blocks ? "checked" : ""}> ${tx("input.blocks")}</label>
+      <button type="button" class="x" data-u-del="${i}" aria-label="${tx("input.delete")}">✕</button>
     </div>`).join("");
   $("unknown-rows").innerHTML = rows;
   wireList("u", ["label", "detail", "blocks", "del"]);
@@ -155,11 +184,11 @@ function renderUnknownList() {
 function renderPaymentList() {
   const rows = (window.__payments || []).map((p, i) => `
     <div class="list-row">
-      <input placeholder="Payment label" value="${esc(p.label)}" data-p-label="${i}">
-      <input placeholder="Amount (CNY)" type="number" value="${p.amountCny ?? ""}" data-p-amount="${i}">
-      <input placeholder="Days from sign" type="number" value="${p.daysFromSign ?? ""}" data-p-days="${i}">
-      <label><input type="checkbox" data-p-complete="${i}" ${p.complete ? "checked" : ""}> committed</label>
-      <button type="button" class="x" data-p-del="${i}">✕</button>
+      <input placeholder="${tx("input.paymentLabel")}" value="${esc(p.label)}" data-p-label="${i}">
+      <input placeholder="${tx("input.amount")}" type="number" value="${p.amountCny ?? ""}" data-p-amount="${i}">
+      <input placeholder="${tx("input.days")}" type="number" value="${p.daysFromSign ?? ""}" data-p-days="${i}">
+      <label><input type="checkbox" data-p-complete="${i}" ${p.complete ? "checked" : ""}> ${tx("input.committed")}</label>
+      <button type="button" class="x" data-p-del="${i}" aria-label="${tx("input.delete")}">✕</button>
     </div>`).join("");
   $("payment-rows").innerHTML = rows;
   wireList("p", ["label", "amount", "days", "complete", "del"]);
@@ -168,9 +197,9 @@ function renderPaymentList() {
 function renderQuoteList() {
   const rows = (window.__quotes || []).map((q, i) => `
     <div class="list-row">
-      <input placeholder="Quote basis (e.g. FOB, DDP)" value="${esc(q.basis)}" data-q-basis="${i}">
-      <label><input type="checkbox" data-q-complete="${i}" ${q.complete ? "checked" : ""}> complete</label>
-      <button type="button" class="x" data-q-del="${i}">✕</button>
+      <input placeholder="${tx("input.quoteBasis")}" value="${esc(q.basis)}" data-q-basis="${i}">
+      <label><input type="checkbox" data-q-complete="${i}" ${q.complete ? "checked" : ""}> ${tx("input.complete")}</label>
+      <button type="button" class="x" data-q-del="${i}" aria-label="${tx("input.delete")}">✕</button>
     </div>`).join("");
   $("quote-rows").innerHTML = rows;
   wireList("q", ["basis", "complete", "del"]);
@@ -209,21 +238,6 @@ function esc(s) {
   return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function presentReason(reason) {
-  let text = String(reason || "")
-    .replace(/^Rule \d+:\s*/, "")
-    .replace(/^Rule:\s*/, "")
-    .replace(/\bPURSUE_NOW\b/g, "Pursue now")
-    .replace(/\bPURSUE_CONDITIONALLY\b/g, "Pursue with conditions")
-    .replace(/\bHOLD_FOR_EVIDENCE\b/g, "Hold for evidence")
-    .replace(/\bDO_NOT_PURSUE\b/g, "Do not pursue")
-    .replace(/\bESCALATE\b/g, "Escalate for review");
-  if (current?.quoteComparabilityAssessed === false && text.startsWith("Quote bases are not comparable")) {
-    return "Quote comparability is not assessed — quotes are not ranked.";
-  }
-  return text;
-}
-
 // --- run ---------------------------------------------------------------------
 $("btn-run").addEventListener("click", () => {
   const input = collectBlankInput();
@@ -254,58 +268,58 @@ function renderResult() {
     ...g.materialContradictions.map((c) => c.resolveWith),
     ...g.blockingUnknowns.map((u) => u.resolveWith),
     ...(g.termsIncomplete && current.commercialTerms.resolveWith ? [current.commercialTerms.resolveWith] : []),
-    ...(g.weakEvidence ? ["Upgrade evidence to primary sources (spec review / site visit)"] : []),
-    ...(current.quoteComparabilityAssessed === false ? ["Compare quote bases before ranking them."] : []),
+    ...(g.weakEvidence ? [tx("next.evidence")] : []),
+    ...(current.quoteComparabilityAssessed === false ? [tx("next.compareQuotes")] : []),
   ].filter(Boolean));
 
   // what would change this decision — derived from blockers, business language
   const wouldChange = [];
-  if (g.materialContradictions.length) wouldChange.push("Resolve the material contradiction(s) — then the option to pursue now may open.");
-  if (g.blockingUnknowns.length) wouldChange.push("Verify the blocking UNKNOWN(s) — they currently gate pursuit.");
-  if (g.termsIncomplete) wouldChange.push("Finalize the commercial terms in writing.");
-  if (g.weakEvidence || g.strongEvidence === false) wouldChange.push("Raise evidence quality (spec review / direct confirmation).");
-  if (g.kycGate === "SANCTIONS_VETO") wouldChange.push("Resolve the sanctions/adverse finding — this is a hard veto.");
-  if (g.kycGate === "KYC_INCOMPLETE") wouldChange.push("Complete customer verification — until then, hold.");
-  if (g.marginGate === "BELOW_THRESHOLD") wouldChange.push("Re-check the margin figure against the declared threshold — currently below it.");
-  if (!wouldChange.length && g.recommended === "HOLD_FOR_EVIDENCE") wouldChange.push("Provide the missing evidence needed to reassess this opportunity.");
-  if (!wouldChange.length) wouldChange.push("Nothing blocks pursuit under the current evidence — the desk sees no open gate.");
+  if (g.materialContradictions.length) wouldChange.push(tx("next.pursueMayOpen"));
+  if (g.blockingUnknowns.length) wouldChange.push(tx("next.resolveUnknown"));
+  if (g.termsIncomplete) wouldChange.push(tx("next.resolveTerms"));
+  if (g.weakEvidence || g.strongEvidence === false) wouldChange.push(tx("next.evidence"));
+  if (g.kycGate === "SANCTIONS_VETO") wouldChange.push(tx("next.resolveKyc"));
+  if (g.kycGate === "KYC_INCOMPLETE") wouldChange.push(tx("next.completeKyc"));
+  if (g.marginGate === "BELOW_THRESHOLD") wouldChange.push(tx("next.recheckMargin"));
+  if (!wouldChange.length && g.recommended === "HOLD_FOR_EVIDENCE") wouldChange.push(tx("next.missing"));
+  if (!wouldChange.length) wouldChange.push(tx("next.nothingBlocks"));
 
   $("result-rec").innerHTML = `
     <div class="glance-rec">
-      <span class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.08em">Desk recommendation</span>
-      <span class="rec-tag ${tagClass(g.recommended)}">${STATE_LABELS[g.recommended]}</span>
-      <span class="muted" style="font-size:12px">· deterministic rules, no score</span>
+      <span class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.08em">${tx("result.recommendation")}</span>
+      <span class="rec-tag ${tagClass(g.recommended)}">${stateLabel(g.recommended)}</span>
+      <span class="muted" style="font-size:12px">${tx("result.deterministic")}</span>
     </div>
     <hr class="glance-hr">
     <div class="glance-grid">
-      <div class="glance-col"><h4>Why</h4><ul>${g.reasons.map((r) => `<li>${esc(presentReason(r))}</li>`).join("")}</ul></div>
-      <div class="glance-col"><h4>Blockers</h4>${g.materialContradictions.length || g.termsIncomplete || g.blockingUnknowns.length ? `<ul>${[
-        ...g.materialContradictions.map((c) => `<li>Material contradiction: ${esc(c.label)} (unresolved)</li>`),
-        ...(g.termsIncomplete ? [`<li>Commercial terms incomplete</li>`] : []),
-        ...g.blockingUnknowns.map((u) => `<li>Blocking unknown: ${esc(u.label)}</li>`),
-        ...(g.weakEvidence ? [`<li>Evidence quality low</li>`] : []),
-      ].join("")}</ul>` : `<span class="muted">None — all gates clear.</span>`}</div>
+      <div class="glance-col"><h4>${tx("result.why")}</h4><ul>${g.reasons.map((r) => `<li>${esc(localizeReason(r, language, current.quoteComparabilityAssessed !== false))}</li>`).join("")}</ul></div>
+      <div class="glance-col"><h4>${tx("result.blockers")}</h4>${g.materialContradictions.length || g.termsIncomplete || g.blockingUnknowns.length ? `<ul>${[
+        ...g.materialContradictions.map((c) => `<li>${tx("result.materialContradiction")}: ${esc(c.label)} (${tx("result.unresolved")})</li>`),
+        ...(g.termsIncomplete ? [`<li>${tx("result.termsIncomplete")}</li>`] : []),
+        ...g.blockingUnknowns.map((u) => `<li>${tx("result.blockingUnknown")}: ${esc(u.label)}</li>`),
+        ...(g.weakEvidence ? [`<li>${tx("result.evidenceLow")}</li>`] : []),
+      ].join("")}</ul>` : `<span class="muted">${tx("result.noBlockers")}</span>`}</div>
     </div>
     <div class="glance-grid">
-      <div class="glance-col"><h4>Missing / unknown evidence</h4><ul>${[
+      <div class="glance-col"><h4>${tx("result.missing")}</h4><ul>${[
         ...g.blockingUnknowns.map((u) => `<li>${esc(u.label)}</li>`),
         ...(g.weakEvidence || g.strongEvidence === false ? [`<li>Evidence quality not strong</li>`] : []),
-        ...(g.kycGate === "ABSENT" && mode === "blank" ? [`<li>Customer verification — not assessed</li>`] : []),
-        ...(g.marginGate === "ABSENT" && mode === "blank" ? [`<li>Margin policy — not assessed</li>`] : []),
-        ...(current.quoteComparabilityAssessed === false ? [`<li>Quote comparability — not assessed</li>`] : []),
-      ].join("") || `<span class="muted">None.</span>`}</ul></div>
-      <div class="glance-col"><h4>Contradictions</h4>${current.contradictions.length ? `<ul>${current.contradictions.map((c) => `<li>${esc(c.label)}${c.material ? " (material)" : ""} — ${c.status === "RESOLVED" ? "resolved" : "unresolved"}</li>`).join("")}</ul>` : `<span class="muted">None recorded.</span>`}</div>
+        ...(g.kycGate === "ABSENT" && mode === "blank" ? [`<li>${tx("input.kyc")} — ${tx("result.notAssessed")}</li>`] : []),
+        ...(g.marginGate === "ABSENT" && mode === "blank" ? [`<li>${tx("input.margin")} — ${tx("result.notAssessed")}</li>`] : []),
+        ...(current.quoteComparabilityAssessed === false ? [`<li>${tx("input.quoteComparability")} — ${tx("result.notAssessed")}</li>`] : []),
+      ].join("") || `<span class="muted">${tx("result.none")}</span>`}</ul></div>
+      <div class="glance-col"><h4>${tx("result.contradictions")}</h4>${current.contradictions.length ? `<ul>${current.contradictions.map((c) => `<li>${esc(c.label)}${c.material ? ` (${tx("input.material")})` : ""} — ${c.status === "RESOLVED" ? tx("input.resolved") : tx("result.unresolved")}</li>`).join("")}</ul>` : `<span class="muted">${tx("result.noneRecorded")}</span>`}</div>
     </div>
     <div class="glance-grid">
-      <div class="glance-col"><h4>What to verify next</h4>${next.length ? `<ul>${next.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<span class="muted">No further evidence required by the desk.</span>`}</div>
-      <div class="glance-col"><h4>What would change this decision?</h4><ul>${wouldChange.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>
+      <div class="glance-col"><h4>${tx("result.verifyNext")}</h4>${next.length ? `<ul>${next.map((n) => `<li>${esc(localizeEvidenceText(n, language))}</li>`).join("")}</ul>` : `<span class="muted">${tx("result.noFurtherEvidence")}</span>`}</div>
+      <div class="glance-col"><h4>${tx("result.wouldChange")}</h4><ul>${wouldChange.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>
     </div>
-    <p class="glance-note">The desk only narrows the options with evidence and deterministic rules. The decision is yours.</p>
+    <p class="glance-note">${tx("boundary.note")}</p>
   `;
 
   // human decision — separate from the engine recommendation
   $("human-state-buttons").innerHTML = DECISION_STATES.map(
-    (s) => `<button type="button" data-hstate="${s}" class="${humanDecision === s ? "sel" : ""}">${STATE_LABELS[s]}</button>`,
+    (s) => `<button type="button" data-hstate="${s}" class="${humanDecision === s ? "sel" : ""}">${stateLabel(s)}</button>`,
   ).join("");
   $("human-state-buttons").querySelectorAll("button").forEach((b) => {
     b.addEventListener("click", () => {
@@ -319,10 +333,9 @@ function renderResult() {
 
 function renderHumanDecision() {
   const note = $("human-note").value;
-  const marker = document.createElement("div");
   $("human-decision-status").innerHTML = humanDecision
-    ? `<span class="ok-tag">Your decision: ${STATE_LABELS[humanDecision]}${note ? " — " + esc(note) : ""}</span>`
-    : `<span class="muted">No human decision recorded yet. The desk recommendation above is NOT your decision.</span>`;
+    ? `<span class="ok-tag">${tx("result.humanDecision")}${stateLabel(humanDecision)}${note ? " — " + esc(note) : ""}</span>`
+    : `<span class="muted">${tx("result.noHumanDecision")}</span>`;
   $("human-state-buttons").querySelectorAll("button").forEach((button) => {
     button.classList.toggle("sel", button.dataset.hstate === humanDecision);
   });
@@ -352,5 +365,5 @@ $("btn-home").addEventListener("click", () => {
 });
 
 // --- boot --------------------------------------------------------------------
-$("synthetic-note").textContent = "No AI, no API key, no backend. Manual-first decision support.";
+applyLanguage();
 showModeScreen();

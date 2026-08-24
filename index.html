@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="data:," />
-    <title>Commercial Decision Workbench — Manual Assessment</title>
+    <title data-i18n="document.title">商務決策工作台 — 手動評估</title>
     <style>
       :root {
         --ink: #17271f;
@@ -101,31 +101,41 @@
       .foot { margin-top: 30px; border-top: 1px solid var(--line); padding-top: 14px; font-size: 12px; color: var(--muted); }
       .rec-box { background: var(--forest); color: var(--bone); border-radius: 10px; padding: 14px 16px; margin-top: 12px; font-size: 14px; }
       .rec-box b { color: var(--gold); }
+      .language-switch { display:flex; justify-content:flex-end; align-items:center; gap:6px; margin-bottom:10px; }
+      .language-label { color:var(--muted); font-size:12px; }
+      button.language-button { background:transparent; color:var(--muted); border:1px solid var(--line); padding:5px 10px; font-size:12px; }
+      button.language-button.active { background:var(--forest); color:var(--bone); border-color:var(--forest); }
+      @media (max-width:640px) { .language-switch { justify-content:flex-start; } }
     </style>
   </head>
   <body>
     <div class="wrap">
       <header class="hero">
-        <p class="eyebrow">Commercial Decision Workbench · Manual</p>
-        <h1>Commercial Decision Workbench</h1>
-        <p class="sub">Assess one opportunity: input what you know → review evidence and unknowns → get a desk recommendation → record your own decision. No AI, no API key.</p>
+        <div class="language-switch" role="group" data-i18n-aria-label="header.language">
+          <span class="language-label" data-i18n="header.language">語言</span>
+          <button type="button" class="language-button active" id="lang-zh" aria-pressed="true">繁中</button>
+          <button type="button" class="language-button" id="lang-en" aria-pressed="false">EN</button>
+        </div>
+        <p class="eyebrow" data-i18n="header.eyebrow">商務決策工作台 · 手動評估</p>
+        <h1 data-i18n="header.title">商務決策工作台</h1>
+        <p class="sub" data-i18n="header.subtitle">評估一個商機：輸入已知資訊 → 檢視證據與未知 → 取得工作台建議 → 記錄你自己的決定。無需 AI 或 API 金鑰。</p>
       </header>
 
-      <div class="synthetic-banner" id="synthetic-note"></div>
+      <div class="synthetic-banner" id="synthetic-note" data-i18n="header.synthetic">無 AI、無 API 金鑰、無後端。以人工輸入為主的決策支援。</div>
 
       <!-- MODE SCREEN -->
       <section id="mode-screen">
-        <h2>Start</h2>
+        <h2 data-i18n="mode.heading">開始</h2>
         <div class="mode-row">
           <div class="mode-card" id="mode-sample">
-            <h3>Try the sample</h3>
-            <p>Walk through a ready-made synthetic case (a Gulf-region hotel window-treatment inquiry) end to end — about 3–5 minutes.</p>
-            <span class="cta">Open sample →</span>
+            <h3 data-i18n="mode.sample.title">試用範例</h3>
+            <p data-i18n="mode.sample.description">查看一個預先整理的合成案例，完整走過評估流程，約需 3–5 分鐘。</p>
+            <span class="cta" data-i18n="mode.sample.cta">開啟範例 →</span>
           </div>
           <div class="mode-card" id="mode-blank">
-            <h3>Start a blank assessment</h3>
-            <p>Enter what you know about your own opportunity. Leave anything unknown as Unknown — nothing is assumed.</p>
-            <span class="cta">Start blank →</span>
+            <h3 data-i18n="mode.blank.title">開始空白評估</h3>
+            <p data-i18n="mode.blank.description">輸入你目前知道的商機資訊。未知就保留為「未知」，系統不會自行假設。</p>
+            <span class="cta" data-i18n="mode.blank.cta">開始輸入 →</span>
           </div>
         </div>
       </section>
@@ -133,119 +143,121 @@
       <!-- WORKBENCH -->
       <section id="workbench" hidden>
         <div class="btn-row">
-          <button type="button" class="secondary" id="btn-home">← Choose mode</button>
-          <button type="button" class="secondary" id="btn-reset">Reset</button>
+          <button type="button" class="secondary" id="btn-home" data-i18n="nav.chooseMode">← 選擇模式</button>
+          <button type="button" class="secondary" id="btn-reset" data-i18n="nav.reset">重設</button>
         </div>
-        <h2 id="workbench-title" style="margin-top:18px">Opportunity</h2>
+        <h2 id="workbench-title" style="margin-top:18px">商機</h2>
         <p class="muted" id="workbench-sub"></p>
 
         <!-- blank intake -->
         <div id="intake-area" hidden>
           <div class="card">
-            <h3>What do you know about this opportunity?</h3>
-            <label class="field">Opportunity name</label>
-            <input type="text" id="in-name" placeholder="e.g. Hotel chain in Dubai — curtain supply" />
+            <h3 data-i18n="input.heading">你目前知道這個商機的哪些事？</h3>
+            <label class="field"><span data-i18n="input.opportunityName">商機名稱</span></label>
+            <input type="text" id="in-name" data-i18n-placeholder="input.opportunityNamePlaceholder" placeholder="例如：杜拜飯店集團 — 窗簾供應" />
             <div class="field-row">
-              <label class="field">Buyer fit
+              <label class="field"><span data-i18n="input.buyerFit">買方契合度</span>
                 <select id="in-buyer">
-                  <option value="unknown">Unknown</option>
-                  <option value="strong">Strong signal</option>
-                  <option value="some">Some signal</option>
-                  <option value="weak">Weak signal</option>
+                  <option value="unknown" data-i18n="status.unknown">未知</option>
+                  <option value="strong" data-i18n="status.strongSignal">訊號明確</option>
+                  <option value="some" data-i18n="status.someSignal">有一些訊號</option>
+                  <option value="weak" data-i18n="status.weakSignal">訊號偏弱</option>
                 </select>
               </label>
-              <label class="field">Category fit
+              <label class="field"><span data-i18n="input.categoryFit">產品類別契合度</span>
                 <select id="in-category">
-                  <option value="unknown">Unknown</option>
-                  <option value="strong">Strong — core product</option>
-                  <option value="partial">Partial — adjacent</option>
-                  <option value="weak">Weak</option>
-                  <option value="notOurCategory">Not our category</option>
+                  <option value="unknown" data-i18n="status.unknown">未知</option>
+                  <option value="strong" data-i18n="status.coreProduct">核心產品</option>
+                  <option value="partial" data-i18n="status.adjacent">相鄰類別</option>
+                  <option value="weak" data-i18n="status.weak">偏弱</option>
+                  <option value="notOurCategory" data-i18n="status.notOurCategory">不是我們的類別</option>
                 </select>
               </label>
             </div>
-            <label class="field">Evidence quality — how confident are you in what you know?
+            <label class="field"><span data-i18n="input.evidenceQuality">證據品質：你對目前資訊有多大把握？</span>
               <select id="in-evidence">
-                <option value="unknown">Unknown</option>
-                <option value="strong">High confidence (verified)</option>
-                <option value="some">Some confidence</option>
-                <option value="weak">Low confidence</option>
+                <option value="unknown" data-i18n="status.unknown">未知</option>
+                <option value="strong" data-i18n="status.highConfidence">信心高（已驗證）</option>
+                <option value="some" data-i18n="status.someConfidence">有一些信心</option>
+                <option value="weak" data-i18n="status.lowConfidence">信心低</option>
               </select>
             </label>
             <div class="field-row">
-              <label class="field">Commercial terms
+              <label class="field"><span data-i18n="input.terms">商務條件</span>
                 <select id="in-terms">
-                  <option value="unknown">Unknown</option>
-                  <option value="agreed">Agreed in writing</option>
-                  <option value="notAgreed">Not yet agreed</option>
+                  <option value="unknown" data-i18n="status.unknown">未知</option>
+                  <option value="agreed" data-i18n="status.agreed">已書面確認</option>
+                  <option value="notAgreed" data-i18n="status.notAgreed">尚未確認</option>
                 </select>
               </label>
-              <label class="field">Customer verification (KYC / sanctions)
+              <label class="field"><span data-i18n="input.kyc">客戶查核（KYC／制裁名單）</span>
                 <select id="in-kyc">
-                  <option value="notAssessed">Not assessed</option>
-                  <option value="clear">Verified clear</option>
-                  <option value="incomplete">Incomplete</option>
-                  <option value="sanctionsConcern">Sanctions / adverse concern</option>
+                  <option value="notAssessed" data-i18n="status.notAssessed">尚未評估</option>
+                  <option value="clear" data-i18n="status.verifiedClear">查核結果清楚</option>
+                  <option value="incomplete" data-i18n="status.incomplete">資料不完整</option>
+                  <option value="sanctionsConcern" data-i18n="status.sanctionsConcern">制裁／不利資訊疑慮</option>
                 </select>
               </label>
             </div>
-            <label class="field">Terms detail (optional)</label>
-            <input type="text" id="in-terms-detail" placeholder="e.g. 30% advance, balance before shipment" />
+            <label class="field"><span data-i18n="input.termsDetail">條件細節（選填）</span></label>
+            <input type="text" id="in-terms-detail" data-i18n-placeholder="input.termsDetailPlaceholder" placeholder="例如：30% 預付款，出貨前付清尾款" />
             <div class="field-row">
-              <label class="field">Margin policy
+              <label class="field"><span data-i18n="input.margin">毛利政策</span>
                 <select id="in-margin-status">
-                  <option value="notAssessed">Not assessed</option>
-                  <option value="assessed">Assessed — I have figures</option>
+                  <option value="notAssessed" data-i18n="status.notAssessed">尚未評估</option>
+                  <option value="assessed" data-i18n="status.assessedFigures">已評估，我有相關數字</option>
                 </select>
               </label>
-              <label class="field">Quote comparability
+              <label class="field"><span data-i18n="input.quoteComparability">報價基礎是否可比較</span>
                 <select id="in-quotes-comp">
-                  <option value="notAssessed">Not assessed</option>
-                  <option value="yes">All quotes comparable</option>
-                  <option value="no">Not comparable</option>
+                  <option value="notAssessed" data-i18n="status.notAssessed">尚未評估</option>
+                  <option value="yes" data-i18n="status.comparable">所有報價基礎可比較</option>
+                  <option value="no" data-i18n="status.notComparable">不可比較</option>
                 </select>
               </label>
             </div>
             <div class="field-row">
-              <label class="field">Expected gross margin (basis points, e.g. 500 = 5%)</label>
-              <input type="number" id="in-margin-bps" placeholder="e.g. 500" />
-              <label class="field">Minimum viable margin (your call, basis points)</label>
-              <input type="number" id="in-margin-thr" placeholder="e.g. 800" />
+              <label class="field"><span data-i18n="input.marginBps">預期毛利（基點，例如 500 = 5%）</span>
+                <input type="number" id="in-margin-bps" data-i18n-placeholder="input.marginBpsPlaceholder" placeholder="例如：500" />
+              </label>
+              <label class="field"><span data-i18n="input.marginThreshold">最低可接受毛利（由你設定，基點）</span>
+                <input type="number" id="in-margin-thr" data-i18n-placeholder="input.marginThresholdPlaceholder" placeholder="例如：800" />
+              </label>
             </div>
 
             <div id="contradiction-rows-wrap" style="margin-top:14px">
               <div class="card" style="margin-top:0">
-                <h3>Contradictions</h3>
+                <h3 data-i18n="input.contradictions">互相矛盾的資訊</h3>
                 <div id="contradiction-rows"></div>
-                <div style="margin-top:10px"><button type="button" class="secondary" data-add="c">+ Add contradiction</button></div>
+                <div style="margin-top:10px"><button type="button" class="secondary" data-add="c" data-i18n="input.addContradiction">+ 新增矛盾資訊</button></div>
               </div>
             </div>
             <div style="margin-top:14px">
               <div class="card" style="margin-top:0">
-                <h3>Unknowns</h3>
+                <h3 data-i18n="input.unknowns">未知資訊</h3>
                 <div id="unknown-rows"></div>
-                <div style="margin-top:10px"><button type="button" class="secondary" data-add="u">+ Add unknown</button></div>
+                <div style="margin-top:10px"><button type="button" class="secondary" data-add="u" data-i18n="input.addUnknown">+ 新增未知資訊</button></div>
               </div>
             </div>
             <div style="margin-top:14px">
               <div class="card" style="margin-top:0">
-                <h3>Payment commitments (optional)</h3>
+                <h3 data-i18n="input.payments">付款承諾（選填）</h3>
                 <div id="payment-rows"></div>
-                <div style="margin-top:10px"><button type="button" class="secondary" data-add="p">+ Add payment</button></div>
+                <div style="margin-top:10px"><button type="button" class="secondary" data-add="p" data-i18n="input.addPayment">+ 新增付款承諾</button></div>
               </div>
             </div>
             <div style="margin-top:14px">
               <div class="card" style="margin-top:0">
-                <h3>Quotes (optional)</h3>
+                <h3 data-i18n="input.quotes">報價（選填）</h3>
                 <div id="quote-rows"></div>
-                <div style="margin-top:10px"><button type="button" class="secondary" data-add="q">+ Add quote</button></div>
+                <div style="margin-top:10px"><button type="button" class="secondary" data-add="q" data-i18n="input.addQuote">+ 新增報價</button></div>
               </div>
             </div>
-            <label class="field">Why pursue? (one per line)</label>
+            <label class="field"><span data-i18n="input.why">為什麼值得推進？（每行一項）</span></label>
             <textarea id="in-why"></textarea>
-            <label class="field">Why not / concerns? (one per line)</label>
+            <label class="field"><span data-i18n="input.whyNot">為什麼先不要推進／有哪些疑慮？（每行一項）</span></label>
             <textarea id="in-whynot"></textarea>
-            <label class="field">Notes (optional)</label>
+            <label class="field"><span data-i18n="input.notes">備註（選填）</span></label>
             <textarea id="in-note"></textarea>
           </div>
         </div>
@@ -253,36 +265,36 @@
         <!-- run -->
         <div id="run-area" hidden>
           <div class="btn-row">
-            <button type="button" id="btn-run">Run assessment</button>
+            <button type="button" id="btn-run" data-i18n="input.run">執行評估</button>
           </div>
         </div>
 
         <!-- result -->
         <div id="result-area" hidden>
-          <h2>Desk recommendation</h2>
+          <h2 data-i18n="result.heading">工作台建議</h2>
           <div class="card" id="result-rec"></div>
 
-          <h2>Your decision</h2>
+          <h2 data-i18n="result.yourDecision">你的決定</h2>
           <div class="card">
             <div class="human-boundary">
-              <b>Human decision boundary.</b> The recommendation above comes from deterministic rules over your evidence. It is <b>not</b> your decision — record your own, even if it disagrees.
+              <span data-i18n-html="result.humanBoundary"><b>人的決策界線。</b>上方建議是根據你提供的證據與既定規則產生的。它不是你的決定，請記錄自己的判斷，即使你不同意工作台建議。</span>
             </div>
             <div class="state-buttons" id="human-state-buttons"></div>
             <div class="human-note-area">
-              <label class="field">Your note (optional)</label>
-              <input type="text" id="human-note" placeholder="e.g. Hold but keep warm — wait for the spec" />
+              <label class="field"><span data-i18n="result.yourNote">你的備註（選填）</span></label>
+              <input type="text" id="human-note" data-i18n-placeholder="result.yourNotePlaceholder" placeholder="例如：先保留合作可能，等規格確認後再決定" />
             </div>
             <div style="margin-top:12px" id="human-decision-status"></div>
           </div>
         </div>
 
         <div class="btn-row">
-          <button type="button" class="secondary" id="btn-reset-2">Reset</button>
+          <button type="button" class="secondary" id="btn-reset-2" data-i18n="nav.reset">重設</button>
         </div>
       </section>
 
       <footer class="foot">
-        Manual-first decision support. No AI, no API key, no backend, no persistence, no network calls. All sample data is synthetic.
+        <span data-i18n="result.footer">以人工輸入為主的決策支援。無 AI、無 API 金鑰、無後端、無資料庫、無網路呼叫。所有範例資料皆為合成資料。</span>
       </footer>
     </div>
     <script type="module" src="./app.js"></script>

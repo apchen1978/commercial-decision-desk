@@ -110,6 +110,22 @@
       .scope-body { margin:0; color:var(--ink); font-size:14px; line-height:1.65; }
       .scope-disclosure { margin:10px 0 0; padding-left:11px; border-left:2px solid var(--gold); color:var(--muted); font-size:12px; line-height:1.6; }
       .scope-sequence { margin:10px 0 0; color:var(--muted); font-size:11px; letter-spacing:.03em; }
+      .decision-path { margin-top:18px; }
+      .path-warning { margin:0 0 12px; padding:9px 11px; border-left:3px solid var(--gold); background:rgba(178,142,72,.10); color:var(--ink); font-size:12px; font-weight:700; letter-spacing:.02em; }
+      .path-current { display:flex; flex-wrap:wrap; align-items:baseline; gap:9px; margin-bottom:10px; }
+      .path-current .rec-tag { font-size:13px; }
+      .path-list { margin:8px 0 0; padding-left:20px; color:var(--muted); font-size:13px; line-height:1.65; }
+      .path-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:10px; }
+      .path-options button { text-align:left; line-height:1.35; }
+      .path-option-id { display:block; color:var(--gold); font-size:11px; letter-spacing:.08em; margin-bottom:3px; }
+      .path-detail { margin-top:12px; }
+      .path-detail h4 { margin-bottom:5px; }
+      .path-detail p { margin:0 0 9px; color:var(--muted); font-size:13px; line-height:1.6; }
+      .path-columns { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+      .path-columns ul { margin:5px 0 0; padding-left:18px; color:var(--muted); font-size:13px; line-height:1.55; }
+      .path-trace { margin-top:12px; color:var(--muted); font-size:12px; }
+      .path-trace summary { cursor:pointer; color:var(--ink); }
+      @media (max-width:640px) { .path-options, .path-columns { grid-template-columns:1fr; } }
       @media (max-width:640px) { .language-switch { justify-content:flex-start; } }
     </style>
   </head>
@@ -284,6 +300,17 @@
         <div id="result-area" hidden>
           <h2 data-i18n="result.heading">工作台建議</h2>
           <div class="card" id="result-rec"></div>
+
+          <section class="decision-path" id="decision-path-area" hidden aria-live="polite">
+            <h2 data-i18n="path.heading">Decision Path：證據如何影響判斷</h2>
+            <div class="card" id="decision-path-current"></div>
+            <div class="card">
+              <h3 data-i18n="path.tryChange">試跑一個假設的證據變化</h3>
+              <div class="path-options" id="decision-path-options"></div>
+              <p class="muted" id="decision-path-empty" data-i18n="path.noSelection">選擇一個假設的證據變化，查看同一套規則會如何重新判斷。</p>
+            </div>
+            <div class="card path-detail" id="decision-path-detail" hidden></div>
+          </section>
 
           <h2 data-i18n="result.yourDecision">你的決定</h2>
           <div class="card">

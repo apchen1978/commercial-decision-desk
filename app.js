@@ -6,6 +6,7 @@ import { opportunity, dimensions, SYNTHETIC_LABEL } from "./fixtures.js";
 import { DECISION_STATES, dedupePreserveOrder, evaluateDecision, buildBrief, paymentExposure } from "./decision-engine.js";
 import { blankAssessmentDefaults, buildOpportunityFromInput, summarizeInput } from "./workbench-adapter.js";
 import { DEFAULT_LANGUAGE, localizeEvidenceText, presentReason as localizeReason, stateLabels, t } from "./i18n.js";
+import { createDecisionPathExperiment } from "./decision-path.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -16,9 +17,12 @@ let engine = null;
 let humanDecision = null;
 let humanNote = "";
 let language = DEFAULT_LANGUAGE;
+let selectedPathId = null;
+let decisionPathExperiment = null;
 
 const tx = (key) => t(key, language);
 const stateLabel = (state) => stateLabels(language)[state] || state;
+const pathText = (key, values = {}) => Object.entries(values).reduce((text, [name, value]) => text.replaceAll(`{${name}}`, value), tx(key));
 
 function tagClass(s) {
   return { ESCALATE: "esc", PURSUE_NOW: "now", PURSUE_CONDITIONALLY: "cond", HOLD_FOR_EVIDENCE: "hold", DO_NOT_PURSUE: "drop" }[s] || "";
@@ -88,6 +92,8 @@ $("mode-blank").addEventListener("click", () => {
   engine = null;
   humanDecision = null;
   humanNote = "";
+  selectedPathId = null;
+  decisionPathExperiment = null;
   fillBlankIntake();
   $("intake-area").hidden = false;
   $("run-area").hidden = false;
@@ -251,6 +257,8 @@ function runAssessment() {
   engine = evaluateDecision(current);
   humanDecision = null;
   humanNote = "";
+  selectedPathId = null;
+  decisionPathExperiment = current?.id === "OPP-2026-008" ? createDecisionPathExperiment(current) : null;
   renderResult();
 }
 
@@ -317,6 +325,8 @@ function renderResult() {
     <p class="glance-note">${tx("boundary.note")}</p>
   `;
 
+  renderDecisionPath();
+
   // human decision — separate from the engine recommendation
   $("human-state-buttons").innerHTML = DECISION_STATES.map(
     (s) => `<button type="button" data-hstate="${s}" class="${humanDecision === s ? "sel" : ""}">${stateLabel(s)}</button>`,
@@ -329,6 +339,97 @@ function renderResult() {
   });
   $("human-note").value = humanNote;
   renderHumanDecision();
+}
+
+const pathTitleKey = { "CP-1": "path.cp1", "CP-2": "path.cp2", "CP-3R": "path.cp3", "CP-4": "path.cp4" };
+const pathSourceKey = { "CP-1": "path.cp1Source", "CP-2": "path.cp2Source", "CP-3R": "path.cp3Source", "CP-4": "path.cp4Source" };
+
+function decisionPathControlItems(result) {
+  return [
+    ...result.materialContradictions.map((c) => pathText("path.control.contradiction", { label: localizeEvidenceText(c.label, language) })),
+    ...result.blockingUnknowns.map((u) => pathText("path.control.unknown", { label: localizeEvidenceText(u.label, language) })),
+    ...(result.termsIncomplete ? [tx("path.control.terms")] : []),
+    ...(result.kycGate === "KYC_INCOMPLETE" ? [tx("path.control.kyc")] : []),
+    ...(result.marginGate === "BELOW_THRESHOLD" ? [tx("path.control.margin")] : []),
+    ...(!result.exposure.computed ? [tx("path.control.payment")] : []),
+  ];
+}
+
+function pathChangeType(type) {
+  return {
+    quoteBasesComparable: "quote",
+    materialContradictions: "contradiction",
+    blockingUnknowns: "unknown",
+    termsIncomplete: "terms",
+    kycGate: "kyc",
+    marginGate: "margin",
+  }[type] || type;
+}
+
+function decisionPathChangeText(change, changed) {
+  const key = `${changed ? "path.changed" : "path.unchanged"}.${pathChangeType(change.type)}`;
+  return tx(key);
+}
+
+function pathBlockText(item) {
+  const key = { terms: "path.control.terms", kyc: "path.control.kyc", kycVeto: "path.control.kycVeto", margin: "path.control.margin", payment: "path.control.payment" }[item.type];
+  return key ? tx(key) : localizeEvidenceText(item.label, language);
+}
+
+function renderDecisionPath() {
+  const area = $("decision-path-area");
+  if (!area) return;
+  if (!decisionPathExperiment || !current || current.id !== "OPP-2026-008") {
+    area.hidden = true;
+    return;
+  }
+  area.hidden = false;
+  const experiment = decisionPathExperiment;
+  const controls = decisionPathControlItems(experiment.current);
+  $("decision-path-current").innerHTML = `
+    <div class="path-current"><span class="muted">${tx("path.currentDecision")}</span><span class="rec-tag ${tagClass(experiment.current.recommended)}">${stateLabel(experiment.current.recommended)}</span></div>
+    <h4>${tx("path.currentControls")}</h4>
+    ${controls.length ? `<ul class="path-list">${controls.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>` : `<p class="muted">${tx("path.noOpenGates")}</p>`}
+  `;
+  $("decision-path-options").innerHTML = experiment.paths.map((path) => `
+    <button type="button" class="secondary ${selectedPathId === path.id ? "sel" : ""}" data-path-id="${path.id}">
+      <span class="path-option-id">${path.id}</span>${tx(pathTitleKey[path.id])}
+    </button>
+  `).join("");
+  $("decision-path-options").querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedPathId = button.dataset.pathId;
+      renderDecisionPath();
+    });
+  });
+  $("decision-path-empty").hidden = Boolean(selectedPathId);
+  const selected = experiment.paths.find((path) => path.id === selectedPathId);
+  const detail = $("decision-path-detail");
+  if (!selected) {
+    detail.hidden = true;
+    return;
+  }
+  detail.hidden = false;
+  const changed = selected.comparison.changed.map((item) => decisionPathChangeText(item, true));
+  const unchanged = selected.comparison.unchanged.map((item) => decisionPathChangeText(item, false));
+  const blocks = selected.stillBlocks.map(pathBlockText);
+  detail.innerHTML = `
+    <p class="path-warning">${tx("path.hypotheticalWarning")}</p>
+    <h3>${tx("path.evidenceChange")}</h3>
+    <p><strong>${tx(pathTitleKey[selected.id])}</strong><br>${tx(pathSourceKey[selected.id])}</p>
+    <div class="path-columns">
+      <div><h4>${tx("path.current")}</h4><p><span class="rec-tag ${tagClass(selected.current.recommended)}">${stateLabel(selected.current.recommended)}</span></p></div>
+      <div><h4>${tx("path.hypothetical")}</h4><p><span class="rec-tag ${tagClass(selected.hypothetical.recommended)}">${stateLabel(selected.hypothetical.recommended)}</span></p></div>
+    </div>
+    <p><strong>${selected.comparison.decisionChanged ? tx("path.changed") : tx("path.unchanged")}</strong><br>${selected.comparison.decisionChanged ? pathText("path.recommendationChanged", { from: stateLabel(selected.current.recommended), to: stateLabel(selected.hypothetical.recommended) }) : pathText("path.recommendationUnchanged", { state: stateLabel(selected.current.recommended) })}</p>
+    <div class="path-columns">
+      <div><h4>${tx("path.whatChanged")}</h4><ul>${(changed.length ? changed : [tx("path.noFact")]).map((item) => `<li>${esc(item)}</li>`).join("")}</ul></div>
+      <div><h4>${tx("path.whatDidNotChange")}</h4><ul>${unchanged.map((item) => `<li>${esc(item)}</li>`).join("")}</ul></div>
+    </div>
+    <div class="path-detail"><h4>${tx("path.stillBlocks")}</h4>${blocks.length ? `<ul>${blocks.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>` : `<p>${tx("path.noOpenGates")}</p>`}</div>
+    <div class="path-detail"><h4>${tx("path.human")}</h4><p>${tx("path.humanBoundary")}</p></div>
+    <details class="path-trace"><summary>${tx("path.trace")}</summary><p>${esc(selected.manifest.semanticNote)}</p><p>${esc(selected.manifest.fieldsAffected.join(", "))}</p></details>
+  `;
 }
 
 function renderHumanDecision() {

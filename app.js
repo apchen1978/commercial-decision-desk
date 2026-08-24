@@ -10,6 +10,7 @@ import { createDecisionPathExperiment } from "./decision-path.js";
 import { buildCommercialViewModel } from "./commercial-action-layer.js";
 import { buildTradeDealViewModel } from "./trade-deal-structure.js";
 import { buildEconomicsBridge, economicsEvidenceTrace } from "./economics-bridge.js";
+import { buildDealBriefViewModel, downloadDealBrief } from "./deal-brief.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -222,6 +223,35 @@ function renderPriorityActions(view) {
         <p class="action-human"><strong>${tx("actions.human")}</strong> ${tx("action.humanBoundary")}</p>
       </article>`).join("")
     : `<p class="muted">${tx("result.noneRequired")}</p>`;
+}
+
+function currentDealBrief() {
+  if (!current || !engine) return null;
+  const commercialView = buildCommercialViewModel(current, engine, decisionPathExperiment);
+  const tradeView = buildTradeDealViewModel(current, engine);
+  const economicsBridge = buildEconomicsBridge(current.economics || {});
+  return buildDealBriefViewModel({
+    opportunity: current,
+    engine,
+    commercialView,
+    tradeView,
+    economicsBridge,
+    decisionPathExperiment,
+    humanDecision,
+    humanNote,
+    language,
+  });
+}
+
+function exportCurrentDealBrief(format) {
+  const brief = currentDealBrief();
+  if (!brief) {
+    $("export-status").textContent = tx("export.beforeRun");
+    return;
+  }
+  const result = downloadDealBrief(brief, format, language);
+  window.__lastDealBriefExport = { format, ...result, brief };
+  $("export-status").textContent = tx("export.downloaded") + " " + result.filename;
 }
 
 // --- entry ------------------------------------------------------------------
@@ -583,6 +613,7 @@ function renderResult() {
   const economicsInput = current.economics || {};
   const economics = buildEconomicsBridge(economicsInput);
   renderEconomicsBridge(economics, economicsInput.currency || "CNY");
+  $("export-status").textContent = tx("export.ready") + " " + current.name;
 
   // human decision — separate from the engine recommendation
   $("human-state-buttons").innerHTML = DECISION_STATES.map(
@@ -700,6 +731,8 @@ function renderHumanDecision() {
 }
 
 $("human-note").addEventListener("input", (e) => { humanNote = e.target.value; renderHumanDecision(); });
+$("btn-export-md").addEventListener("click", () => exportCurrentDealBrief("md"));
+$("btn-export-txt").addEventListener("click", () => exportCurrentDealBrief("txt"));
 
 // --- reset -------------------------------------------------------------------
 $("btn-reset").addEventListener("click", () => {

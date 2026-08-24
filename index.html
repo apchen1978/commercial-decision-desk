@@ -172,6 +172,11 @@
       .economics-owner-input strong { color:var(--ink); text-align:right; }
       .economics-gap { margin:10px 0 0; color:var(--ink); font-size:13px; }
       .economics-note, .economics-trace { margin:9px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
+      .deal-brief-export { border-top:1px solid var(--line); padding-top:18px; }
+      .export-heading-row { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
+      .export-heading-row h2 { margin-bottom:4px; }
+      .export-heading-row .btn-row { margin-top:0; }
+      .export-status { margin:10px 0 0; min-height:1.4em; }
       .negotiation-prep { display:grid; gap:10px; }
       .prep-item { border-left:3px solid var(--amber); padding:12px 14px; background:#fafbf7; border-radius:0 10px 10px 0; }
       .prep-item p { margin:7px 0 0; color:var(--muted); font-size:12.5px; line-height:1.55; }
@@ -182,6 +187,7 @@
       @media (max-width:640px) { .trade-grid { grid-template-columns:1fr; } .trade-block dl { grid-template-columns:1fr; gap:2px; } .trade-block dd { margin-bottom:5px; } }
       @media (max-width:760px) { .context-grid, .authority-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
       @media (max-width:420px) { .context-grid, .authority-grid { grid-template-columns:1fr 1fr; gap:7px; } .economics-owner-input { display:block; } .economics-owner-input strong { display:block; text-align:left; margin-top:4px; } }
+      @media (max-width:640px) { .export-heading-row { flex-direction:column; } .export-actions { width:100%; } .export-actions button { flex:1; } }
     </style>
   </head>
   <body>
@@ -433,6 +439,20 @@
           </section>
 
           <div class="card" id="result-rec"></div>
+
+          <section class="deal-brief-export" aria-live="polite">
+            <div class="export-heading-row">
+              <div>
+                <h2 data-i18n="export.heading">匯出 Deal Brief</h2>
+                <p class="muted" data-i18n="export.helper">把這筆商機整理成可獨立閱讀的 Markdown 或純文字 brief。</p>
+              </div>
+              <div class="btn-row export-actions">
+                <button type="button" class="secondary" id="btn-export-md" data-i18n="export.markdown">下載 Markdown</button>
+                <button type="button" class="secondary" id="btn-export-txt" data-i18n="export.text">下載純文字</button>
+              </div>
+            </div>
+            <p class="export-status muted" id="export-status"></p>
+          </section>
 
           <section class="decision-path" id="decision-path-area" hidden aria-live="polite">
             <h2 data-i18n="path.heading">Decision Path：證據如何影響判斷</h2>

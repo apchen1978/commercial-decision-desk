@@ -13,7 +13,7 @@ const engine = evaluateDecision(opportunity);
 const path = createDecisionPathExperiment(opportunity);
 const view = buildCommercialViewModel(opportunity, engine, path);
 
-check("structure uses existing payment exposure", view.structure.paymentExposure === 84000);
+check("structure uses existing payment exposure", view.structure.paymentExposure === 3600000);
 check("structure preserves incomplete terms", view.structure.terms === "INCOMPLETE");
 check("structure preserves non-comparable quotes", view.structure.quoteComparability === "NOT_COMPARABLE");
 check("actions are bounded to 1-3", view.actions.length >= 1 && view.actions.length <= 3);

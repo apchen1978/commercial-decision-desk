@@ -14,6 +14,13 @@ check("A high Momentum can coexist with low Coverage", () => {
   const op = structuredClone(opportunity);
   op.dimensions.importOpenness.value = "UNKNOWN";
   op.dimensions.commercialFeasibility.value = "UNKNOWN";
+  op.commercialTerms = {};
+  op.paymentEvents = [];
+  op.quoteBasesComparable = undefined;
+  op.quoteComparabilityAssessed = undefined;
+  op.kyc = {};
+  op.economics = {};
+  op.commercialContext = {};
   const momentum = buildCommercialMomentum(op, buildEconomicsBridge({}));
   const coverage = buildEvidenceCoverage(op, buildEconomicsBridge({}));
   assert.equal(momentum.score, 100);
@@ -52,6 +59,13 @@ check("C high Momentum and high Coverage do not clear a hard veto", () => {
 check("D many UNKNOWNs do not become negative evidence", () => {
   const op = structuredClone(opportunity);
   op.dimensions = { buyerFit: { value: "HIGH" }, categoryFit: { value: "UNKNOWN" }, importOpenness: { value: "UNKNOWN" }, commercialFeasibility: { value: "UNKNOWN" } };
+  op.commercialTerms = {};
+  op.paymentEvents = [];
+  op.quoteBasesComparable = undefined;
+  op.quoteComparabilityAssessed = undefined;
+  op.kyc = {};
+  op.economics = {};
+  op.commercialContext = {};
   const result = buildCommercialMomentum(op, buildEconomicsBridge({}));
   assert.equal(result.score, null);
   assert.equal(result.status, "NOT_ENOUGH_KNOWN_SIGNALS");
@@ -73,8 +87,8 @@ check("F same evidence produces the same score and trace", () => {
 });
 
 check("G sample score is model-generated and remains compatible with ESCALATE", () => {
-  const momentum = buildCommercialMomentum(opportunity, buildEconomicsBridge({}));
-  assert.equal(momentum.score, 92);
+  const momentum = buildCommercialMomentum(opportunity, buildEconomicsBridge(opportunity.economics));
+  assert.equal(momentum.score, 93);
   assert.equal(momentumPresentationBand(momentum.score), "STRONG");
   assert.equal(evaluateDecision(opportunity).recommended, "ESCALATE");
 });

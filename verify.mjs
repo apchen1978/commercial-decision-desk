@@ -31,7 +31,7 @@ const check = (name, cond, detail = "") => {
   check("R3 terms incomplete flag", e.termsIncomplete === true);
   check("R3 HOLD_FOR_EVIDENCE available", e.available.HOLD_FOR_EVIDENCE === true);
   const unk = opportunity.unknowns.map((u) => u.label);
-  check("R3 UNKNOWN not converted", unk.includes("Final payment terms") && unk.includes("Actual order volume"));
+  check("R3 UNKNOWN not converted", unk.includes("Final payment terms") && unk.includes("Released order volume"));
 }
 
 // Hard rule 4 — non-comparable quote bases never ranked.
@@ -45,8 +45,9 @@ check("R4 quote bases not comparable", opportunity.quoteBasesComparable === fals
 // Hard rule 5 — payment exposure only from complete events; incomplete → UNKNOWN.
 {
   const e1 = paymentExposure(opportunity.paymentEvents);
-  check("R5 exposure computed from complete events", e1.computed === true && e1.totalCommittedCny === 25200 + 58800);
-  check("R5 incomplete events reported as UNKNOWN", e1.incompleteCount === 1 && e1.incompleteLabels.includes("Conditional performance bond"));
+  check("R5 exposure computed from complete events", e1.computed === true && e1.totalCommittedCny === 1080000 + 2520000);
+  const mixed = paymentExposure([...opportunity.paymentEvents, { label: "Unconfirmed bond", status: "INCOMPLETE" }]);
+  check("R5 incomplete events reported as UNKNOWN", mixed.incompleteCount === 1 && mixed.incompleteLabels.includes("Unconfirmed bond"));
   const onlyIncomplete = paymentExposure([{ status: "INCOMPLETE" }]);
   check("R5 no complete events → not computed", onlyIncomplete.computed === false && onlyIncomplete.reason.includes("UNKNOWN"));
 }
@@ -60,7 +61,7 @@ check("R4 quote bases not comparable", opportunity.quoteBasesComparable === fals
 // Hard rule 7 — disclosure present as NEGATED form; exposure never described AS those.
 {
   const forbidden = ["cash balance", "liquidity", "affordability", "cash shortfall", "credit capacity"];
-  check("R7 disclosure present", opportunity.paymentDisclosure.includes("committed payment events"));
+  check("R7 disclosure present", opportunity.paymentDisclosure.includes("internal supplier-commitment events"));
   const sentence = opportunity.paymentDisclosure.split(".").find((s) => forbidden.some((f) => s.toLowerCase().includes(f)));
   check("R7 forbidden terms only in negated sentence", Boolean(sentence && /\bis not\b/i.test(sentence)));
   check("R7 never described as forbidden terms", !/exposure (is|means|equals) (cash balance|liquidity|affordability|cash shortfall|credit capacity)/i.test(opportunity.paymentDisclosure));
@@ -130,6 +131,7 @@ function cleanScenario() {
   c.commercialTerms = { status: "COMPLETE", detail: "" };
   c.quoteBasesComparable = true;
   c.paymentEvents = c.paymentEvents.map((e) => ({ ...e, status: "COMPLETE", amountCny: e.amountCny || 10000, daysFromSign: e.daysFromSign ?? 10 }));
+  delete c.kyc;
   c.unknowns = [];
   c.dimensions.buyerFit.value = "HIGH";
   c.dimensions.evidenceQuality.value = "HIGH";
@@ -173,7 +175,7 @@ function cleanScenario() {
 }
 {
   const e = paymentExposure(opportunity.paymentEvents);
-  check("audit payment semantics unchanged", e.computed && e.totalCommittedCny === 84000 && e.peakWindowCny === 58800);
+  check("audit payment semantics unchanged", e.computed && e.totalCommittedCny === 3600000 && e.peakWindowCny === 2520000);
 }
 {
   const engineSrc = readFileSync(new URL("./decision-engine.js", import.meta.url), "utf8");

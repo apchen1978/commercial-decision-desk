@@ -33,7 +33,7 @@ check("CP-3R changes quote comparability only", cp3.hypotheticalOpportunity.quot
 check("CP-3R expected result ESCALATE -> ESCALATE", cp3.hypothetical.recommended === "ESCALATE", cp3.hypothetical.recommended);
 check("CP-4 maps one adverse screening event to existing KYC fields", cp4.hypotheticalOpportunity.kyc.status === "ADVERSE" && cp4.hypotheticalOpportunity.kyc.sanctionsHit === true && cp4.hypotheticalOpportunity.kyc.adverseFinding === true);
 check("CP-4 expected result ESCALATE -> DO_NOT_PURSUE", cp4.hypothetical.recommended === "DO_NOT_PURSUE", cp4.hypothetical.recommended);
-check("unrelated UNKNOWNs are preserved", first.paths.every((p) => ["UNK-1", "UNK-3", "UNK-4"].every((id) => p.hypotheticalOpportunity.unknowns.some((u) => u.id === id))));
+check("unrelated UNKNOWNs are preserved", first.paths.every((p) => ["UNK-1", "UNK-3"].every((id) => p.hypotheticalOpportunity.unknowns.some((u) => u.id === id))));
 check("unrelated contradiction is preserved", first.paths.every((p) => p.id === "CP-1" || p.hypothetical.materialContradictions.some((c) => c.id === "CTR-1")));
 check("changed / unchanged comparison is engine-derived", cp1.comparison.decisionChanged === true && cp2.comparison.decisionChanged === false && cp3.comparison.decisionChanged === false && cp4.comparison.decisionChanged === true);
 check("no new margin threshold", first.paths.every((p) => p.hypotheticalOpportunity.margin === undefined));

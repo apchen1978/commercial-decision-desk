@@ -5,7 +5,7 @@
 import { opportunity, dimensions, SYNTHETIC_LABEL } from "./fixtures.js";
 import { DECISION_STATES, dedupePreserveOrder, evaluateDecision, buildBrief, paymentExposure } from "./decision-engine.js";
 import { blankAssessmentDefaults, buildOpportunityFromInput, summarizeInput } from "./workbench-adapter.js";
-import { DEFAULT_LANGUAGE, localizeEvidenceText, presentReason as localizeReason, stateLabels, t } from "./i18n.js";
+import { localizeEvidenceText, presentReason as localizeReason, stateLabels, t } from "./i18n.js";
 import { createDecisionPathExperiment } from "./decision-path.js";
 import { buildCommercialViewModel } from "./commercial-action-layer.js";
 import { buildTradeDealViewModel } from "./trade-deal-structure.js";
@@ -314,7 +314,7 @@ function initialLanguage() {
     if (saved === "en" || saved === "zh-TW") return saved;
   } catch (_) { /* storage unavailable */ }
   const nav = (navigator.language || "en").toLowerCase();
-  return nav.startsWith("zh") ? "zh-TW" : DEFAULT_LANGUAGE;
+  return nav.startsWith("zh") ? "zh-TW" : "en";
 }
 
 function persistLanguage(nextLanguage) {

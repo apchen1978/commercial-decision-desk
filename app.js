@@ -20,7 +20,10 @@ let current = null; // current normalized opportunity
 let engine = null;
 let humanDecision = null;
 let humanNote = "";
-let language = DEFAULT_LANGUAGE;
+// Language resolution priority: URL ?lang= → saved choice → browser language → default.
+// English-friendly for international visitors; only the UI preference is remembered
+// (localStorage) — all business/decision data stays in-session, never persisted.
+let language = initialLanguage();
 let selectedPathId = null;
 let decisionPathExperiment = null;
 
@@ -302,9 +305,29 @@ function applyLanguage() {
   if (engine) renderResult();
 }
 
+function initialLanguage() {
+  const param = new URLSearchParams(window.location.search).get("lang");
+  if (param === "en") return "en";
+  if (param === "zh" || param === "zh-TW") return "zh-TW";
+  try {
+    const saved = window.localStorage.getItem("cdd-lang");
+    if (saved === "en" || saved === "zh-TW") return saved;
+  } catch (_) { /* storage unavailable */ }
+  const nav = (navigator.language || "en").toLowerCase();
+  return nav.startsWith("zh") ? "zh-TW" : DEFAULT_LANGUAGE;
+}
+
+function persistLanguage(nextLanguage) {
+  try { window.localStorage.setItem("cdd-lang", nextLanguage); } catch (_) { /* ignore */ }
+  const url = new URL(window.location.href);
+  url.searchParams.set("lang", nextLanguage === "en" ? "en" : "zh");
+  window.history.replaceState(null, "", url.toString());
+}
+
 function setLanguage(nextLanguage) {
   if (nextLanguage === language) return;
   language = nextLanguage;
+  persistLanguage(nextLanguage);
   applyLanguage();
 }
 

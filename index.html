@@ -501,6 +501,165 @@
         #result-area .snapshot-next-action { grid-template-columns:1fr; gap:3px; }
         #result-area .snapshot-drivers { grid-template-columns:1fr; gap:0; }
       }
+
+      /* ================================================================
+         PREMIUM SAAS REFINEMENT — bounded visual layer, no semantics change.
+         Design read: B2B decision tool for senior commercial operators.
+         Language: cold-neutral canvas + single forest accent + unified
+         surface/radius/shadow tokens. Preserves all logic, IA, i18n, copy.
+         ================================================================ */
+      :root {
+        /* Cold-neutral canvas (was warm ivory/bone) — the biggest lever */
+        --bone: #f6f8f7;
+        --paper: #eef2f0;
+        --line: #dfe6e2;
+        --ink: #16211c;
+        --muted: #5b6a63;
+        /* Single accent stays forest; gold/amber remain semantic only */
+        --forest: #14532d;
+        --pine: #0b2b1d;
+        --moss: #2c6647;
+        --amber: #9a6a1a;
+        --gold: #a3873f;
+        --bad: #b0412b;
+        --ok: #236b46;
+        --unk: #7d6b1f;
+        /* Unified surface hierarchy */
+        --surface: #ffffff;
+        --surface-2: #fafcfb;
+        --surface-3: #f3f7f4;
+        --hairline: #e6ece8;
+        --shadow-1: 0 1px 2px rgba(22,33,28,.05), 0 4px 12px -6px rgba(22,33,28,.08);
+        --shadow-2: 0 2px 4px rgba(22,33,28,.05), 0 14px 34px -18px rgba(22,33,28,.18);
+        --radius-lg: 14px;
+        --radius-md: 10px;
+        --radius-sm: 8px;
+      }
+      body { background: var(--bone); color: var(--ink); }
+      header.hero { border-bottom-color: var(--line); }
+      .wrap { max-width: 1120px; }
+      .eyebrow { color: var(--muted); letter-spacing: .16em; }
+      h1 { font-size: 28px; letter-spacing: -0.02em; }
+      h2 { font-size: 20px; letter-spacing: -0.015em; }
+      .sub { color: var(--muted); }
+      .card {
+        background: var(--surface); border: 1px solid var(--line);
+        border-radius: var(--radius-lg); box-shadow: var(--shadow-1);
+      }
+      .card h3 { font-size: 16px; color: var(--ink); }
+      .muted { color: var(--muted); }
+      /* Inputs — SaaS-grade focus and surface */
+      input[type="text"], input[type="number"], textarea, select {
+        background: var(--surface); border: 1px solid var(--line);
+        border-radius: var(--radius-sm); color: var(--ink);
+        transition: border-color .15s, box-shadow .15s;
+      }
+      input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
+        outline: none; border-color: var(--forest);
+        box-shadow: 0 0 0 3px rgba(20,83,45,.12);
+      }
+      label.field { color: var(--muted); }
+      button {
+        background: var(--forest); border-color: var(--forest); color: #fff;
+        border-radius: 999px; box-shadow: var(--shadow-1);
+        transition: background-color .15s, transform .1s, box-shadow .15s;
+      }
+      button:hover { background: #0f4526; }
+      button:active { transform: translateY(1px); }
+      button.secondary { background: var(--surface); color: var(--forest); border-color: var(--line); }
+      button.secondary:hover { border-color: var(--forest); background: var(--surface-3); }
+      /* Mode cards — clear primary vs secondary hierarchy */
+      .mode-card { border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-1); }
+      .mode-card.mode-primary { border-color: var(--forest); box-shadow: var(--shadow-2); }
+      .mode-card.mode-primary h3 { color: var(--forest); }
+      .mode-card p { color: var(--muted); }
+      .mode-card .cta { color: var(--forest); }
+      .mode-badge { border-color: var(--gold); background: #faf6e8; color: #6b5214; }
+      /* Decision lead / snapshot — anchored, single accent */
+      .decision-lead { background: var(--surface); border-color: var(--line); border-left-color: var(--forest); box-shadow: var(--shadow-1); }
+      .executive-snapshot { background: var(--surface); border-color: var(--line); border-top-color: var(--forest); box-shadow: var(--shadow-2); }
+      /* Result-area — unify its local tokens to the cold canvas */
+      #result-area {
+        --ivory: #ffffff;
+        --charcoal: #16211c;
+        --brass: #a3873f;
+        --rust: #b0412b;
+        --sage: #236b46;
+        --hairline: #e6ece8;
+        color: var(--charcoal);
+      }
+      #result-area .executive-snapshot { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-2); }
+      #result-area .snapshot-heading-row h2 { color: var(--charcoal); }
+      /* Unified surface-2 cards (glance / structure / context / trade / action) */
+      .glance-col, .structure-item, .context-grid > div, .dl-grid .glance-col,
+      .trade-block, .action-item, .prep-item, .payment-evidence-item,
+      .snapshot-field {
+        background: var(--surface-2); border-color: var(--line);
+      }
+      .glance-col h4, .dl-grid .glance-col h4 { color: var(--muted); }
+      .final-decision-summary { background: var(--surface); border-color: var(--line); border-radius: var(--radius-lg); }
+      .final-decision-heading { border-bottom-color: var(--line); }
+      .final-decision-heading .eyebrow { color: var(--muted); }
+      .final-decision-action { border-left-color: var(--line); }
+      .final-decision-card strong { color: var(--ink); }
+      .final-decision-action strong { color: var(--forest); }
+      /* Action / priority / control rows — forest accent, muted fill */
+      .action-item { border-left-color: var(--forest); background: var(--surface-2); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+      .action-topline h3 { color: var(--forest); }
+      .action-priority { color: var(--amber); }
+      .action-item p { color: var(--muted); }
+      .action-item p strong { color: var(--ink); }
+      .action-item .action-why { color: var(--ink); }
+      .action-item .action-human { border-top-color: var(--line); }
+      .prep-item { border-left-color: var(--amber); background: var(--surface-2); }
+      .control-item, .acceptance-remedy-item { border-left-color: var(--amber); background: var(--surface-3); }
+      .control-item small, .acceptance-remedy-item small { color: var(--muted); }
+      /* Structure / context grids */
+      .structure-item span, .context-grid span { color: var(--muted); }
+      .structure-item strong, .context-grid strong { color: var(--ink); }
+      .trade-block h3 { color: var(--forest); }
+      .trade-block dt { color: var(--muted); }
+      .trade-block dd { color: var(--ink); }
+      .economics-row span { color: var(--muted); }
+      .economics-row strong { color: var(--ink); }
+      .economics-result span, .economics-result strong { color: var(--forest); }
+      .economics-owner-input { background: var(--surface-3); border-color: var(--line); }
+      .economics-owner-input span { color: var(--muted); }
+      .economics-owner-input strong { color: var(--ink); }
+      /* Result nav — quiet, hairline */
+      .result-nav { border-bottom-color: var(--line); }
+      .result-nav a { color: var(--muted); }
+      .result-nav a:hover { color: var(--forest); }
+      /* Human boundary — distinct but calm */
+      .human-boundary { border-color: var(--line); border-left-color: var(--forest); background: var(--surface); }
+      .state-buttons button { background: var(--surface); color: var(--forest); border-color: var(--line); }
+      .state-buttons button.sel { background: var(--forest); color: #fff; border-color: var(--forest); }
+      /* Scope / capability note */
+      .scope-title { color: var(--forest); }
+      .scope-body { color: var(--ink); }
+      .scope-disclosure { border-left-color: var(--gold); color: var(--muted); }
+      .capability-eyebrow { color: var(--gold); }
+      .capability-title { color: var(--forest); }
+      .capability-body { color: var(--muted); }
+      .capability-line { color: var(--gold); }
+      /* Path / negotiation */
+      .path-warning { border-left-color: var(--gold); background: rgba(163,135,63,.07); }
+      .path-option-id { color: var(--gold); }
+      .path-list, .path-detail p, .path-columns ul, .path-trace { color: var(--muted); }
+      .path-detail h4 { color: var(--ink); }
+      .trade-boundary { border-left-color: var(--gold); color: var(--muted); }
+      /* Payment evidence */
+      .payment-evidence-subsection h4 { color: var(--forest); }
+      .payment-evidence-item span { color: var(--forest); }
+      .payment-evidence-item small { color: var(--muted); }
+      /* Export */
+      .deal-brief-export { border-top-color: var(--line); }
+      .export-status { color: var(--muted); }
+      /* Footer */
+      .foot { border-top-color: var(--line); color: var(--muted); }
+      /* Language switch */
+      button.language-button { background: var(--surface); color: var(--muted); border-color: var(--line); }
+      button.language-button.active { background: var(--forest); color: #fff; border-color: var(--forest); }
     </style>
   </head>
   <body>

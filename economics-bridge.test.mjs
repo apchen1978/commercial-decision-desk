@@ -1,4 +1,4 @@
-import { buildEconomicsBridge, economicsEvidenceTrace } from "./economics-bridge.js";
+import { buildEconomicsBridge, economicsEvidenceTrace, economicsReading } from "./economics-bridge.js";
 
 const results = [];
 const check = (name, condition, detail = "") => {
@@ -16,6 +16,10 @@ check("complete bridge calculates contribution", complete.expectedNetContributio
 check("gap compares only owner-provided minimum", complete.gap === 10000);
 check("zero is valid evidence", buildEconomicsBridge({ revenue: 0, directCost: 0, tradeCost: 0, dealSpecificCost: 0, contingency: 0 }).expectedNetContribution === 0);
 check("negative or invalid inputs stay UNKNOWN", buildEconomicsBridge({ revenue: -1, directCost: "not-a-number" }).revenue === null && buildEconomicsBridge({ revenue: -1 }).directCost === null);
+check("positive contribution reads POSITIVE", economicsReading(complete) === "POSITIVE");
+check("zero contribution reads BREAK_EVEN", economicsReading(buildEconomicsBridge({ revenue: 0, directCost: 0, tradeCost: 0, dealSpecificCost: 0, contingency: 0 })) === "BREAK_EVEN");
+check("negative contribution reads NEGATIVE", economicsReading(buildEconomicsBridge({ revenue: 100, directCost: 150, tradeCost: 0, dealSpecificCost: 0, contingency: 0 })) === "NEGATIVE");
+check("incomplete economics reads UNKNOWN", economicsReading(incomplete) === "UNKNOWN");
 
 console.log("\nECONOMICS BRIDGE RESULT: " + results.filter(Boolean).length + "/" + results.length + " PASS");
 process.exitCode = results.every(Boolean) ? 0 : 1;

@@ -44,3 +44,12 @@ export function economicsEvidenceTrace(bridge) {
     bridge.contingency === null ? "contingency" : null,
   ].filter(Boolean);
 }
+
+// Presentation-only reading. This never enters evaluateDecision() and carries
+// no threshold or approval meaning.
+export function economicsReading(bridge = {}) {
+  if (bridge.calculationStatus !== "CALCULATED" || !Number.isFinite(bridge.expectedNetContribution)) return "UNKNOWN";
+  if (bridge.expectedNetContribution > 0) return "POSITIVE";
+  if (bridge.expectedNetContribution === 0) return "BREAK_EVEN";
+  return "NEGATIVE";
+}

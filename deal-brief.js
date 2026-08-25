@@ -2,6 +2,7 @@
 // Presentation-only: reads existing CDD evidence and outputs. It does not
 // evaluate decisions, add gates, infer missing values, or persist data.
 import { presentReason, stateLabels, t } from "./i18n.js";
+import { economicsReading } from "./economics-bridge.js";
 
 const UNKNOWN = "UNKNOWN";
 
@@ -92,6 +93,7 @@ function economicsData(opportunity, bridge) {
     gap: bridge?.gap ?? null,
     currency: valueOrUnknown(input.currency),
     calculated: bridge?.calculationStatus === "CALCULATED",
+    reading: economicsReading(bridge),
     missing: ["revenue", "directCost", "tradeCost", "dealSpecificCost", "contingency"].filter((key) => bridge?.[key] === null || bridge?.[key] === undefined),
   };
 }
@@ -260,6 +262,8 @@ export function serializeDealBriefMarkdown(brief, language = "zh-TW") {
     line(label("dealSpecificCost", language), money(e.dealSpecificCost, e.currency)),
     line(label("contingency", language), money(e.contingency, e.currency)),
     line(label("expectedNetContribution", language), e.calculated ? money(e.expectedNetContribution, e.currency) : label("notCalculated", language)),
+    line(label("economicsReading", language), t(`economics.reading.${e.reading}`, language)),
+    line(label("economicsInterpretation", language), t(`economics.interpretation.${e.reading}`, language)),
     line(label("ownerMinimum", language), money(e.minimumNetContribution, e.currency)),
     label("economicsBoundary", language),
     "",

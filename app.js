@@ -9,7 +9,7 @@ import { localizeEvidenceText, presentReason as localizeReason, stateLabels, t }
 import { createDecisionPathExperiment } from "./decision-path.js";
 import { buildCommercialViewModel } from "./commercial-action-layer.js";
 import { buildTradeDealViewModel } from "./trade-deal-structure.js";
-import { buildEconomicsBridge, economicsEvidenceTrace } from "./economics-bridge.js";
+import { buildEconomicsBridge, economicsEvidenceTrace, economicsReading } from "./economics-bridge.js";
 import { buildCommercialMomentum, buildEvidenceCoverage, momentumPresentationBand } from "./commercial-momentum.js";
 import { buildDealBriefViewModel, downloadDealBrief } from "./deal-brief.js";
 
@@ -117,6 +117,7 @@ function renderEconomicsBridge(bridge, currency) {
     '</div>',
     '<div class="economics-owner-input"><span>' + tx("economics.minimum") + '</span><strong>' + economicsValue(bridge.minimumNetContribution, currency) + '</strong></div>',
     '<p class="economics-gap"><strong>' + tx("economics.gap") + '</strong> ' + (bridge.gap === null ? tx("economics.notCalculated") : economicsValue(bridge.gap, currency)) + '</p>',
+    '<div class="economics-reading"><span>' + tx("economics.readingLabel") + '</span><strong>' + tx("economics.reading." + economicsReading(bridge)) + '</strong><p>' + tx("economics.interpretation." + economicsReading(bridge)) + '</p></div>',
     '<p class="economics-note">' + tx("economics.note") + '</p>',
   ].join("");
   $("economics-trace").innerHTML = economicsEvidenceTrace(bridge).length
@@ -173,6 +174,7 @@ function renderExecutiveSnapshot({ economics, tradeView, control, momentum, cove
   const netContribution = economics.expectedNetContribution === null
     ? tx("snapshot.notCalculated")
     : economicsValue(economics.expectedNetContribution, currency);
+  const reading = economicsReading(economics);
   const delivery = tradeTermLabel(tradeView.structure.delivery.declaredTerm);
   const fields = [
     ["snapshot.buyer", buyer],
@@ -207,6 +209,7 @@ function renderExecutiveSnapshot({ economics, tradeView, control, momentum, cove
       <div class="snapshot-signal snapshot-position"><span>${tx("snapshot.decision")}</span><strong class="rec-tag ${tagClass(engine.recommended)}">${stateLabel(engine.recommended)}</strong><p>${tx("momentum.positionNote")}</p></div>
     </div>
     <p class="snapshot-story">${pathText(`momentum.story.${momentumBand}`, { position: stateLabel(engine.recommended) })}</p>
+    <div class="snapshot-economics-reading"><span>${tx("economics.readingLabel")}</span><strong>${tx("economics.reading." + reading)}</strong><p>${tx("economics.interpretation." + reading)}</p></div>
     <div class="snapshot-next-action"><span>${tx("result.nextBestAction")}</span><strong>${esc(nextBestAction)}</strong></div>
     <div class="snapshot-drivers">
       <div><span>${tx("momentum.supports")}</span><ul>${positiveDrivers.map(driverLine).join("") || `<li>${tx("momentum.noKnownDrivers")}</li>`}</ul></div>

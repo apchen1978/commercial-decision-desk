@@ -24,9 +24,21 @@ for (const economics of [
   assert.equal(evaluateDecision(candidate).recommended, base.recommended);
 }
 
+const rt003 = structuredClone(opportunity);
+rt003.contradictions = [];
+rt003.unknowns = [];
+rt003.commercialTerms = { status: "COMPLETE", detail: "" };
+rt003.quoteBasesComparable = true;
+rt003.quoteComparabilityAssessed = true;
+rt003.paymentEvents = [{ label: "confirmed", amountCny: 1, daysFromSign: 0, status: "COMPLETE" }];
+for (const key of ["buyerFit", "categoryFit", "evidenceQuality", "importOpenness", "commercialFeasibility"]) rt003.dimensions[key].value = "HIGH";
+rt003.economics = { revenue: 100, directCost: 500, tradeCost: 0, dealSpecificCost: 0, contingency: 0 };
+assert.equal(evaluateDecision(rt003).recommended, "PURSUE_NOW");
+assert.equal(economicsReading(buildEconomicsBridge(rt003.economics)), "NEGATIVE");
+
 const kycVeto = structuredClone(opportunity);
 kycVeto.economics = { revenue: 100, directCost: 500, tradeCost: 0, dealSpecificCost: 0, contingency: 0 };
 kycVeto.kyc = { status: "ADVERSE", beneficialOwnerVerified: true, sanctionsHit: true, adverseFinding: true };
 assert.equal(evaluateDecision(kycVeto).recommended, "DO_NOT_PURSUE");
 
-console.log("Economics Semantics v0.1: 10/10 PASS");
+console.log("Economics Semantics v0.1: 12/12 PASS");

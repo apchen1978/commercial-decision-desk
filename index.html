@@ -34,11 +34,11 @@
       .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); }
       h1 { font-size: 30px; margin: 10px 0 6px; letter-spacing: -0.01em; }
       .sub { color: var(--muted); font-size: 15px; max-width: 720px; }
-      .synthetic-banner {
-        border: 1px solid var(--gold); border-left: 4px solid var(--amber);
-        background: #fdf6e4; border-radius: 10px; padding: 10px 14px; margin: 14px 0;
-        font-size: 13px; color: #6b5214; font-weight: 600;
-      }
+      .capability-note { max-width: 760px; margin: 20px 0 26px; padding: 16px 0 0; border-top: 1px solid var(--line); }
+      .capability-eyebrow { margin: 0 0 7px; font-size: 11.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+      .capability-title { margin: 0 0 7px; color: var(--forest); font-size: 20px; letter-spacing: -.01em; }
+      .capability-body { margin: 0; font-size: 13.5px; line-height: 1.65; color: var(--muted); max-width: 64ch; }
+      .capability-line { margin: 10px 0 0; color: var(--gold); font-size: 11px; letter-spacing: .04em; }
       section { margin-top: 26px; }
       h2 { font-size: 19px; margin: 0 0 10px; letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
       .card {
@@ -110,10 +110,6 @@
       .scope-body { margin:0; color:var(--ink); font-size:14px; line-height:1.65; }
       .scope-disclosure { margin:10px 0 0; padding-left:11px; border-left:2px solid var(--gold); color:var(--muted); font-size:12px; line-height:1.6; }
       .scope-sequence { margin:10px 0 0; color:var(--muted); font-size:11px; letter-spacing:.03em; }
-      /* Evolution signal — subtle capability note, hairline hierarchy, no roadmap wall */
-      .evolution-note { max-width: 760px; margin: 20px 0 26px; padding-top: 16px; border-top: 1px solid var(--line); }
-      .evolution-eyebrow { margin: 0 0 6px; font-size: 11.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
-      .evolution-body { margin: 0; font-size: 13.5px; line-height: 1.65; color: var(--muted); max-width: 64ch; }
       .decision-path { margin-top:18px; }
       .path-warning { margin:0 0 12px; padding:9px 11px; border-left:3px solid var(--gold); background:rgba(178,142,72,.10); color:var(--ink); font-size:12px; font-weight:700; letter-spacing:.02em; }
       .path-current { display:flex; flex-wrap:wrap; align-items:baseline; gap:9px; margin-bottom:10px; }
@@ -467,7 +463,7 @@
         <div class="hero-ident">
           <p class="eyebrow" data-i18n="header.eyebrow">商務決策工作台 · 手動評估</p>
           <h1 data-i18n="header.title">商務決策工作台</h1>
-          <p class="sub" data-i18n="header.subtitle">評估一個商機：輸入已知資訊 → 檢視證據與未知 → 取得工作台建議 → 記錄你自己的決定。無需 AI 或 API 金鑰。</p>
+          <p class="sub" data-i18n="header.subtitle">評估一個商機：輸入已知資訊 → 檢視證據與未知 → 取得工作台建議 → 記錄你自己的決定。</p>
         </div>
         <div class="hero-actions">
           <div class="language-switch" role="group" data-i18n-aria-label="header.language">
@@ -478,13 +474,13 @@
         </div>
       </header>
 
-      <div class="synthetic-banner" id="synthetic-note" data-i18n="header.synthetic">無 AI、無 API 金鑰、無後端。以人工輸入為主的決策支援。</div>
-
       <!-- MODE SCREEN -->
       <section id="mode-screen">
-        <div class="evolution-note">
-          <p class="evolution-eyebrow" data-i18n="evolution.eyebrow">可持續進化的商業決策系統</p>
-          <p class="evolution-body" data-i18n="evolution.body">目前以可追溯的商業規則與證據進行評估。未來可透過 AI API 與外部資料來源，進一步支援商務資訊理解、自動結構化、證據補強、情境分析與決策準備。</p>
+        <div class="capability-note">
+          <p class="capability-eyebrow" data-i18n="capability.eyebrow">手動優先 · AI 可擴充 · 人類治理</p>
+          <h2 class="capability-title" data-i18n="capability.title">手動即可使用，也能持續擴充能力</h2>
+          <p class="capability-body" data-i18n="capability.body">CDD 不依賴人工智慧、API 金鑰或後端即可完成核心評估。系統以可追溯的商業規則、證據與人工判斷為基礎；未來亦可透過 AI API 與外部資料，進一步輔助資訊結構化、證據豐富、情境分析與更深入的決策支援。</p>
+          <p class="capability-line" data-i18n="capability.line">今日手動使用 → 需要時由 AI 輔助</p>
         </div>
         <h2 data-i18n="mode.heading">開始</h2>
         <div class="mode-row">

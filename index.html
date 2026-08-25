@@ -102,6 +102,15 @@
       .state-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
       .state-buttons button { background: #fff; color: var(--forest); border-color: var(--line); }
       .state-buttons button.sel { background: var(--forest); color: var(--bone); border-color: var(--forest); }
+      .final-decision-summary { margin-top: 18px; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: #f3f8ef; }
+      .final-decision-heading { display:flex; justify-content:space-between; gap:16px; align-items:baseline; flex-wrap:wrap; }
+      .final-decision-heading p { margin:0; }
+      .final-decision-boundary { color:var(--muted); font-size:13px; max-width:62ch; }
+      .final-decision-grid { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr); gap:12px; margin-top:14px; }
+      .final-decision-card, .final-decision-action { background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px; min-width:0; }
+      .final-decision-card strong { display:block; margin-top:6px; font-size:26px; color:var(--forest); }
+      .final-decision-note, .final-decision-action p { margin:8px 0 0; color:var(--muted); font-size:13.5px; line-height:1.55; }
+      @media (max-width:640px) { .final-decision-grid { grid-template-columns:1fr; } .final-decision-card strong { font-size:23px; } }
       .ok-tag { font-weight: 700; color: var(--forest); }
       .human-note-area { margin-top: 12px; }
       .foot { margin-top: 30px; border-top: 1px solid var(--line); padding-top: 14px; font-size: 12px; color: var(--muted); }
@@ -816,6 +825,24 @@
               <input type="text" id="human-note" data-i18n-placeholder="result.yourNotePlaceholder" placeholder="例如：先保留合作可能，等規格確認後再決定" />
             </div>
             <div style="margin-top:12px" id="human-decision-status"></div>
+            <section id="final-decision-summary" class="final-decision-summary" hidden aria-live="polite">
+              <div class="final-decision-heading">
+                <p class="eyebrow" data-i18n="result.finalDecisionSummary">最終決策</p>
+                <p class="final-decision-boundary" data-i18n="result.finalDecisionSummaryBoundary">這是你的最終商業判斷。CDD 提供證據與決策支援，最終承諾仍由你決定。</p>
+              </div>
+              <div class="final-decision-grid">
+                <div class="final-decision-card">
+                  <span class="muted" data-i18n="result.yourFinalDecision">你的最終判斷</span>
+                  <strong id="final-decision-value"></strong>
+                  <p id="final-decision-note" class="final-decision-note"></p>
+                </div>
+                <div id="final-decision-next-action" class="final-decision-action">
+                  <span class="muted" data-i18n="result.nextBestAction">下一步優先行動</span>
+                  <strong id="final-decision-action-title"></strong>
+                  <p id="final-decision-action-why"></p>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
 

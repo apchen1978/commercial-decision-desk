@@ -12,6 +12,7 @@ import { buildTradeDealViewModel } from "./trade-deal-structure.js";
 import { buildEconomicsBridge, economicsEvidenceTrace, economicsReading } from "./economics-bridge.js";
 import { buildCommercialMomentum, buildEvidenceCoverage, momentumPresentationBand } from "./commercial-momentum.js";
 import { buildDealBriefViewModel, downloadDealBrief } from "./deal-brief.js";
+import { buildFinalDecisionSummaryState } from "./final-decision-summary.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -911,6 +912,23 @@ function renderHumanDecision() {
   $("human-state-buttons").querySelectorAll("button").forEach((button) => {
     button.classList.toggle("sel", button.dataset.hstate === humanDecision);
   });
+  const next = current && engine ? buildCommercialViewModel(current, engine, decisionPathExperiment).actions?.[0] : null;
+  const summary = buildFinalDecisionSummaryState({
+    humanDecision,
+    humanNote: note,
+    nextAction: next ? { title: actionTitle(next), why: actionWhy(next) } : null,
+  });
+  const summaryArea = $("final-decision-summary");
+  summaryArea.hidden = !summary.active;
+  if (!summary.active) return;
+  $("final-decision-value").textContent = stateLabel(summary.decision);
+  $("final-decision-note").textContent = summary.note || tx("result.finalDecisionNoNote");
+  const actionArea = $("final-decision-next-action");
+  actionArea.hidden = !summary.nextAction;
+  if (summary.nextAction) {
+    $("final-decision-action-title").textContent = summary.nextAction.title;
+    $("final-decision-action-why").textContent = summary.nextAction.why;
+  }
 }
 
 $("human-note").addEventListener("input", (e) => { humanNote = e.target.value; renderHumanDecision(); });
@@ -928,6 +946,8 @@ $("btn-reset").addEventListener("click", () => {
     $("result-area").hidden = true;
   } else {
     current = JSON.parse(JSON.stringify(opportunity));
+    humanDecision = null;
+    humanNote = "";
     runAssessment();
   }
 });

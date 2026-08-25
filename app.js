@@ -250,6 +250,8 @@ function renderTradeDeal(view) {
   const d = view.structure.delivery;
   const exposure = p.exposure === null ? tx("trade.unknown") : p.exposure.toLocaleString() + " " + tx("trade.cny");
   const events = p.events.length ? p.events.map((event) => esc(event.label) + " · " + (event.status === "COMPLETE" ? tx("trade.confirmed") : tx("trade.unknown"))).join("<br>") : tx("trade.noPaymentEvents");
+  const paymentEvidence = view.structure.paymentEvidence;
+  const evidenceRows = paymentEvidence.items.length ? paymentEvidence.items.map((item) => `<div class="payment-evidence-item"><strong>${esc(item.label)}</strong><span>${tx("trade.paymentState." + item.state)}</span><small>${esc(item.source || tx("trade.unknown"))}${item.asOf ? " · " + esc(item.asOf) : ""}</small><small>${item.humanStatus === "CONFIRMED_BY_OWNER" ? tx("trade.ownerConfirmed") : tx("trade.pendingOwnerConfirmation")}${item.fragment ? " · " + esc(item.fragment) : ""}</small></div>`).join("") : `<p class="muted">${tx("trade.noPaymentEvidence")}</p>`;
   $("trade-deal-structure").innerHTML = [
     '<div class="trade-grid">',
     '<div class="trade-block"><h3>' + tx("trade.paymentHeading") + '</h3><dl>',
@@ -257,6 +259,7 @@ function renderTradeDeal(view) {
     '<dt>' + tx("trade.paymentEvents") + '</dt><dd>' + events + '</dd>',
     '<dt>' + tx("trade.exposure") + '</dt><dd>' + exposure + '</dd>',
     '</dl></div>',
+    '<div class="trade-block"><h3>' + tx("trade.paymentEvidenceHeading") + '</h3>' + evidenceRows + '<p class="trade-boundary">' + tx("trade.paymentEvidenceBoundary") + '</p></div>',
     '<div class="trade-block"><h3>' + tx("trade.deliveryHeading") + '</h3><dl>',
     '<dt>' + tx("trade.declaredTerm") + '</dt><dd>' + tradeTermLabel(d.declaredTerm) + '</dd>',
     '<dt>' + tx("trade.responsibility") + '</dt><dd>' + tx("trade.boundary." + tradeTermCopyKey(d.declaredTerm)) + '</dd>',
@@ -484,6 +487,7 @@ function fillBlankIntake() {
   window.__contradictions = [];
   window.__unknowns = [];
   window.__payments = [];
+  window.__paymentEvidence = [];
   window.__quotes = [];
   renderContradictionList();
   renderUnknownList();
@@ -532,6 +536,7 @@ function collectBlankInput() {
     contradictions: window.__contradictions || [],
     unknowns: window.__unknowns || [],
     paymentEvents: window.__payments || [],
+    paymentEvidence: window.__paymentEvidence || [],
     quotes: window.__quotes || [],
     why: ($("in-why").value.split("\n") || []).map((s) => s.trim()).filter(Boolean),
     whyNot: ($("in-whynot").value.split("\n") || []).map((s) => s.trim()).filter(Boolean),
@@ -585,6 +590,34 @@ function renderPaymentList() {
     </div>`).join("");
   $("payment-rows").innerHTML = rows;
   wireList("p", ["label", "amount", "days", "complete", "del"]);
+  const evidenceRows = (window.__paymentEvidence || []).map((e, i) => `
+    <div class="list-row">
+      <input placeholder="${tx("input.paymentEvidenceLabel")}" value="${esc(e.label)}" data-pe-label="${i}">
+      <select data-pe-state="${i}">${["UNKNOWN", "MENTIONED", "PROPOSED", "NEGOTIATED", "CONFIRMED", "BINDING"].map((state) => `<option value="${state}" ${e.state === state ? "selected" : ""}>${tx("trade.paymentState." + state)}</option>`).join("")}</select>
+      <input placeholder="${tx("input.paymentEvidenceSource")}" value="${esc(e.source)}" data-pe-source="${i}">
+      <input placeholder="${tx("input.paymentEvidenceFragment")}" value="${esc(e.fragment)}" data-pe-fragment="${i}">
+      <input placeholder="${tx("input.paymentEvidenceAsOf")}" value="${esc(e.asOf)}" data-pe-asof="${i}">
+      <label><input type="checkbox" data-pe-confirmed="${i}" ${e.humanStatus === "CONFIRMED_BY_OWNER" ? "checked" : ""}> ${tx("input.ownerConfirmed")}</label>
+      <button type="button" class="x" data-pe-del="${i}" aria-label="${tx("input.delete")}">✕</button>
+    </div>`).join("");
+  $("payment-evidence-rows").innerHTML = evidenceRows;
+  wirePaymentEvidenceList();
+}
+
+function wirePaymentEvidenceList() {
+  document.querySelectorAll("[data-pe-state],[data-pe-label],[data-pe-source],[data-pe-fragment],[data-pe-asof],[data-pe-confirmed]").forEach((el) => el.addEventListener("change", (event) => {
+    const key = Object.keys(event.target.dataset).find((item) => item.startsWith("pe"));
+    const i = Number(event.target.dataset[key]);
+    const item = window.__paymentEvidence[i];
+    if (!item) return;
+    const field = key.replace(/^pe/, "").replace(/^./, (char) => char.toLowerCase());
+    if (field === "state") item.state = event.target.value;
+    else if (["label", "source", "fragment", "asof"].includes(field)) item[field === "asof" ? "asOf" : field] = event.target.value;
+    else if (field === "confirmed") item.humanStatus = event.target.checked ? "CONFIRMED_BY_OWNER" : "PENDING_REVIEW";
+  }));
+  document.querySelectorAll("[data-pe-del]").forEach((el) => el.addEventListener("click", (event) => { const i = Number(event.target.dataset.peDel); window.__paymentEvidence.splice(i, 1); rerenderLists(); }));
+  const add = document.querySelector('[data-add="pe"]');
+  if (add) add.addEventListener("click", () => { window.__paymentEvidence.push({ label: "", state: "UNKNOWN", source: "", fragment: "", humanStatus: "PENDING_REVIEW" }); rerenderLists(); });
 }
 
 function renderQuoteList() {

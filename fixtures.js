@@ -109,6 +109,10 @@ export const opportunity = {
     detail:
       "SYNTHETIC planning basis: USD 480,000 CIF Khalifa Port, 60-day quote validity, 12,000-metre MOQ baseline and sample-approved production scope. The buyer's RFP states 90 days after delivery while a referral note suggests 30% advance; binding payment terms are therefore INCOMPLETE. Target price is USD 40/metre; a requested 5% discount and two competing supplier offers require scope-normalized comparison.",
     resolveWith: "Binding commercial terms in writing (payment schedule, CIF named place and excluded installation/import scope)",
+    paymentEvidence: [
+      { id: "PEV-1", label: "Buyer RFP: 90 days after delivery", state: "PROPOSED", source: "Synthetic buyer RFP", fragment: "Payment at 90 days after delivery", asOf: "2026-06-18 (synthetic)", humanStatus: "PENDING_REVIEW" },
+      { id: "PEV-2", label: "Referral note: 30% advance", state: "MENTIONED", source: "Synthetic referral call note", fragment: "Verbal indication of a 30% advance", asOf: "2026-06-20 (synthetic)", humanStatus: "PENDING_REVIEW" },
+    ],
   },
   quotes: [
     {

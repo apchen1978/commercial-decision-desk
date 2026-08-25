@@ -1,5 +1,6 @@
 // Trade Deal Structure + Negotiation Prep Lite.
 // Presentation-only. This module does not evaluate, score, infer, or add gates.
+import { buildPaymentEvidenceView } from "./payment-evidence.js";
 
 export const INCOTERM_OPTIONS = Object.freeze(["notAssessed", "EXW", "FCA", "FOB", "CFR", "CIF", "CPT", "CIP", "DAP", "DPU", "DDP"]);
 
@@ -38,6 +39,7 @@ export function buildTradeDealStructure(opportunity, engine) {
   const delivery = INCOTERM_BOUNDARIES[deliveryTerm];
   return {
     payment: paymentEvidence(opportunity, engine),
+    paymentEvidence: buildPaymentEvidenceView(opportunity),
     delivery: {
       declaredTerm: deliveryTerm,
       confirmed: Boolean(delivery),

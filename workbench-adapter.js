@@ -16,6 +16,7 @@
 // invent KYC clearance, invent margin thresholds, infer contradictions, infer
 // urgency, rank incomparable quotes.
 import { PAYMENT_DISCLOSURE } from "./decision-engine.js";
+import { normalizePaymentEvidence } from "./payment-evidence.js";
 
 // --- vocabulary maps (business words -> contract values) --------------------
 const FIT_MAP = {
@@ -61,6 +62,7 @@ export function blankAssessmentDefaults() {
     contradictions: [], // { label, detail, material, resolved }
     unknowns: [], // { label, detail, blocks }
     paymentEvents: [], // { label, amountCny, daysFromSign, complete }
+    paymentEvidence: [], // { label, state, source, fragment, asOf, humanStatus }
     quotes: [], // { id, basis, complete }
     quotesComparable: "notAssessed",
     why: [],
@@ -166,6 +168,7 @@ export function buildOpportunityFromInput(input) {
     commercialTerms: {
       status: TERMS_MAP[in_.termsStatus] || "INCOMPLETE",
       detail: String(in_.termsDetail || ""),
+      paymentEvidence: normalizePaymentEvidence(in_.paymentEvidence),
     },
     quotes,
     quoteBasesComparable,

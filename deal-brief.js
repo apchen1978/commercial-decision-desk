@@ -108,6 +108,11 @@ function tradeData(tradeView) {
       exposureStatus: valueOrUnknown(payment.exposureStatus),
       events: listOrEmpty(payment.events),
     },
+    paymentEvidence: {
+      status: valueOrUnknown(structure.paymentEvidence?.status),
+      items: listOrEmpty(structure.paymentEvidence?.items),
+      unresolvedCount: structure.paymentEvidence?.unresolvedCount ?? 0,
+    },
     delivery: {
       declaredTerm: valueOrUnknown(delivery.declaredTerm),
       responsibilityBoundary: valueOrUnknown(delivery.responsibilityBoundary),
@@ -260,6 +265,8 @@ export function serializeDealBriefMarkdown(brief, language = "zh-TW") {
     "",
     `## ${label("tradeStructure", language)}`,
     line(label("paymentTerms", language), tData.payment.termsStatus),
+    line(label("paymentEvidenceStatus", language), tData.paymentEvidence.status),
+    ...(tData.paymentEvidence.items.length ? tData.paymentEvidence.items.map((item) => bullet(`${clean(item.label)} — ${t(`trade.paymentState.${item.state}`, language)} — ${clean(item.source || UNKNOWN)}${item.asOf ? ` · ${clean(item.asOf)}` : ""} · ${item.humanStatus === "CONFIRMED_BY_OWNER" ? t("trade.ownerConfirmed", language) : t("trade.pendingOwnerConfirmation", language)}`)) : [bullet(label("noPaymentEvidence", language))]),
     line(label("paymentExposure", language), tData.payment.exposure === null ? UNKNOWN : `${tData.payment.exposure} CNY`),
     line(label("deliveryTerm", language), tData.delivery.declaredTerm),
     line(label("responsibility", language), tData.delivery.responsibilityBoundary),

@@ -254,6 +254,7 @@ function renderTradeDeal(view) {
   const exposure = p.exposure === null ? tx("trade.unknown") : p.exposure.toLocaleString() + " " + tx("trade.cny");
   const events = p.events.length ? p.events.map((event) => esc(event.label) + " · " + (event.status === "COMPLETE" ? tx("trade.confirmed") : tx("trade.unknown"))).join("<br>") : tx("trade.noPaymentEvents");
   const paymentEvidence = view.structure.paymentEvidence;
+  const acceptanceRemedy = view.structure.acceptanceRemedy;
   const evidenceRows = paymentEvidence.items.length ? paymentEvidence.items.map((item) => `<div class="payment-evidence-item"><strong>${esc(item.label)}</strong><span>${tx("trade.paymentState." + item.state)}</span><small>${esc(item.source || tx("trade.unknown"))}${item.asOf ? " · " + esc(item.asOf) : ""}</small><small>${item.humanStatus === "CONFIRMED_BY_OWNER" ? tx("trade.ownerConfirmed") : tx("trade.pendingOwnerConfirmation")}${item.fragment ? " · " + esc(item.fragment) : ""}</small></div>`).join("") : `<p class="muted">${tx("trade.noPaymentEvidence")}</p>`;
   $("trade-deal-structure").innerHTML = [
     '<div class="trade-grid">',
@@ -263,6 +264,7 @@ function renderTradeDeal(view) {
     '<dt>' + tx("trade.exposure") + '</dt><dd>' + exposure + '</dd>',
     '</dl></div>',
     '<div class="trade-block"><h3>' + tx("trade.paymentEvidenceHeading") + '</h3>' + evidenceRows + '<p class="trade-boundary">' + tx("trade.paymentEvidenceBoundary") + '</p></div>',
+    '<div class="trade-block"><h3>' + tx("trade.acceptanceRemedyHeading") + '</h3>' + (acceptanceRemedy.items.length ? acceptanceRemedy.items.map((item) => '<div class="acceptance-remedy-item"><strong>' + esc(item.condition) + '</strong><small>' + esc(item.evidence) + '</small><small>' + esc(item.boundary) + '</small></div>').join("") : '<p class="muted">' + tx("trade.acceptanceRemedyUnknown") + '</p>') + '</div>',
     '<div class="trade-block"><h3>' + tx("trade.deliveryHeading") + '</h3><dl>',
     '<dt>' + tx("trade.declaredTerm") + '</dt><dd>' + tradeTermLabel(d.declaredTerm) + '</dd>',
     '<dt>' + tx("trade.responsibility") + '</dt><dd>' + tx("trade.boundary." + tradeTermCopyKey(d.declaredTerm)) + '</dd>',
@@ -276,11 +278,11 @@ function renderNegotiationPrep(view) {
   $("negotiation-prep").innerHTML = view.negotiationPrep.length
     ? view.negotiationPrep.map((item) => [
       '<article class="prep-item"><div class="action-topline"><span class="action-priority">0' + item.priority + '</span><h3>' + tx("trade.prep." + item.type) + '</h3></div>',
-      '<p><strong>' + tx("trade.question") + '</strong> ' + tx("trade.prep.question." + prepCopyKey(item, view.structure.delivery.confirmed)) + '</p>',
-      '<p><strong>' + tx("trade.request") + '</strong> ' + tx("trade.prep.request." + prepCopyKey(item, view.structure.delivery.confirmed)) + '</p>',
-      '<p><strong>' + tx("trade.doNotCommit") + '</strong> ' + tx("trade.prep.avoid." + prepCopyKey(item, view.structure.delivery.confirmed)) + '</p>',
-      '<p><strong>' + tx("trade.ownerInput") + '</strong> ' + tx("trade.prep.owner." + prepCopyKey(item, view.structure.delivery.confirmed)) + '</p>',
-      '<p><strong>' + tx("trade.rerun") + '</strong> ' + tx("trade.prep.rerun." + prepCopyKey(item, view.structure.delivery.confirmed)) + '</p>',
+      '<p><strong>' + tx("trade.question") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? esc(item.question) : tx("trade.prep.question." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
+      '<p><strong>' + tx("trade.request") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? esc(item.request) : tx("trade.prep.request." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
+      '<p><strong>' + tx("trade.doNotCommit") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? esc(item.avoidCommitment) : tx("trade.prep.avoid." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
+      '<p><strong>' + tx("trade.ownerInput") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? esc(item.ownerInput) : tx("trade.prep.owner." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
+      '<p><strong>' + tx("trade.rerun") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? esc(item.rerunWhen) : tx("trade.prep.rerun." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
       '<p class="trade-trace"><strong>' + tx("trade.trace") + '</strong> ' + item.evidenceTrace.map(tradeTraceText).join(" · ") + '</p></article>',
     ].join("")).join("")
     : '<p class="muted">' + tx("trade.noPrep") + '</p>';
@@ -289,6 +291,7 @@ function renderNegotiationPrep(view) {
 function renderCommercialStructure(view) {
   const s = view.structure;
   const exposure = s.paymentExposure === null ? tx("structure.exposureUnknown") : `${s.paymentExposure.toLocaleString()} ${tx("structure.exposureUnit")}`;
+  const acceptanceRemedy = s.acceptanceRemedy;
   $("commercial-structure").innerHTML = `
     <p class="muted structure-intro">${tx("structure.intro")}</p>
     <div class="structure-grid">
@@ -302,12 +305,14 @@ function renderCommercialStructure(view) {
       <div class="structure-item"><span>${tx("structure.category")}</span><strong>${structureFit(s.categoryFit)}</strong></div>
     </div>
     <p class="structure-open-items">${tx("structure.openItems")}: ${s.unknownCount} ${tx("structure.unknown")} · ${s.contradictionCount} ${tx("result.contradictions")}</p>
+    <div class="structure-controls"><h3>${tx("structure.acceptanceRemedy")}</h3>${acceptanceRemedy?.items?.length ? acceptanceRemedy.items.map((item) => `<div class="control-item"><strong>${esc(item.condition)}</strong><small>${esc(item.action)}</small><small>${esc(item.rerunWhen)}</small></div>`).join("") : `<p class="muted">${tx("structure.acceptanceRemedyUnknown")}</p>`}</div>
   `;
 }
 
 function renderPriorityActions(view) {
   const actions = view.actions;
-  $("priority-actions").innerHTML = actions.length
+  const controls = view.structure.acceptanceRemedy?.items || [];
+  const actionHtml = actions.length
     ? actions.map((item) => `
       <article class="action-item">
         <div class="action-topline"><span class="action-priority">0${item.priority}</span><h3>${actionTitle(item)}</h3></div>
@@ -317,6 +322,8 @@ function renderPriorityActions(view) {
         <p class="action-human"><strong>${tx("actions.human")}</strong> ${tx("action.humanBoundary")}</p>
       </article>`).join("")
     : `<p class="muted">${tx("result.noneRequired")}</p>`;
+  const controlHtml = controls.map((item) => `<article class="action-item acceptance-remedy-control"><div class="action-topline"><span class="action-priority">G6</span><h3>${esc(item.condition)}</h3></div><p class="action-why"><strong>${tx("actions.why")}</strong> ${esc(item.evidence)}</p><p><strong>${tx("actions.rerun")}</strong> ${esc(item.rerunWhen)}</p><p class="action-human"><strong>${tx("actions.human")}</strong> ${esc(item.boundary)}</p></article>`).join("");
+  $("priority-actions").innerHTML = actionHtml + controlHtml;
 }
 
 function currentDealBrief() {

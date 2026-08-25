@@ -115,6 +115,14 @@ function tradeData(tradeView) {
       items: listOrEmpty(structure.paymentEvidence?.items),
       unresolvedCount: structure.paymentEvidence?.unresolvedCount ?? 0,
     },
+    acceptanceRemedy: listOrEmpty(structure.acceptanceRemedy?.items).map((item) => ({
+      condition: item.condition,
+      evidence: item.evidence,
+      action: item.action,
+      boundary: item.boundary,
+      rerunWhen: item.rerunWhen,
+      evidenceTrace: clone(item.evidenceTrace || []),
+    })),
     delivery: {
       declaredTerm: valueOrUnknown(delivery.declaredTerm),
       responsibilityBoundary: valueOrUnknown(delivery.responsibilityBoundary),
@@ -275,6 +283,12 @@ export function serializeDealBriefMarkdown(brief, language = "zh-TW") {
     line(label("deliveryTerm", language), tData.delivery.declaredTerm),
     line(label("responsibility", language), tData.delivery.responsibilityBoundary),
     line(label("evidenceRequired", language), tData.delivery.evidenceRequired),
+    `### ${label("acceptanceRemedy", language)}`,
+    ...(tData.acceptanceRemedy.length ? tData.acceptanceRemedy.flatMap((item) => [
+      bullet(`${clean(item.condition)} — ${clean(item.evidence)}`),
+      bullet(`${label("ask", language)}: ${clean(item.action)}`),
+      bullet(`${label("rerunWhen", language)}: ${clean(item.rerunWhen)}`),
+    ]) : [bullet(label("acceptanceRemedyUnknown", language))]),
     "",
     `## ${label("meetingAgenda", language)}`,
     ...agenda,

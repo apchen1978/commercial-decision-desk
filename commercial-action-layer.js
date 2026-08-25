@@ -1,6 +1,7 @@
 // Presentation-only commercial structure and action derivation.
 // This module reads the existing opportunity contract, engine result, and
 // Decision Path experiment. It does not evaluate, score, infer, or add gates.
+import { buildAcceptanceRemedyPresentation } from "./acceptance-remedy-presentation.js";
 
 export const ACTION_TYPES = Object.freeze([
   "PAYMENT_NEGOTIATION",
@@ -151,8 +152,9 @@ export function buildCommercialStructure(opportunity, engine) {
 }
 
 export function buildCommercialViewModel(opportunity, engine, decisionPathExperiment = null) {
+  const structure = buildCommercialStructure(opportunity, engine);
   return {
-    structure: buildCommercialStructure(opportunity, engine),
+    structure: { ...structure, acceptanceRemedy: buildAcceptanceRemedyPresentation(opportunity) },
     actions: derivePriorityActions(opportunity, engine, decisionPathExperiment),
   };
 }

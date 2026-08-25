@@ -1,6 +1,7 @@
 // Trade Deal Structure + Negotiation Prep Lite.
 // Presentation-only. This module does not evaluate, score, infer, or add gates.
 import { buildPaymentEvidenceView } from "./payment-evidence.js";
+import { buildAcceptanceRemedyPresentation } from "./acceptance-remedy-presentation.js";
 
 export const INCOTERM_OPTIONS = Object.freeze(["notAssessed", "EXW", "FCA", "FOB", "CFR", "CIF", "CPT", "CIP", "DAP", "DPU", "DDP"]);
 
@@ -40,6 +41,7 @@ export function buildTradeDealStructure(opportunity, engine) {
   return {
     payment: paymentEvidence(opportunity, engine),
     paymentEvidence: buildPaymentEvidenceView(opportunity),
+    acceptanceRemedy: buildAcceptanceRemedyPresentation(opportunity),
     delivery: {
       declaredTerm: deliveryTerm,
       confirmed: Boolean(delivery),
@@ -54,6 +56,18 @@ export function buildNegotiationPrep(opportunity, engine, tradeStructure) {
   const prep = [];
   const payment = tradeStructure.payment;
   const context = opportunity.commercialContext || null;
+  for (const item of tradeStructure.acceptanceRemedy?.items || []) {
+    prep.push({
+      type: "ACCEPTANCE_REMEDY",
+      priority: 1,
+      question: item.action,
+      request: item.evidence,
+      avoidCommitment: item.boundary,
+      ownerInput: "Owner confirmation is required; CDD does not infer legal meaning or an automatic transaction outcome.",
+      rerunWhen: item.rerunWhen,
+      evidenceTrace: item.evidenceTrace,
+    });
+  }
   if (engine.materialContradictions?.length || engine.termsIncomplete || payment.exposureStatus === "UNKNOWN") {
     prep.push({
       type: "PAYMENT",

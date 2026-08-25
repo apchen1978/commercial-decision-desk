@@ -820,6 +820,31 @@
         .mode-card, .card, .decision-lead, .executive-snapshot { transition: none; }
         .mode-card:hover { transform: none; }
       }
+
+      /* ================================================================
+         LAYER 4 — seam repair + full-page line audit.
+         The 'ghost white line' under the hero was two stacked 1px lines
+         (header.hero border-bottom + .capability-note border-top) separated
+         by 36px of background — a visible seam on the cold canvas.
+         Fix: single hairline per boundary, whitespace instead of double
+         rules. Same audit applied page-wide.
+         ================================================================ */
+      header.hero { border-bottom: 1px solid var(--hairline); padding-bottom: 20px; }
+      .capability-note { border-top: 0; margin-top: 28px; padding-top: 0; }
+      /* Page-wide: collapse double-rule seams to single hairlines */
+      section { border: 0; }
+      .foot { border-top: 1px solid var(--hairline); }
+      .deal-brief-export { border-top: 1px solid var(--hairline); }
+      .final-decision-heading { border-bottom: 1px solid var(--hairline); }
+      .result-nav { border-bottom: 1px solid var(--hairline); }
+      .human-boundary { border: 0; border-top: 1px solid var(--hairline); }
+      .economics-divider { border-top: 1px solid var(--hairline); }
+      .trade-boundary, .scope-disclosure, .path-warning { border-left-width: 2px; }
+      /* Capability block — enterprise-grade intro, no box, generous space */
+      .capability-eyebrow { color: var(--muted); }
+      .capability-title { color: var(--ink); font-size: 23px; letter-spacing: -0.02em; }
+      .capability-body { color: var(--muted); font-size: 14px; line-height: 1.7; max-width: 66ch; }
+      .capability-line { color: var(--muted-2); }
     </style>
   </head>
   <body>

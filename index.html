@@ -705,7 +705,104 @@
         font-family: "Geist Mono", "Geist", ui-monospace, monospace;
         font-variant-numeric: tabular-nums;
       }
-      /* Typographic scale — tighter display, calmer body */
+
+      /* ================================================================
+         COLOR SYSTEM — layer 3 (premium SaaS neutral discipline).
+         Problem found: every neutral carried a green tinge (bone/line/muted/
+         surface-3 all G-heavy) -> read as ecology/health, not SaaS.
+         Fix: desaturate neutrals to near-hueless cold grays (zinc-family),
+         keep forest as the single saturated accent, precise hover states.
+         ================================================================ */
+      :root {
+        /* Near-hueless neutral scale (zinc-like, cool, not green) */
+        --ink: #16191d;
+        --muted: #5c6570;
+        --muted-2: #8b929c;
+        --line: #e2e6ea;
+        --bone: #f7f8f9;
+        --paper: #eef0f3;
+        --surface: #ffffff;
+        --surface-2: #f9fafb;
+        --surface-3: #f2f4f6;
+        --hairline: #e7eaee;
+        /* Single saturated accent — forest stays brand, slightly deeper */
+        --forest: #0e4f2f;
+        --forest-hover: #0a3d24;
+        --forest-soft: rgba(14, 79, 47, 0.08);
+        /* Semantic — tuned to the same cool family, restrained */
+        --amber: #9a6b1f;
+        --gold: #8f7d4a;
+        --bad: #b3402b;
+        --bad-soft: rgba(179, 64, 43, 0.08);
+        --ok: #1f6b46;
+        --ok-soft: rgba(31, 107, 70, 0.10);
+        --unk: #7c6b1e;
+        --unk-soft: rgba(124, 107, 30, 0.10);
+        /* Elevation — cool-tinted, near-invisible at rest */
+        --shadow-1: 0 1px 2px rgba(22, 25, 29, 0.04), 0 4px 12px -6px rgba(22, 25, 29, 0.06);
+        --shadow-2: 0 2px 4px rgba(22, 25, 29, 0.05), 0 16px 36px -20px rgba(22, 25, 29, 0.16);
+      }
+      body { background: var(--bone); color: var(--ink); }
+      /* Buttons — forest primary, precise hover, cool-tinted focus */
+      button {
+        background: var(--forest); border-color: var(--forest); color: #fff;
+        box-shadow: var(--shadow-1);
+      }
+      button:hover { background: var(--forest-hover); border-color: var(--forest-hover); }
+      button:focus-visible { outline: 2px solid var(--forest); outline-offset: 2px; }
+      button.secondary { background: var(--surface); color: var(--ink); border-color: var(--line); }
+      button.secondary:hover { background: var(--surface-2); border-color: var(--muted-2); color: var(--ink); }
+      /* Inputs — cool focus halo instead of green glow */
+      input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
+        outline: none; border-color: var(--forest);
+        box-shadow: 0 0 0 3px var(--forest-soft);
+      }
+      /* Accent usage — forest only where it matters; semantic soft fills */
+      .mode-card.mode-primary { border-color: var(--forest); box-shadow: var(--shadow-2); }
+      .decision-lead { border-left-color: var(--forest); }
+      .executive-snapshot { border-top-color: var(--forest); }
+      .dl-grid .glance-col { border-left-color: var(--forest); }
+      .action-item { border-left-color: var(--forest); }
+      .final-decision-action strong, .scope-title, .trade-block h3,
+      .payment-evidence-item span, .context-grid strong,
+      .structure-item strong { color: var(--forest); }
+      .result-nav a:hover { color: var(--forest); }
+      button.language-button.active { background: var(--forest); border-color: var(--forest); color: #fff; }
+      .state-buttons button.sel { background: var(--forest); border-color: var(--forest); color: #fff; }
+      .ok-tag { color: var(--forest); }
+      /* Semantic soft fills — muted, professional */
+      .flag-box, .control-item, .acceptance-remedy-item { border-left-color: var(--bad); background: #fdf5f3; }
+      .unk-box { border-left-color: var(--unk); background: #fbf8ec; }
+      .economics-owner-input { background: var(--surface-3); border-color: var(--line); }
+      .path-warning { border-left-color: var(--line); background: var(--surface-3); }
+      .mode-badge { border-color: var(--line); background: var(--surface-3); color: var(--muted); }
+      /* States — rec-tag colors keep semantic meaning, toned down */
+      .glance-rec .rec-tag.esc, .glance-rec .rec-tag.drop { color: var(--bad); }
+      .glance-rec .rec-tag.now { color: var(--ok); }
+      .glance-rec .rec-tag.cond { color: var(--amber); }
+      .glance-rec .rec-tag.hold { color: var(--unk); }
+      /* Snapshot economics — accent number */
+      .snapshot-economics strong { color: var(--forest); }
+      /* Kickers — muted mono, no gold */
+      .eyebrow, .snapshot-kicker, .dl-label, .capability-eyebrow { color: var(--muted); }
+      .result-nav a::before { color: var(--forest); }
+      /* Hover elevation — restrained */
+      .mode-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); border-color: var(--line); }
+      .mode-card.mode-primary:hover { border-color: var(--forest); }
+
+      /* Result-area — converge executive-brief accents onto the single forest */
+      #result-area .decision-lead { border-left-color: var(--forest); }
+      #result-area .snapshot-kicker, #result-area .snapshot-state span,
+      #result-area .snapshot-control span, #result-area .snapshot-kicker {
+        color: var(--muted);
+      }
+      #result-area .result-nav a::before { color: var(--forest); }
+      #result-area .action-priority, #result-area .path-option-id { color: var(--muted); }
+      #result-area section > h2 { color: var(--ink); }
+      #result-area .snapshot-heading-row h2 { color: var(--ink); }
+      #result-area .snapshot-field span { color: var(--muted-2); }
+
+      /* Typographic scale — restored (tighter display, calmer body) */
       h1 { font-size: 30px; letter-spacing: -0.028em; font-weight: 650; }
       h2 { font-size: 21px; letter-spacing: -0.02em; font-weight: 650; }
       .snapshot-heading-row h2 { font-size: 30px; letter-spacing: -0.028em; font-weight: 650; }
@@ -714,27 +811,11 @@
       .sub, .muted, .scope-body, .trade-block p, .glance-col li,
       .action-item p, .prep-item p { font-size: 14px; line-height: 1.6; }
       .eyebrow, .snapshot-kicker, .dl-label { letter-spacing: 0.14em; }
-      /* Warm accents — converge on forest/muted; gold only as tiny semantic mark */
-      .eyebrow { color: var(--muted); }
-      .mode-badge { border-color: var(--line); background: var(--surface-3); color: var(--muted); }
-      .capability-eyebrow, .capability-line, .scope-sequence { color: var(--muted); }
-      .scope-disclosure { border-left-color: var(--line); color: var(--muted); }
-      .path-warning { border-left-color: var(--line); background: var(--surface-3); color: var(--ink); }
-      .path-option-id { color: var(--muted); }
-      .trade-boundary { border-left-color: var(--line); color: var(--muted); }
-      .action-priority { color: var(--muted); }
-      .prep-item, .control-item, .acceptance-remedy-item { border-left-color: var(--line); }
-      .result-nav a::before { color: var(--forest); }
-      /* Accent applied where it matters: actions, current state, key numbers */
-      .action-topline h3, .trade-block h3, .structure-item strong,
-      .context-grid strong, .payment-evidence-item span,
-      .final-decision-action strong, .scope-title { color: var(--forest); }
       .rec-tag { letter-spacing: 0.02em; }
-      /* Subtle micro-interaction — SaaS tactility, restrained */
+      /* Micro-interaction — restored, reduced-motion guarded */
       .mode-card, .card, .decision-lead, .executive-snapshot {
         transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
       }
-      .mode-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
       @media (prefers-reduced-motion: reduce) {
         .mode-card, .card, .decision-lead, .executive-snapshot { transition: none; }
         .mode-card:hover { transform: none; }

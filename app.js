@@ -361,10 +361,98 @@ function exportCurrentDealBrief(format) {
 function showModeScreen() {
   $("mode-screen").hidden = false;
   $("workbench").hidden = true;
+  renderPreviewBand();
 }
 function showWorkbench() {
   $("mode-screen").hidden = true;
   $("workbench").hidden = false;
+}
+
+// --- RICHNESS: sample preview band on the entry screen -----------------------
+// Renders REAL sample outputs (same view models as the result page) so a
+// visitor sees the depth before clicking. Sample data only; never current.
+function renderPreviewBand() {
+  const grid = $("preview-grid");
+  if (!grid || grid.dataset.rendered) return;
+  grid.dataset.rendered = "1";
+  const opp = opportunity;
+  const eng = evaluateDecision(opp);
+  const path = createDecisionPathExperiment(opp);
+  const commercialView = buildCommercialViewModel(opp, eng, path);
+  const tradeView = buildTradeDealViewModel(opp, eng);
+  const econBridge = buildEconomicsBridge(opp.economics || {});
+  const brief = buildDealBriefViewModel({ opportunity: opp, engine: eng, commercialView, tradeView, economicsBridge: econBridge, decisionPathExperiment: path, humanDecision: null, humanNote: "", language });
+
+  const p = brief.position || {};
+  const rec = p.recommendation || "UNKNOWN";
+  const recLabel = stateLabel(rec);
+  const recClass = { ESCALATE: "esc", PURSUE_NOW: "now", PURSUE_CONDITIONALLY: "cond", HOLD_FOR_EVIDENCE: "hold", DO_NOT_PURSUE: "drop" }[rec] || "unk";
+
+  const econ = brief.economics || {};
+  const trade = brief.trade || {};
+  const cards = [
+    {
+      k: "1", title: tx("preview.cardDecision"), body: tx("preview.cardDecisionBody"),
+      big: `<span class="tag ${recClass}">${recLabel}</span>`,
+      kv: [
+        [tx("preview.controls"), String(p.blockers?.length || 0)],
+        [tx("preview.unknowns"), String(p.unknowns?.length || 0)],
+        [tx("preview.contradictions"), String(p.contradictions?.length || 0)],
+      ],
+    },
+    {
+      k: "2", title: tx("preview.cardEconomics"), body: tx("preview.cardEconomicsBody"),
+      big: econ.expectedNetContribution != null ? `${econ.expectedNetContribution} ${econ.currency || "CNY"}` : tx("preview.notCalculated"),
+      kv: [
+        [tx("preview.revenue"), econ.revenue != null ? `${econ.revenue} ${econ.currency || ""}`.trim() : tx("preview.unknown")],
+        [tx("preview.reading"), tx(`economics.reading.${econ.reading || "unknown"}`)],
+      ],
+    },
+    {
+      k: "3", title: tx("preview.cardTrade"), body: tx("preview.cardTradeBody"),
+      big: trade.payment?.termsStatus || tx("preview.unknown"),
+      kv: [
+        [tx("preview.delivery"), trade.delivery?.declaredTerm || tx("preview.unknown")],
+        [tx("preview.exposure"), trade.payment?.exposure != null ? `${trade.payment.exposure} CNY` : tx("preview.unknown")],
+      ],
+    },
+    {
+      k: "4", title: tx("preview.cardPath"), body: tx("preview.cardPathBody"),
+      big: brief.decisionPath?.available ? String(brief.decisionPath.paths.length) : "0",
+      kv: [
+        [tx("preview.pathCurrent"), brief.decisionPath?.current ? stateLabel(brief.decisionPath.current) : tx("preview.unknown")],
+        [tx("preview.hypothetical"), tx("preview.pathTry")],
+      ],
+    },
+    {
+      k: "5", title: tx("preview.cardGates"), body: tx("preview.cardGatesBody"),
+      big: [eng.kycGate !== "ABSENT" && eng.kycGate !== "CLEAR" ? "KYC" : null, eng.marginGate === "BELOW_THRESHOLD" ? "MARGIN" : null].filter(Boolean).join(" + ") || tx("preview.gatesClear"),
+      kv: [
+        [tx("preview.kyc"), eng.kycGate || "ABSENT"],
+        [tx("preview.margin"), eng.marginGate || "ABSENT"],
+      ],
+    },
+    {
+      k: "6", title: tx("preview.cardExport"), body: tx("preview.cardExportBody"),
+      big: tx("preview.exports3"),
+      kv: [
+        [tx("preview.dealBrief"), "MD / TXT"],
+        [tx("preview.ledger"), "JSON"],
+      ],
+    },
+  ];
+
+  grid.innerHTML = cards.map((c) => `
+    <div class="preview-card" data-open-sample>
+      <h4><span class="k">${c.k}</span>${c.title}</h4>
+      <p>${c.body}</p>
+      <div class="big">${c.big}</div>
+      <div class="kv">${c.kv.map(([a, b]) => `<div><span>${a}</span><span>${b}</span></div>`).join("")}</div>
+    </div>`).join("");
+
+  grid.querySelectorAll("[data-open-sample]").forEach((el) => el.addEventListener("click", () => {
+    document.getElementById("mode-sample").click();
+  }));
 }
 
 function applyLanguage() {

@@ -862,6 +862,32 @@
       .badge .dot.warn { background: var(--amber); }
       .badge .mono-num { font-family: "Geist Mono", ui-monospace, monospace; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--forest); }
       .hero-sub-note { margin: 6px 0 0; color: var(--muted-2); font-size: 12.5px; }
+      /* ================================================================
+         RICHNESS layer — 'what one assessment yields' preview band.
+         Renders the SAMPLE's real outputs on the entry screen so a visitor
+         sees the depth before clicking. Pure presentation; sample data only.
+         ================================================================ */
+      .preview-band { margin-top: 30px; }
+      .preview-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+      .preview-head h2 { margin: 0; }
+      .preview-tag { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--muted-2); text-transform: uppercase; }
+      .preview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+      @media (max-width: 900px) { .preview-grid { grid-template-columns: 1fr 1fr; } }
+      @media (max-width: 600px) { .preview-grid { grid-template-columns: 1fr; } }
+      .preview-card {
+        background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
+        padding: 14px 16px; box-shadow: var(--shadow-1); cursor: pointer;
+        transition: border-color .15s, box-shadow .15s, transform .15s;
+      }
+      .preview-card:hover { border-color: var(--forest); box-shadow: var(--shadow-2); transform: translateY(-2px); }
+      .preview-card h4 { margin: 0 0 8px; font-size: 13px; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+      .preview-card h4 .k { color: var(--forest); }
+      .preview-card p { margin: 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+      .preview-card .big { font-size: 16px; font-weight: 700; color: var(--ink); margin: 2px 0 6px; font-family: "Geist Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+      .preview-card .kv { margin-top: 6px; }
+      .preview-card .kv div { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; color: var(--muted); padding: 2px 0; border-top: 1px dashed var(--hairline); }
+      .preview-card .kv div:first-child { border-top: 0; }
+      .preview-note { margin-top: 10px; font-size: 11.5px; color: var(--muted-2); }
     </style>
   </head>
   <body>
@@ -908,6 +934,16 @@
             <p data-i18n="mode.sample.description">看 CDD 如何把證據變成建議與會議簡報。這是合成教學案例，不會影響你的評估。</p>
             <span class="cta" data-i18n="mode.sample.cta">查看範例 →</span>
           </div>
+        </div>
+
+        <!-- RICHNESS: what one assessment yields (sample preview band) -->
+        <div class="preview-band" id="preview-band">
+          <div class="preview-head">
+            <h2 data-i18n="preview.heading">一次評估，你會得到什麼</h2>
+            <span class="preview-tag" data-i18n="preview.tag">SAMPLE PREVIEW</span>
+          </div>
+          <div class="preview-grid" id="preview-grid"></div>
+          <p class="preview-note" data-i18n="preview.note">以上為合成範例的真實輸出預覽——點任何一張即進入完整範例。你建立的評估會得到同樣的深度。</p>
         </div>
       </section>
 

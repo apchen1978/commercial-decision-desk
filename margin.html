@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>Trade Margin Calculator — 有效毛利試算</title>
+    <style>
+      :root {
+        --ink: #16191d; --muted: #5c6570; --muted-2: #8b929c;
+        --line: #e2e6ea; --bone: #f7f8f9; --surface: #ffffff;
+        --surface-2: #f9fafb; --surface-3: #f2f4f6; --hairline: #e7eaee;
+        --forest: #0e4f2f; --forest-soft: rgba(14, 79, 47, 0.08);
+        --gold: #8f7d4a; --bad: #b3402b; --bad-soft: rgba(179, 64, 43, 0.08);
+        --ok: #1f6b46; --unk: #7c6b1e;
+        --radius-lg: 14px; --radius-sm: 8px;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+        background: var(--bone); color: var(--ink); line-height: 1.6;
+      }
+      .wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 80px; }
+      header { border-bottom: 1px solid var(--hairline); padding-bottom: 16px; }
+      .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+      h1 { font-size: 26px; margin: 8px 0 4px; letter-spacing: -0.02em; }
+      .sub { color: var(--muted); font-size: 13.5px; max-width: 640px; }
+      .note { margin-top: 14px; padding: 10px 14px; border: 1px solid var(--line); border-left: 3px solid var(--gold); background: var(--surface-2); border-radius: 8px; font-size: 12.5px; color: var(--muted); }
+      .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 20px; }
+      @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px 20px; box-shadow: 0 1px 2px rgba(22,25,29,.04); }
+      .card h2 { margin: 0 0 14px; font-size: 15px; letter-spacing: -0.01em; }
+      label.field { display: block; margin-top: 10px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+      input[type="number"], select {
+        font: inherit; width: 100%; margin-top: 4px; padding: 8px 11px;
+        border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fff; color: var(--ink);
+        transition: border-color .15s, box-shadow .15s;
+      }
+      input:focus, select:focus { outline: none; border-color: var(--forest); box-shadow: 0 0 0 3px var(--forest-soft); }
+      .btn-row { margin-top: 16px; display: flex; gap: 10px; }
+      button {
+        font: inherit; cursor: pointer; border: 1px solid var(--forest); background: var(--forest); color: #fff;
+        border-radius: 999px; padding: 9px 18px; font-weight: 700; font-size: 13.5px;
+      }
+      button.secondary { background: var(--surface); color: var(--ink); border-color: var(--line); }
+      button.secondary:hover { background: var(--surface-2); }
+      .result-card { margin-top: 20px; }
+      .big-row { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+      .big { font-size: 28px; font-weight: 800; font-family: "Geist Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+      .big.ok { color: var(--ok); }
+      .big.below { color: var(--bad); }
+      .big.unk { color: var(--unk); }
+      .status-chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+      .status-chip.below { background: var(--bad-soft); color: var(--bad); }
+      .status-chip.meets { background: rgba(31,107,70,.10); color: var(--ok); }
+      .status-chip.no { background: var(--surface-3); color: var(--muted); }
+      .kv { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; }
+      .kv div { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; padding: 4px 0; border-top: 1px dashed var(--hairline); }
+      .kv div:first-child, .kv div:nth-child(2) { border-top: 0; }
+      .kv span:first-child { color: var(--muted); }
+      .kv span:last-child { font-family: "Geist Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+      .boundary { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--hairline); font-size: 12px; color: var(--muted); }
+      footer { margin-top: 26px; border-top: 1px solid var(--hairline); padding-top: 12px; font-size: 11.5px; color: var(--muted-2); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <p class="eyebrow">Trade Margin Calculator · 有效毛利試算</p>
+        <h1>這單算完，還剩多少？</h1>
+        <p class="sub">輸入售價與成本，看有效毛利、成本轉嫁影響，並與你自己的門檻對照。</p>
+      </header>
+
+      <div class="note">
+        邊界：本工具<b>只算數字、不判決定</b>——門檻由你宣告，工具不會發明標準，也不會說「該不該做」。
+        未輸入的欄位保持 UNKNOWN。本頁無 API key、無後端、無上傳。
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <h2>輸入</h2>
+          <label class="field">幣別</label>
+          <select id="in-currency">
+            <option value="CNY">CNY</option>
+            <option value="USD" selected>USD</option>
+            <option value="EUR">EUR</option>
+          </select>
+          <label class="field">售價 / 訂單收入</label>
+          <input type="number" id="in-revenue" placeholder="如 480000" />
+          <label class="field">直接成本（物料／生產）</label>
+          <input type="number" id="in-direct" placeholder="如 250000" />
+          <label class="field">貿易成本（運費／保險／關稅）</label>
+          <input type="number" id="in-trade" placeholder="如 60000" />
+          <label class="field">交易特定成本（認證／檢驗／客製）</label>
+          <input type="number" id="in-deal" placeholder="如 50000" />
+          <label class="field">預留（contingency）</label>
+          <input type="number" id="in-contingency" placeholder="可留空" />
+          <label class="field">你的最低可接受淨貢獻（可留空）</label>
+          <input type="number" id="in-min" placeholder="如 80000" />
+          <label class="field">你的毛利門檻（basis points，如 800 = 8%）</label>
+          <input type="number" id="in-threshold" placeholder="如 800" />
+          <div class="btn-row">
+            <button type="button" id="btn-calc">計算</button>
+            <button type="button" class="secondary" id="btn-reset">重設</button>
+          </div>
+        </div>
+
+        <div class="card result-card">
+          <h2>結果</h2>
+          <div class="big-row">
+            <span class="big" id="r-bps">—</span>
+            <span class="status-chip no" id="r-chip">尚未計算</span>
+          </div>
+          <div class="kv" id="r-kv"></div>
+          <p class="boundary" id="r-reading"></p>
+        </div>
+      </div>
+
+      <footer>Trade Margin Calculator · 純確定性計算 · 門檻由你宣告 · 無 API key</footer>
+    </div>
+    <script type="module" src="./margin-view.js"></script>
+  </body>
+</html>

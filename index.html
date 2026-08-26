@@ -845,6 +845,23 @@
       .capability-title { color: var(--ink); font-size: 23px; letter-spacing: -0.02em; }
       .capability-body { color: var(--muted); font-size: 14px; line-height: 1.7; max-width: 66ch; }
       .capability-line { color: var(--muted-2); }
+      /* ================================================================
+         TRUST + DELIGHT layer — evidence badges + micro-narrative.
+         A1: verification badges row (live-checkable evidence, not claims).
+         B1: hero micro-narrative subtitle (a trade person's sentence).
+         ================================================================ */
+      .badges-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 4px; }
+      .badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 12px; border: 1px solid var(--line); border-radius: 999px;
+        background: var(--surface); font-size: 11.5px; font-weight: 600; color: var(--ink);
+        text-decoration: none; transition: border-color .15s, box-shadow .15s, transform .15s;
+      }
+      .badge:hover { border-color: var(--forest); box-shadow: var(--shadow-1); transform: translateY(-1px); }
+      .badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); flex: 0 0 auto; }
+      .badge .dot.warn { background: var(--amber); }
+      .badge .mono-num { font-family: "Geist Mono", ui-monospace, monospace; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--forest); }
+      .hero-sub-note { margin: 6px 0 0; color: var(--muted-2); font-size: 12.5px; }
     </style>
   </head>
   <body>
@@ -871,6 +888,12 @@
           <h2 class="capability-title" data-i18n="capability.title">手動即可使用，也能持續擴充能力</h2>
           <p class="capability-body" data-i18n="capability.body">CDD 不依賴人工智慧、API 金鑰或後端即可完成核心評估。系統以可追溯的商業規則、證據與人工判斷為基礎；未來亦可透過 AI API 與外部資料，進一步輔助資訊結構化、證據豐富、情境分析與更深入的決策支援。</p>
           <p class="capability-line" data-i18n="capability.line">今日手動使用 → 需要時由 AI 輔助</p>
+          <div class="badges-row" aria-label="驗證徽章">
+            <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.verify">自動檢查</span> <span class="mono-num" data-i18n="badge.verifyNum">50/50</span></a>
+            <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk/tree/main/scenario-test" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.scenarios">情境回歸</span> <span class="mono-num">21</span></a>
+            <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk/tree/main/docs/interviews" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.gates">KYC + Margin 關卡已實作</span></a>
+            <a class="badge" href="#"><span class="dot"></span><span data-i18n="badge.manual">無 API key · 手動優先</span></a>
+          </div>
         </div>
         <h2 data-i18n="mode.heading">開始</h2>
         <div class="mode-row">

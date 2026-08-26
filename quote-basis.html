@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>Quote Basis Ledger — 報價基礎對照</title>
+    <style>
+      :root {
+        --ink: #16191d; --muted: #5c6570; --muted-2: #8b929c;
+        --line: #e2e6ea; --bone: #f7f8f9; --surface: #ffffff;
+        --surface-2: #f9fafb; --surface-3: #f2f4f6; --hairline: #e7eaee;
+        --forest: #0e4f2f; --forest-soft: rgba(14, 79, 47, 0.08);
+        --gold: #8f7d4a; --bad: #b3402b; --bad-soft: rgba(179, 64, 43, 0.08);
+        --ok: #1f6b46; --unk: #7c6b1e;
+        --radius-lg: 14px; --radius-sm: 8px;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+        background: var(--bone); color: var(--ink); line-height: 1.6;
+      }
+      .wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 80px; }
+      header { border-bottom: 1px solid var(--hairline); padding-bottom: 16px; }
+      .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+      h1 { font-size: 26px; margin: 8px 0 4px; letter-spacing: -0.02em; }
+      .sub { color: var(--muted); font-size: 13.5px; max-width: 640px; }
+      .note { margin-top: 14px; padding: 10px 14px; border: 1px solid var(--line); border-left: 3px solid var(--gold); background: var(--surface-2); border-radius: 8px; font-size: 12.5px; color: var(--muted); }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px 20px; box-shadow: 0 1px 2px rgba(22,25,29,.04); margin-top: 20px; }
+      .card h2 { margin: 0 0 6px; font-size: 15px; letter-spacing: -0.01em; }
+      .card .hint { margin: 0 0 12px; font-size: 12px; color: var(--muted); }
+      .quote-row {
+        display: grid; grid-template-columns: 1.1fr .8fr .6fr .9fr .8fr auto;
+        gap: 8px; align-items: end; margin-top: 10px; padding: 12px 0;
+        border-top: 1px dashed var(--hairline);
+      }
+      .quote-row:first-of-type { border-top: 0; padding-top: 0; }
+      @media (max-width: 760px) { .quote-row { grid-template-columns: 1fr 1fr; } }
+      label.field { display: block; font-size: 12px; font-weight: 600; color: var(--muted); }
+      input[type="number"], input[type="text"], input[type="date"], select {
+        font: inherit; width: 100%; margin-top: 4px; padding: 8px 11px;
+        border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fff; color: var(--ink);
+        transition: border-color .15s, box-shadow .15s;
+      }
+      input:focus, select:focus { outline: none; border-color: var(--forest); box-shadow: 0 0 0 3px var(--forest-soft); }
+      .del { border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: var(--radius-sm); padding: 8px 10px; cursor: pointer; font-size: 13px; }
+      .del:hover { background: var(--bad-soft); color: var(--bad); border-color: var(--bad); }
+      .btn-row { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+      button {
+        font: inherit; cursor: pointer; border: 1px solid var(--forest); background: var(--forest); color: #fff;
+        border-radius: 999px; padding: 9px 18px; font-weight: 700; font-size: 13.5px;
+      }
+      button.secondary { background: var(--surface); color: var(--ink); border-color: var(--line); }
+      button.secondary:hover { background: var(--surface-2); }
+      button.ghost { background: var(--surface); color: var(--forest); border-color: var(--forest); }
+      .result-card { }
+      .big-row { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+      .status-chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+      .status-chip.comparable { background: rgba(31,107,70,.10); color: var(--ok); }
+      .status-chip.mixed { background: var(--bad-soft); color: var(--bad); }
+      .status-chip.no { background: var(--surface-3); color: var(--muted); }
+      .status-chip.ranked { background: rgba(143,125,74,.14); color: var(--gold); }
+      table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12.5px; }
+      th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; padding: 6px 8px; border-bottom: 1px solid var(--hairline); }
+      td { padding: 8px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+      td.money, th.money { text-align: right; font-family: "Geist Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+      .resp { font-size: 11px; color: var(--muted); margin-top: 2px; }
+      .warn { margin-top: 14px; padding: 12px 14px; border: 1px solid var(--bad); border-left: 3px solid var(--bad); background: var(--bad-soft); border-radius: 8px; font-size: 13px; color: #7c2d1d; }
+      .ok-note { margin-top: 14px; padding: 12px 14px; border: 1px solid rgba(31,107,70,.35); border-left: 3px solid var(--ok); background: rgba(31,107,70,.06); border-radius: 8px; font-size: 13px; color: #14532d; }
+      .boundary { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--hairline); font-size: 12px; color: var(--muted); }
+      footer { margin-top: 26px; border-top: 1px solid var(--hairline); padding-top: 12px; font-size: 11.5px; color: var(--muted-2); }
+      .hidden { display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <p class="eyebrow">Quote Basis Ledger · 報價基礎對照</p>
+        <h1>兩張報價，先別比價錢，先比基礎。</h1>
+        <p class="sub">把每張報價的交貨條件（Incoterm）、幣別與責任範圍攤開對照——基礎不同就不排名，由你決定要不要先統一條件。</p>
+      </header>
+
+      <div class="note">
+        邊界：本工具<b>只做對照、不排名不可比的報價</b>（Rule 4 紀律）——FOB 與 DDP 的價錢不能直接比，工具不會硬排，也不會偷偷換匯率。
+        條件相同才提供排序視圖，且排序僅供參考，決定仍在你。本頁無 API key、無後端、無上傳。
+      </div>
+
+      <div class="card">
+        <h2>報價輸入</h2>
+        <p class="hint">至少兩張。每張填供應商／報價單號、交貨條件、幣別與金額；不確定的欄位留空即可（顯示 UNKNOWN，不猜）。</p>
+        <div id="quote-rows"></div>
+        <div class="btn-row">
+          <button type="button" class="ghost" id="btn-add">＋ 加一張報價</button>
+          <button type="button" id="btn-calc">對照</button>
+          <button type="button" class="secondary" id="btn-reset">重設</button>
+        </div>
+      </div>
+
+      <div class="card result-card hidden" id="result-card">
+        <h2>對照結果</h2>
+        <div class="big-row">
+          <span class="status-chip no" id="r-chip">—</span>
+        </div>
+        <div id="r-warn"></div>
+        <div id="r-table-wrap"></div>
+        <p class="boundary" id="r-reading"></p>
+      </div>
+
+      <footer>Quote Basis Ledger · 純確定性對照 · 基礎不同不排名 · 無 API key</footer>
+    </div>
+    <script type="module" src="./quote-basis-view.js"></script>
+  </body>
+</html>

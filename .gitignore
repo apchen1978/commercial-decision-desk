@@ -1,0 +1,5 @@
+# local browser-verification artifacts (Playwright screenshots/scripts)
+output/
+.playwright-cli/
+# volatile matrix-run output (regenerated on demand)
+scenario-test/outputs/scenario-results.raw.json

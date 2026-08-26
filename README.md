@@ -31,6 +31,30 @@ python -m http.server 8080
 # or: npx serve .
 ```
 
+## Workbench tools (companion pages, no engine changes)
+
+Small deterministic companions to the desk — pure client-side, no API key,
+no backend, no network, no persistence. They **present and classify only**;
+every threshold, ranking and decision stays with the human.
+
+- `margin.html` — **Trade Margin & Cost Calculator** (`margin-calculator.js`,
+  21/21 tests): net contribution = revenue − direct − trade − deal-specific −
+  contingency; effective margin in bps; a display-only cost-shift line; the
+  threshold is **caller-declared**, never invented (`NO_THRESHOLD` when absent).
+- `ledger.html` — **Decision Ledger** (`workbench-ledger.js`, 19/19 tests):
+  export the desk's recommendation as a JSON decision asset; the review page is
+  a read-only local-file viewer (FileReader, no server). Human decision is
+  recorded separately and never fabricated.
+- `quote-basis.html` — **Quote Basis Ledger** (`quote-basis-ledger.js`,
+  28/28 tests): compares quotes by Incoterm, currency, responsibility and
+  amount. **Rule 4 discipline:** mixed bases / mixed currencies / incomplete
+  entries are `NOT_COMPARABLE` and never ranked; the tool does not silently
+  convert FX. A sorted view appears only when the set is comparable, and is
+  labeled "reference only".
+
+Tests: `node margin-calculator.test.mjs` · `node workbench-ledger.test.mjs` ·
+`node quote-basis-ledger.test.mjs`.
+
 ## Files
 
 - `index.html` — one-screen flow: Opportunity → Evidence → Commercial →

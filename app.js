@@ -12,6 +12,7 @@ import { buildTradeDealViewModel } from "./trade-deal-structure.js";
 import { buildEconomicsBridge, economicsEvidenceTrace, economicsReading } from "./economics-bridge.js";
 import { buildCommercialMomentum, buildEvidenceCoverage, momentumPresentationBand } from "./commercial-momentum.js";
 import { buildDealBriefViewModel, downloadDealBrief } from "./deal-brief.js";
+import { downloadLedgerSnapshot } from "./workbench-ledger.js";
 import { buildFinalDecisionSummaryState } from "./final-decision-summary.js";
 
 const $ = (id) => document.getElementById(id);
@@ -934,6 +935,15 @@ function renderHumanDecision() {
 $("human-note").addEventListener("input", (e) => { humanNote = e.target.value; renderHumanDecision(); });
 $("btn-export-md").addEventListener("click", () => exportCurrentDealBrief("md"));
 $("btn-export-txt").addEventListener("click", () => exportCurrentDealBrief("txt"));
+$("btn-export-ledger").addEventListener("click", () => {
+  const brief = currentDealBrief();
+  if (!brief) {
+    $("export-status").textContent = tx("export.beforeRun");
+    return;
+  }
+  const result = downloadLedgerSnapshot(brief);
+  $("export-status").textContent = tx("export.downloaded") + " " + result.filename;
+});
 
 // --- reset -------------------------------------------------------------------
 $("btn-reset").addEventListener("click", () => {

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>Decision Ledger — 決策回顧</title>
+    <style>
+      :root {
+        --ink: #16191d; --muted: #5c6570; --muted-2: #8b929c;
+        --line: #e2e6ea; --bone: #f7f8f9; --surface: #ffffff;
+        --surface-2: #f9fafb; --hairline: #e7eaee;
+        --forest: #0e4f2f; --gold: #8f7d4a; --bad: #b3402b;
+        --ok: #1f6b46; --unk: #7c6b1e;
+        --radius-lg: 14px; --radius-sm: 8px;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+        background: var(--bone); color: var(--ink); line-height: 1.6;
+      }
+      .wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 80px; }
+      header { border-bottom: 1px solid var(--hairline); padding-bottom: 16px; }
+      .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+      h1 { font-size: 26px; margin: 8px 0 4px; letter-spacing: -0.02em; }
+      .sub { color: var(--muted); font-size: 13.5px; max-width: 640px; }
+      .note { margin-top: 14px; padding: 10px 14px; border: 1px solid var(--line); border-left: 3px solid var(--gold); background: var(--surface-2); border-radius: 8px; font-size: 12.5px; color: var(--muted); }
+      .load-zone { margin: 22px 0; padding: 22px; border: 1.5px dashed var(--line); border-radius: var(--radius-lg); background: var(--surface); text-align: center; }
+      .load-zone input[type="file"] { font: inherit; }
+      section { margin-top: 26px; }
+      h2 { font-size: 17px; letter-spacing: -0.01em; margin: 0 0 10px; }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px 18px; margin-top: 10px; box-shadow: 0 1px 2px rgba(22,25,29,.04); }
+      .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+      .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+      .tag.now { background: #e6f2ec; color: var(--ok); }
+      .tag.hold { background: #f4eeda; color: var(--unk); }
+      .tag.cond { background: #f6eede; color: #9a6b1f; }
+      .tag.esc, .tag.drop { background: #f9e7e2; color: var(--bad); }
+      .tag.unk { background: #eef0f3; color: var(--muted); }
+      .tag.human { background: #e6eef7; color: #2b5b9e; }
+      .muted { color: var(--muted); font-size: 13px; }
+      .mono { font-family: "Geist Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+      .kv { display: grid; grid-template-columns: 150px 1fr; gap: 4px 12px; font-size: 13px; margin-top: 8px; }
+      .kv dt { color: var(--muted); }
+      .kv dd { margin: 0; overflow-wrap: anywhere; }
+      ul { margin: 8px 0 0; padding-left: 18px; }
+      li { font-size: 13px; margin: 4px 0; }
+      .divider { border: 0; border-top: 1px solid var(--hairline); margin: 14px 0; }
+      .rec { font-size: 18px; font-weight: 700; letter-spacing: 0.01em; }
+      footer { margin-top: 30px; border-top: 1px solid var(--hairline); padding-top: 12px; font-size: 11.5px; color: var(--muted-2); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <p class="eyebrow">Decision Ledger · 決策回顧</p>
+        <h1>決策複利庫</h1>
+        <p class="sub">匯入 CDD 匯出的決策快照（JSON），回顧每張商機的證據、建議與你的決定。本頁<b>唯讀</b>——不會重算、不會重新詮釋任何決定。</p>
+      </header>
+
+      <div class="note">
+        隱私與邊界：本頁<b>僅在本機瀏覽器運作</b>——不上傳、不儲存、無網路呼叫、無 API key。
+        快照內容由 CDD 評估時產生；本頁只呈現，不判斷。
+      </div>
+
+      <div class="load-zone">
+        <input type="file" id="file-input" accept=".json,application/json" />
+        <p class="muted" style="margin:10px 0 0" id="file-hint">選擇一個 CDD-Decision-Ledger-*.json 快照</p>
+      </div>
+
+      <div id="error-box" hidden style="padding:12px 14px;border:1px solid #f0c9c2;border-left:3px solid var(--bad);background:#fdf5f3;border-radius:8px;font-size:13px;color:var(--bad)"></div>
+
+      <div id="ledger-content" hidden>
+        <section id="sec-overview">
+          <h2>商機總覽</h2>
+          <div class="card">
+            <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+              <span class="tag unk" id="l-synthetic">SYNTHETIC</span>
+              <h2 style="margin:0" id="l-name">—</h2>
+              <span class="mono muted" id="l-id"></span>
+            </div>
+            <dl class="kv" id="l-snapshot"></dl>
+          </div>
+        </section>
+
+        <section id="sec-decision">
+          <h2>建議 vs 你的決定（分離呈現）</h2>
+          <div class="grid2">
+            <div class="card">
+              <p class="muted" style="margin:0">工作台建議</p>
+              <p class="rec" id="l-rec">—</p>
+            </div>
+            <div class="card">
+              <p class="muted" style="margin:0">人類決定</p>
+              <p class="rec" id="l-human">—</p>
+              <p class="muted" id="l-human-note" style="margin:8px 0 0"></p>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-position">
+          <h2>證據位置（原樣呈現，不重算）</h2>
+          <div class="grid2">
+            <div class="card">
+              <h2 style="font-size:14px;margin:0 0 6px">為什麼</h2>
+              <ul id="l-reasons"></ul>
+            </div>
+            <div class="card">
+              <h2 style="font-size:14px;margin:0 0 6px">控制項目 / 阻擋</h2>
+              <ul id="l-blockers"></ul>
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="card">
+              <h2 style="font-size:14px;margin:0 0 6px">UNKNOWN（保持 UNKNOWN）</h2>
+              <ul id="l-unknowns"></ul>
+            </div>
+            <div class="card">
+              <h2 style="font-size:14px;margin:0 0 6px">矛盾</h2>
+              <ul id="l-contradictions"></ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-trace">
+          <h2>證據追溯</h2>
+          <div class="card">
+            <p class="muted" id="l-trace"></p>
+            <hr class="divider" />
+            <p class="muted" id="l-boundary"></p>
+          </div>
+        </section>
+      </div>
+
+      <footer>Decision Ledger · 本機唯讀回顧頁 · 快照由 CDD Workbench 匯出 · schema v1</footer>
+    </div>
+    <script type="module" src="./workbench-ledger-view.js"></script>
+  </body>
+</html>

@@ -97,12 +97,18 @@ const brief = buildDealBriefViewModel({
   check("unsupported schema rejected", parseLedgerSnapshot(JSON.stringify({ ...s, ledger: { ...s.ledger, schemaVersion: 99 } })).ok === false);
 }
 
-// 7. filename deterministic + safe
+// 7. filename collision-safe + deterministic
 {
   const f1 = ledgerFilename(brief);
   const f2 = ledgerFilename(brief);
-  check("filename deterministic", f1 === f2);
-  check("filename is .json + date-prefixed", /^CDD-Decision-Ledger-\d{4}-\d{2}-\d{2}-.+\.json$/.test(f1), f1);
+  check("filename deterministic for same brief", f1 === f2);
+  check("filename is .json + date+time+oppid", /^CDD-Decision-Ledger-\d{4}-\d{2}-\d{2}-\d{6}-OPP-2026-008-.+\.json$/.test(f1), f1);
+  // collision test: same opportunity, same day, DIFFERENT generatedAt time -> distinct
+  const fA = ledgerFilename({ snapshot: { name: brief.snapshot.name }, opportunityId: "OPP-2026-008", generatedAt: "2026-08-24T10:00:00.000Z" });
+  const fB = ledgerFilename({ snapshot: { name: brief.snapshot.name }, opportunityId: "OPP-2026-008", generatedAt: "2026-08-24T10:05:00.000Z" });
+  check("same-day same-opp different time -> distinct filenames (no collision)", fA !== fB, fA + " vs " + fB);
+  // no double extension
+  check("filename has single .json extension", /\.json$/.test(f1) && !/\.\.json$/.test(f1), f1);
 }
 
 const failed = results.filter(([, ok]) => !ok);

@@ -6,8 +6,6 @@
 // synthetic markers / evidence traceability.
 //
 // Ledger page (ledger.html) is static, local-file-only, read-only.
-import { sanitizeDealBriefFilename } from "./deal-brief.js";
-
 export const LEDGER_SCHEMA_VERSION = 1;
 
 // --- snapshot shape ----------------------------------------------------------
@@ -40,12 +38,20 @@ export function serializeLedgerSnapshot(brief, extra = {}) {
   };
 }
 
-// --- deterministic filename --------------------------------------------------
+// --- deterministic filename (collision-safe: date + opp id + time) ------------
 export function ledgerFilename(brief, extension = "json") {
-  const base = sanitizeDealBriefFilename(brief?.snapshot?.name || "untitled-opportunity", "");
-  const name = base.replace(/^CDD-Deal-Brief-/, "").replace(/\.(md|txt)$/, "");
+  const rawName = String(brief?.snapshot?.name || "untitled-opportunity")
+    .normalize("NFKC")
+    .replace(/[^\p{L}\p{N}._-]+/gu, "-")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^[-.]+|[-.]+$/g, "")
+    .slice(0, 60) || "untitled-opportunity";
+  const oppId = String(brief?.opportunityId || "opp").replace(/[^\p{L}\p{N}_-]+/gu, "").slice(0, 20) || "opp";
   const date = String(brief?.generatedAt || "").slice(0, 10) || "undated";
-  return `CDD-Decision-Ledger-${date}-${name}.${extension}`;
+  const time = String(brief?.generatedAt || "").slice(11, 19).replace(/:/g, "") || "000000";
+  return `CDD-Decision-Ledger-${date}-${time}-${oppId}-${rawName}.${extension}`;
 }
 
 // --- download hook (mirrors downloadDealBrief) -------------------------------

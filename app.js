@@ -14,6 +14,7 @@ import { buildCommercialMomentum, buildEvidenceCoverage, momentumPresentationBan
 import { buildDealBriefViewModel, downloadDealBrief } from "./deal-brief.js";
 import { downloadLedgerSnapshot } from "./workbench-ledger.js";
 import { buildFinalDecisionSummaryState } from "./final-decision-summary.js";
+import { createImportPreview, reviewImportSignal, confirmImportContext, buildConfirmedInput } from "./intake-import.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -29,6 +30,7 @@ let humanNote = "";
 let language = initialLanguage();
 let selectedPathId = null;
 let decisionPathExperiment = null;
+let intakePreview = null;
 
 const tx = (key) => t(key, language);
 const stateLabel = (state) => stateLabels(language)[state] || state;
@@ -477,6 +479,7 @@ function applyLanguage() {
     rerenderLists();
   }
   if (engine) renderResult();
+  if (intakePreview) renderIntakePreview();
 }
 
 function initialLanguage() {
@@ -508,6 +511,19 @@ function setLanguage(nextLanguage) {
 $("lang-zh").addEventListener("click", () => setLanguage("zh-TW"));
 $("lang-en").addEventListener("click", () => setLanguage("en"));
 
+$("choose-intake-proposal").addEventListener("click", () => $("intake-proposal-file").click());
+$("intake-proposal-file").addEventListener("change", async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  try {
+    intakePreview = createImportPreview(JSON.parse(await file.text()));
+  } catch (error) {
+    intakePreview = { valid: false, errors: [error.message || "invalid JSON"] };
+  }
+  renderIntakePreview();
+  event.target.value = "";
+});
+
 $("mode-sample").addEventListener("click", () => {
   mode = "sample";
   $("workbench-title").textContent = tx("workbench.sampleTitle");
@@ -537,6 +553,59 @@ $("mode-blank").addEventListener("click", () => {
   $("result-area").hidden = true;
   showWorkbench();
 });
+
+function importSignalLabel(signal) {
+  return tx({ BUYER_FIT: "import.buyerFit", CATEGORY_FIT: "import.categoryFit", IMPORT_OPENNESS: "import.importOpenness" }[signal] || "import.preview");
+}
+
+function importStatusLabel(signal) {
+  if (signal.reviewState === "CONFIRMED") return tx("import.confirmed");
+  if (signal.reviewState === "REJECTED") return tx("import.rejected");
+  if (signal.mappingStatus === "UNKNOWN") return tx("import.unknown");
+  return signal.mappingStatus === "PROPOSED_UNMAPPED" ? tx("import.unmapped") : tx("import.proposed");
+}
+
+function renderIntakePreview() {
+  const root = $("intake-preview");
+  if (!root || !intakePreview) return;
+  root.hidden = false;
+  if (!intakePreview.valid) {
+    root.innerHTML = `<p class="import-error"><strong>${tx("import.error")}</strong> ${esc((intakePreview.errors || []).join("; "))}</p>`;
+    return;
+  }
+  const p = intakePreview;
+  const signalRows = p.signals.map((signal) => {
+    const canConfirm = signal.mappingStatus === "MAPPED";
+    return `<div class="import-signal"><div class="import-signal-head"><strong>${esc(importSignalLabel(signal.signal))}</strong><span class="import-status">${esc(importStatusLabel(signal))}</span></div><p>${esc(signal.originalValue)} · ${esc(signal.mappingStatus === "MAPPED" ? tx("import.mapped") : signal.mappingStatus === "UNKNOWN" ? tx("import.unknown") : tx("import.unmapped"))}</p><div class="import-actions">${canConfirm ? `<button type="button" data-import-confirm="${esc(signal.signal)}">${tx("import.confirm")}</button>` : ""}<button type="button" class="secondary" data-import-propose="${esc(signal.signal)}">${tx("import.keepProposed")}</button><button type="button" class="secondary" data-import-reject="${esc(signal.signal)}">${tx("import.reject")}</button></div></div>`;
+  }).join("");
+  root.innerHTML = `<h3>${tx("import.preview")} · ${esc(p.sourceRecordId)}</h3><div class="import-disclosure"><strong>${tx("import.synthetic")}</strong><br>${esc(p.sourceDisclosure.note)}</div><div class="import-meta"><div><span>${tx("snapshot.buyer")}</span><strong>${esc(p.context.buyerName)}</strong></div><div><span>${tx("snapshot.market")}</span><strong>${esc(p.context.marketCategory)}</strong></div><div><span>${tx("import.sourceTiers")}</span><strong>${esc(p.context.sourceTiers.join(" · ") || tx("import.unknown"))}</strong></div></div><label class="field"><input type="checkbox" id="import-context-confirm" ${p.context.confirmed ? "checked" : ""}> ${tx("import.confirmContext")}</label><h4>${tx("import.preview")}</h4>${signalRows}<h4>${tx("import.rationale")}</h4><ul class="import-list">${p.context.rationale.map((item) => `<li>${esc(item)}</li>`).join("") || `<li>${tx("import.unknown")}</li>`}</ul><h4>${tx("import.unknowns")}</h4><ul class="import-list">${p.unknowns.map((item) => `<li>${esc(item)}</li>`).join("") || `<li>${tx("import.unknown")}</li>`}</ul><h4>${tx("import.tensions")}</h4><ul class="import-list">${p.potentialTensions.map((item) => `<li>${esc(item.note)}</li>`).join("") || `<li>${tx("import.unknown")}</li>`}</ul><p class="import-boundary">${tx("import.applyNote")}</p><button type="button" id="apply-intake-proposal" ${p.signals.some((s) => s.reviewState === "CONFIRMED") || p.context.confirmed ? "" : "disabled"}>${tx("import.apply")}</button>`;
+  $("import-context-confirm")?.addEventListener("change", (event) => { intakePreview = confirmImportContext(intakePreview, event.target.checked); renderIntakePreview(); });
+  root.querySelectorAll("[data-import-confirm]").forEach((button) => button.addEventListener("click", () => { intakePreview = reviewImportSignal(intakePreview, button.dataset.importConfirm, "CONFIRMED"); renderIntakePreview(); }));
+  root.querySelectorAll("[data-import-propose]").forEach((button) => button.addEventListener("click", () => { intakePreview = reviewImportSignal(intakePreview, button.dataset.importPropose, "PROPOSED"); renderIntakePreview(); }));
+  root.querySelectorAll("[data-import-reject]").forEach((button) => button.addEventListener("click", () => { intakePreview = reviewImportSignal(intakePreview, button.dataset.importReject, "REJECTED"); renderIntakePreview(); }));
+  $("apply-intake-proposal")?.addEventListener("click", () => {
+    const result = buildConfirmedInput(intakePreview);
+    if (!result.input) return;
+    mode = "blank";
+    current = null;
+    engine = null;
+    humanDecision = null;
+    humanNote = "";
+    fillBlankIntake();
+    if (result.input.name) $("in-name").value = result.input.name;
+    if (result.input.buyerFit) $("in-buyer").value = result.input.buyerFit;
+    if (result.input.categoryFit) $("in-category").value = result.input.categoryFit;
+    if (result.input.note) $("in-note").value = result.input.note;
+    $("workbench-title").textContent = tx("workbench.blankTitle");
+    $("workbench-sub").textContent = tx("workbench.blankSubtitle");
+    $("intake-area").hidden = false;
+    $("run-area").hidden = false;
+    $("result-area").hidden = true;
+    showWorkbench();
+    intakePreview = null;
+    root.hidden = true;
+  });
+}
 
 // --- blank intake form -------------------------------------------------------
 // Locale decides the INITIAL default currency for a new blank assessment only

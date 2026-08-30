@@ -39,6 +39,23 @@
       .capability-title { margin: 0 0 7px; color: var(--forest); font-size: 20px; letter-spacing: -.01em; }
       .capability-body { margin: 0; font-size: 13.5px; line-height: 1.65; color: var(--muted); max-width: 64ch; }
       .capability-line { margin: 10px 0 0; color: var(--gold); font-size: 11px; letter-spacing: .04em; }
+      .scenario-intro { max-width: 860px; margin: 26px 0 30px; padding: 20px 0 0; border-top: 1px solid var(--line); }
+      .scenario-kicker { margin: 0 0 8px; color: var(--gold); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+      .scenario-intro h2 { margin-bottom: 7px; color: var(--forest); font-size: 23px; letter-spacing: -.02em; }
+      .scenario-lead { max-width: 62ch; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+      .scenario-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; margin-top: 18px; border: 1px solid var(--line); background: var(--line); border-radius: 12px; overflow: hidden; }
+      .scenario-fact { min-height: 76px; padding: 12px 13px; background: var(--surface, #fff); }
+      .scenario-fact strong { display: block; color: var(--ink); font-size: 12px; line-height: 1.35; }
+      .scenario-fact span { display: block; margin-top: 5px; color: var(--muted-2); font-size: 11px; line-height: 1.4; }
+      .scenario-flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 10px; margin-top: 18px; color: var(--muted); font-size: 12px; }
+      .scenario-flow strong { display: block; color: var(--forest); font-size: 12px; }
+      .scenario-flow .arrow { color: var(--gold); font-size: 17px; line-height: 1; }
+      .scenario-boundary { max-width: 68ch; margin: 15px 0 0; padding-left: 12px; border-left: 2px solid var(--gold); color: var(--ink); font-size: 13px; line-height: 1.6; }
+      .scenario-sample-link { display: inline-block; margin-top: 13px; color: var(--forest); font-size: 13px; font-weight: 700; text-decoration: none; }
+      .scenario-sample-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+      .trust-note { max-width: 70ch; margin: 12px 0 0; color: var(--muted-2); font-size: 12px; line-height: 1.6; }
+      @media (max-width: 760px) { .scenario-facts { grid-template-columns: 1fr 1fr; } }
+      @media (max-width: 640px) { .scenario-intro { margin-top: 22px; } .scenario-intro h2 { font-size: 21px; } .scenario-flow { grid-template-columns: 1fr; gap: 6px; } .scenario-flow .arrow { transform: rotate(90deg); } }
       section { margin-top: 26px; }
       h2 { font-size: 19px; margin: 0 0 10px; letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
       .card {
@@ -933,17 +950,23 @@
 
       <!-- MODE SCREEN -->
       <section id="mode-screen">
-        <div class="capability-note">
-          <p class="capability-eyebrow" data-i18n="capability.eyebrow">手動優先 · AI 可擴充 · 人類治理</p>
-          <h2 class="capability-title" data-i18n="capability.title">手動即可使用，也能持續擴充能力</h2>
-          <p class="capability-body" data-i18n="capability.body">CDD 不依賴人工智慧、API 金鑰或後端即可完成核心評估。系統以可追溯的商業規則、證據與人工判斷為基礎；未來亦可透過 AI API 與外部資料，進一步輔助資訊結構化、證據豐富、情境分析與更深入的決策支援。</p>
-          <p class="capability-line" data-i18n="capability.line">今日手動使用 → 需要時由 AI 輔助</p>
-          <div class="badges-row" aria-label="驗證徽章">
-            <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.verify">自動檢查</span> <span class="mono-num" data-i18n="badge.verifyNum">50/50</span></a>
-            <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk/tree/main/scenario-test" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.scenarios">情境回歸</span> <span class="mono-num">21</span></a>
-            <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk/tree/main/docs/interviews" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.gates">KYC + Margin 關卡已實作</span></a>
-            <a class="badge" href="#"><span class="dot"></span><span data-i18n="badge.manual">無 API key · 手動優先</span></a>
+        <div class="scenario-intro">
+          <p class="scenario-kicker" data-i18n="scenario.eyebrow">SYNTHETIC DEAL SCENARIO</p>
+          <h2 data-i18n="scenario.title">看似可接的訂單，真正還卡在哪裡？</h2>
+          <p class="scenario-lead" data-i18n="scenario.lead">這筆合成飯店窗簾商機有明確品類與採購路徑，卻仍不能直接承諾。</p>
+          <div class="scenario-facts">
+            <div class="scenario-fact"><strong data-i18n="scenario.fact.value">USD 480,000 合成詢價</strong><span data-i18n="scenario.fact.valueNote">12,000 metres · 規劃基準</span></div>
+            <div class="scenario-fact"><strong data-i18n="scenario.fact.payment">90 天帳期 vs 30% 預付款</strong><span data-i18n="scenario.fact.paymentNote">付款來源互相矛盾</span></div>
+            <div class="scenario-fact"><strong data-i18n="scenario.fact.delivery">CIF Khalifa Port</strong><span data-i18n="scenario.fact.deliveryNote">進口與安裝責任待確認</span></div>
+            <div class="scenario-fact"><strong data-i18n="scenario.fact.authority">最終核准人：UNKNOWN</strong><span data-i18n="scenario.fact.authorityNote">不可假定誰能拍板</span></div>
           </div>
+          <div class="scenario-flow" data-i18n-aria-label="scenario.flowAria" aria-label="CDD 決策流程">
+            <div><strong data-i18n="scenario.flow.raw">已知交易資訊</strong><span data-i18n="scenario.flow.rawNote">報價、付款、交付、聯絡人</span></div><span class="arrow" aria-hidden="true">→</span>
+            <div><strong data-i18n="scenario.flow.cdd">CDD 整理交易結構</strong><span data-i18n="scenario.flow.cddNote">KNOWN、UNKNOWN、矛盾與控制項目</span></div><span class="arrow" aria-hidden="true">→</span>
+            <div><strong data-i18n="scenario.flow.output">承諾前的下一步</strong><span data-i18n="scenario.flow.outputNote">補證據，再由 owner 決定</span></div>
+          </div>
+          <p class="scenario-boundary" data-i18n="scenario.boundary">CDD 不會替你補完缺失資料。它保留 UNKNOWN，指出控制項目與下一個需要確認的事實。</p>
+          <a class="scenario-sample-link" href="#mode-sample" data-i18n="scenario.sampleLink">查看這筆合成商機如何被整理 →</a>
         </div>
         <h2 data-i18n="mode.heading">開始</h2>
         <div class="mode-row">
@@ -958,6 +981,20 @@
             <p data-i18n="mode.sample.description">看 CDD 如何把證據變成建議與會議簡報。這是合成教學案例，不會影響你的評估。</p>
             <span class="cta" data-i18n="mode.sample.cta">查看範例 →</span>
           </div>
+        </div>
+
+        <div class="capability-note">
+          <p class="capability-eyebrow" data-i18n="capability.eyebrow">手動優先 · AI 可擴充 · 人類治理</p>
+          <h2 class="capability-title" data-i18n="capability.title">手動即可使用，也能持續擴充能力</h2>
+          <p class="capability-body" data-i18n="capability.body">CDD 不依賴人工智慧、API 金鑰或後端即可完成核心評估。系統以可追溯的商業規則、證據與人工判斷為基礎；未來亦可透過 AI API 與外部資料，進一步輔助資訊結構化、證據豐富、情境分析與更深入的決策支援。</p>
+          <p class="capability-line" data-i18n="capability.line">今日手動使用 → 需要時由 AI 輔助</p>
+          <div class="badges-row" aria-label="驗證徽章">
+            <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.verify">自動檢查</span> <span class="mono-num" data-i18n="badge.verifyNum">50/50</span></a>
+            <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk/tree/main/scenario-test" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.scenarios">情境回歸</span> <span class="mono-num">21</span></a>
+            <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk/tree/main/docs/interviews" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.gates">KYC + Margin 關卡已實作</span></a>
+            <a class="badge" href="#"><span class="dot"></span><span data-i18n="badge.manual">無 API key · 手動優先</span></a>
+          </div>
+          <p class="trust-note" data-i18n="trust.note">這些不是裝飾數字：自動檢查驗證既有規則可重跑，情境回歸驗證既有修正未倒退。它們不代表商業採用或 ROI 已獲證明。</p>
         </div>
 
         <div class="import-entry">

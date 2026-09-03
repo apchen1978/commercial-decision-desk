@@ -72,6 +72,15 @@ function traceText(item) {
 function actionTitle(action) { return tx(`action.${action.actionType}`); }
 function actionWhy(action) { return tx(`action.why.${action.actionType}`); }
 
+function displayEvidenceLabel(item) {
+  const value = typeof item === "string" ? item : item?.label;
+  const id = typeof item === "string" ? "" : item?.id;
+  const label = localizeEvidenceText(String(value || ""), language)
+    .replace(/\s*\((?:CTR|UNK)-\d+(?:\s*\/\s*(?:CTR|UNK)-\d+)*\)/g, "")
+    .trim();
+  return id ? `${label} (${id})` : label;
+}
+
 function tradeTermLabel(term) {
   return term === "UNKNOWN" || term === "notAssessed" ? tx("trade.notConfirmed") : term;
 }
@@ -88,7 +97,7 @@ function tradeTraceText(item) {
         ? tx("trade.paymentIncomplete")
         : item.sourceId === "BUYER_AUTHORITY"
           ? tx("trade.authorityUnknown")
-        : item.label;
+        : displayEvidenceLabel(item.label);
   return source + ": " + label;
 }
 
@@ -922,9 +931,9 @@ function renderResult() {
     <div id="result-control" class="dl-grid">
       <div class="glance-col"><h4>${tx("result.why")}</h4><ul>${g.reasons.map((r) => `<li>${esc(localizeReason(r, language, current.quoteComparabilityAssessed !== false))}</li>`).join("")}</ul></div>
       <div class="glance-col"><h4>${tx("result.controlItems")}</h4>${g.materialContradictions.length || g.termsIncomplete || g.blockingUnknowns.length ? `<ul>${[
-        ...g.materialContradictions.map((c) => `<li>${tx("result.materialContradiction")}: ${esc(c.label)} (${tx("result.unresolved")})</li>`),
+        ...g.materialContradictions.map((c) => `<li>${tx("result.materialContradiction")}: ${esc(displayEvidenceLabel(c))} (${tx("result.unresolved")})</li>`),
         ...(g.termsIncomplete ? [`<li>${tx("result.termsIncomplete")}</li>`] : []),
-        ...g.blockingUnknowns.map((u) => `<li>${tx("result.blockingUnknown")}: ${esc(u.label)}</li>`),
+        ...g.blockingUnknowns.map((u) => `<li>${tx("result.blockingUnknown")}: ${esc(displayEvidenceLabel(u))}</li>`),
         ...(g.weakEvidence ? [`<li>${tx("result.evidenceLow")}</li>`] : []),
       ].join("")}</ul>` : `<span class="muted">${tx("result.noBlockers")}</span>`}</div>
     </div>
@@ -934,13 +943,13 @@ function renderResult() {
     </div>
     <div class="dl-grid">
       <div class="glance-col"><h4>${tx("result.missing")}</h4><ul>${[
-        ...g.blockingUnknowns.map((u) => `<li>${esc(u.label)}</li>`),
+        ...g.blockingUnknowns.map((u) => `<li>${esc(displayEvidenceLabel(u))}</li>`),
         ...(g.weakEvidence || g.strongEvidence === false ? [`<li>Evidence quality not strong</li>`] : []),
         ...(g.kycGate === "ABSENT" && mode === "blank" ? [`<li>${tx("input.kyc")} — ${tx("result.notAssessed")}</li>`] : []),
         ...(g.marginGate === "ABSENT" && mode === "blank" ? [`<li>${tx("input.margin")} — ${tx("result.notAssessed")}</li>`] : []),
         ...(current.quoteComparabilityAssessed === false ? [`<li>${tx("input.quoteComparability")} — ${tx("result.notAssessed")}</li>`] : []),
       ].join("") || `<span class="muted">${tx("result.none")}</span>`}</ul></div>
-      <div class="glance-col"><h4>${tx("result.contradictions")}</h4>${current.contradictions.length ? `<ul>${current.contradictions.map((c) => `<li>${esc(c.label)}${c.material ? ` (${tx("input.material")})` : ""} — ${c.status === "RESOLVED" ? tx("input.resolved") : tx("result.unresolved")}</li>`).join("")}</ul>` : `<span class="muted">${tx("result.noneRecorded")}</span>`}</div>
+      <div class="glance-col"><h4>${tx("result.contradictions")}</h4>${current.contradictions.length ? `<ul>${current.contradictions.map((c) => `<li>${esc(displayEvidenceLabel(c))}${c.material ? ` (${tx("input.material")})` : ""} — ${c.status === "RESOLVED" ? tx("input.resolved") : tx("result.unresolved")}</li>`).join("")}</ul>` : `<span class="muted">${tx("result.noneRecorded")}</span>`}</div>
     </div>
     <div class="dl-grid dl-next">
       <div class="glance-col"><h4>${tx("result.verifyNext")}</h4>${next.length ? `<ul>${next.map((n) => `<li>${esc(localizeEvidenceText(n, language))}</li>`).join("")}</ul>` : `<span class="muted">${tx("result.noFurtherEvidence")}</span>`}</div>
@@ -1025,6 +1034,25 @@ function pathBlockText(item) {
   return key ? tx(key) : localizeEvidenceText(item.label, language);
 }
 
+function pathTraceFields(fields) {
+  const labels = {
+    "contradictions[CTR-1].status": "付款條件矛盾 (CTR-1)",
+    "unknowns[UNK-1]": "已釋出的訂單數量 (UNK-1)",
+    "unknowns[UNK-2]": "最終付款條件 (UNK-2)",
+    "unknowns[UNK-3]": "安裝與進口責任 (UNK-3)",
+    "commercialTerms.detail": "完整商務條件",
+  };
+  const english = {
+    "contradictions[CTR-1].status": "Payment-terms contradiction (CTR-1)",
+    "unknowns[UNK-1]": "Released order volume (UNK-1)",
+    "unknowns[UNK-2]": "Final payment terms (UNK-2)",
+    "unknowns[UNK-3]": "Installation and import liability (UNK-3)",
+    "commercialTerms.detail": "Complete commercial terms",
+  };
+  const map = language === "zh-TW" ? labels : english;
+  return fields.map((field) => map[field] || field.replace(/\[(?:CTR|UNK)-\d+\]/g, "")).join(" · ");
+}
+
 function renderDecisionPath() {
   const area = $("decision-path-area");
   if (!area) return;
@@ -1042,7 +1070,7 @@ function renderDecisionPath() {
   `;
   $("decision-path-options").innerHTML = experiment.paths.map((path) => `
     <button type="button" class="secondary ${selectedPathId === path.id ? "sel" : ""}" data-path-id="${path.id}">
-      <span class="path-option-id">${path.id}</span>${tx(pathTitleKey[path.id])}
+      <span class="path-option-id">${tx("path.option")} ${experiment.paths.indexOf(path) + 1}</span>${tx(pathTitleKey[path.id])}
     </button>
   `).join("");
   $("decision-path-options").querySelectorAll("button").forEach((button) => {
@@ -1077,7 +1105,7 @@ function renderDecisionPath() {
     </div>
     <div class="path-detail"><h4>${tx("path.stillBlocks")}</h4>${blocks.length ? `<ul>${blocks.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>` : `<p>${tx("path.noOpenGates")}</p>`}</div>
     <div class="path-detail"><h4>${tx("path.human")}</h4><p>${tx("path.humanBoundary")}</p></div>
-    <details class="path-trace"><summary>${tx("path.trace")}</summary><p>${esc(selected.manifest.semanticNote)}</p><p>${esc(selected.manifest.fieldsAffected.join(", "))}</p></details>
+    <details class="path-trace"><summary>${tx("path.trace")}</summary><p>${esc(selected.manifest.semanticNote)}</p><p>${esc(pathTraceFields(selected.manifest.fieldsAffected))}</p></details>
   `;
 }
 

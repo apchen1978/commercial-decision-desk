@@ -462,6 +462,7 @@
       #result-area .snapshot-coverage-track i { display:block; height:100%; background:#a3873f; }
       #result-area .snapshot-position > strong { font-size:18px; letter-spacing:.015em; }
       #result-area .snapshot-story { margin:14px 0 0; color:#4c5049; font-size:13px; line-height:1.55; }
+      #result-area .snapshot-story { padding:11px 14px; border-left:3px solid var(--gold); background:var(--surface-3); color:var(--forest); border-radius:0 var(--radius-sm) var(--radius-sm) 0; }
       #result-area .snapshot-next-action { display:grid; grid-template-columns:170px minmax(0,1fr); gap:12px; margin-top:13px; padding:12px 0; border-top:1px solid var(--hairline); border-bottom:1px solid var(--hairline); }
       #result-area .snapshot-next-action span { color:var(--brass); font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
       #result-area .snapshot-next-action strong { color:var(--charcoal); font-size:14px; line-height:1.45; }
@@ -502,6 +503,7 @@
       #result-area .glance-col { background: transparent; border: 0; border-top: 1px solid var(--hairline); border-radius: 0; padding: 12px 2px 4px; }
       #result-area .glance-col h4 { color: var(--brass); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
       #result-area .glance-col li, #result-area .glance-col span { color: #4b4f45; font-size: 13px; }
+      #result-area .glance-col li::marker { color:var(--gold); }
       #result-area .glance-note { color: #8b887a; font-size: 12px; border-top: 1px solid var(--hairline); padding-top: 10px; margin-top: 14px; }
       /* Next best action — one quiet container, right after position + why */
       #result-area .dl-next-move {
@@ -663,6 +665,12 @@
       .action-item p strong { color: var(--ink); }
       .action-item .action-why { color: var(--ink); }
       .action-item .action-human { border-top-color: var(--line); }
+      #result-area .sample-case-guide { background:var(--surface-3); border:1px solid var(--line); border-radius:var(--radius-sm); padding:12px 14px; }
+      #result-area .sample-case-guide summary { color:var(--forest); }
+      #result-area .sample-case-guide p { color:var(--muted); }
+      #result-area .sample-guide-grid span { color:var(--amber); }
+      #result-area .sample-guide-grid strong { color:var(--forest); }
+      #result-area .path-option-id { color:var(--amber); font-weight:800; margin-right:8px; }
       .prep-item { border-left-color: var(--amber); background: var(--surface-2); }
       .control-item, .acceptance-remedy-item { border-left-color: var(--amber); background: var(--surface-3); }
       .control-item small, .acceptance-remedy-item small { color: var(--muted); }
@@ -850,6 +858,7 @@
       }
       #result-area .result-nav a::before { color: var(--forest); }
       #result-area .action-priority, #result-area .path-option-id { color: var(--muted); }
+      #result-area .path-option-id { color:var(--amber); font-weight:800; margin-right:8px; }
       #result-area section > h2 { color: var(--ink); }
       #result-area .snapshot-heading-row h2 { color: var(--ink); }
       #result-area .snapshot-field span { color: var(--muted-2); }

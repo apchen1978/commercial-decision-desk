@@ -288,7 +288,10 @@ function renderTradeDeal(view) {
   const paymentEvidence = view.structure.paymentEvidence;
   const acceptanceRemedy = view.structure.acceptanceRemedy;
   const evidenceRows = paymentEvidence.items.length ? paymentEvidence.items.map((item) => `<div class="payment-evidence-item"><strong>${esc(item.label)}</strong><span>${tx("trade.paymentState." + item.state)}</span><small>${esc(item.source || tx("trade.unknown"))}${item.asOf ? " · " + esc(item.asOf) : ""}</small><small>${item.humanStatus === "CONFIRMED_BY_OWNER" ? tx("trade.ownerConfirmed") : tx("trade.pendingOwnerConfirmation")}${item.fragment ? " · " + esc(item.fragment) : ""}</small></div>`).join("") : `<p class="muted">${tx("trade.noPaymentEvidence")}</p>`;
+  const termsDetail = p.termsDetail ? esc(p.termsDetail) : tx("trade.noTermsDetail");
+  const namedPlace = current?.trade?.namedPlace || tx("trade.notConfirmed");
   $("trade-deal-structure").innerHTML = [
+    '<div class="trade-structure-brief"><span>' + tx("trade.workingBasis") + '</span><p>' + termsDetail + '</p></div>',
     '<div class="trade-grid">',
     '<div class="trade-block"><h3>' + tx("trade.paymentHeading") + '</h3><dl>',
     '<dt>' + tx("trade.paymentTerms") + '</dt><dd>' + (p.termsStatus === "COMPLETE" ? tx("trade.confirmed") : tx("trade.notConfirmed")) + '</dd>',
@@ -299,6 +302,7 @@ function renderTradeDeal(view) {
     '<div class="trade-block"><h3>' + tx("trade.acceptanceRemedyHeading") + '</h3>' + (acceptanceRemedy.items.length ? acceptanceRemedy.items.map((item) => '<div class="acceptance-remedy-item"><strong>' + esc(item.condition) + '</strong><small>' + esc(item.evidence) + '</small><small>' + esc(item.boundary) + '</small></div>').join("") : '<p class="muted">' + tx("trade.acceptanceRemedyUnknown") + '</p>') + '</div>',
     '<div class="trade-block"><h3>' + tx("trade.deliveryHeading") + '</h3><dl>',
     '<dt>' + tx("trade.declaredTerm") + '</dt><dd>' + tradeTermLabel(d.declaredTerm) + '</dd>',
+    '<dt>' + tx("trade.namedPlace") + '</dt><dd>' + esc(namedPlace) + '</dd>',
     '<dt>' + tx("trade.responsibility") + '</dt><dd>' + tx("trade.boundary." + tradeTermCopyKey(d.declaredTerm)) + '</dd>',
     '<dt>' + tx("trade.evidenceRequired") + '</dt><dd>' + tx("trade.evidence." + tradeTermCopyKey(d.declaredTerm)) + '</dd>',
     '</dl></div></div>',

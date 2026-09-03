@@ -274,8 +274,16 @@
       .snapshot-economics strong { color:var(--forest); font-size:14.5px; }
       .snapshot-control { display:grid; grid-template-columns:170px minmax(0,1fr); gap:12px; align-items:baseline; margin-top:14px; }
       .snapshot-control strong { color:var(--forest); font-size:13.5px; line-height:1.5; }
+      .sample-case-guide { margin-top:14px; padding-top:13px; border-top:1px solid var(--line); }
+      .sample-case-guide summary { cursor:pointer; color:var(--forest); font-size:13px; font-weight:800; }
+      .sample-case-guide > p { max-width:74ch; margin:7px 0 12px; color:var(--muted); font-size:12.5px; line-height:1.55; }
+      .sample-guide-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+      .sample-guide-grid > div { min-width:0; padding:10px 11px; border:1px solid var(--line); background:#fafbf7; }
+      .sample-guide-grid span { display:block; color:var(--muted); font-size:10.5px; font-weight:750; letter-spacing:.05em; text-transform:uppercase; }
+      .sample-guide-grid strong { display:block; margin-top:4px; color:var(--ink); font-size:12px; font-weight:600; line-height:1.5; overflow-wrap:anywhere; }
+      .field-guidance { display:block; margin-top:5px; color:var(--muted); font-size:11.5px; font-weight:500; line-height:1.45; }
       @media (max-width:760px) { .snapshot-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-      @media (max-width:540px) { .executive-snapshot { padding:14px; } .snapshot-heading-row { display:block; } .snapshot-state { min-width:0; padding:12px 0 0; margin-top:12px; border-left:0; border-top:1px solid var(--line); } .snapshot-control { grid-template-columns:1fr; gap:3px; } }
+      @media (max-width:540px) { .executive-snapshot { padding:14px; } .snapshot-heading-row { display:block; } .snapshot-state { min-width:0; padding:12px 0 0; margin-top:12px; border-left:0; border-top:1px solid var(--line); } .snapshot-control { grid-template-columns:1fr; gap:3px; } .sample-guide-grid { grid-template-columns:1fr; } }
 
       /* ===== COMMERCIAL WORKSPACE REFINEMENT (bounded visual layer, no semantics change) ===== */
       .wrap { max-width: 1080px; }
@@ -402,6 +410,8 @@
         background: var(--ivory); border: 1px solid var(--hairline); border-top: 3px solid var(--forest);
         border-radius: 4px; padding: 26px 28px 22px; margin: 10px 0 8px; box-shadow: none;
       }
+      #result-area .snapshot-report-meta { display:flex; align-items:center; flex-wrap:wrap; gap:8px 16px; padding-bottom:12px; border-bottom:1px solid var(--hairline); color:#6b6a5e; font-size:10.5px; font-weight:750; letter-spacing:.1em; text-transform:uppercase; }
+      #result-area .snapshot-report-meta strong { margin-left:auto; color:var(--brass); font-size:10px; font-weight:800; }
       .snapshot-kicker { color: var(--brass); }
       .snapshot-heading-row h2 { font-size: 28px; color: var(--charcoal); letter-spacing: -0.01em; }
       .snapshot-state { border-left-color: var(--hairline); }
@@ -535,6 +545,7 @@
         #result-area .rec-tag { font-size: 20px; }
         #result-area .dl-grid { grid-template-columns: 1fr; gap: 0; }
         #result-area .executive-snapshot { padding: 20px 18px; }
+        #result-area .snapshot-report-meta strong { width:100%; margin-left:0; }
         #result-area .snapshot-signals { grid-template-columns:1fr 1fr; margin-top:18px; }
         #result-area .snapshot-signal { padding:13px 12px; }
         #result-area .snapshot-signal:last-child { border-right:0; }
@@ -1037,6 +1048,9 @@
         <div id="intake-area" hidden>
           <div class="card">
             <h3 data-i18n="input.heading">你目前知道這個商機的哪些事？</h3>
+            <datalist id="quantity-unit-suggestions"><option value="metres"></option><option value="pieces"></option><option value="sets"></option><option value="rolls"></option><option value="m²"></option><option value="pairs"></option></datalist>
+            <datalist id="source-suggestions"><option value="Inbound enquiry"></option><option value="Referral"></option><option value="Trade show"></option><option value="Existing buyer"></option><option value="RFQ / tender"></option><option value="Website enquiry"></option></datalist>
+            <datalist id="contact-role-suggestions"><option value="Owner / founder"></option><option value="Purchasing manager"></option><option value="Technical lead"></option><option value="Project manager"></option><option value="Finance"></option><option value="Sales contact"></option></datalist>
             <label class="field"><span data-i18n="input.opportunityName">商機名稱</span></label>
             <input type="text" id="in-name" data-i18n-placeholder="input.opportunityNamePlaceholder" placeholder="例如：杜拜飯店集團 — 窗簾供應" />
             <details class="card intake-section" open>
@@ -1048,7 +1062,7 @@
               </div>
               <div class="field-row">
                 <label class="field"><span data-i18n="context.market">國家／市場</span><input type="text" id="in-market" /></label>
-                <label class="field"><span data-i18n="context.quantity">預估數量</span><span class="quantity-with-unit"><input type="number" id="in-quantity" min="0" /><span class="unit-hint" data-i18n="context.quantityUnit">單位</span><input type="text" id="in-quantity-unit" data-i18n-placeholder="context.quantityUnitPlaceholder" placeholder="例如：米、片、組、平方公尺" /></span></label>
+                <label class="field"><span data-i18n="context.quantity">預估數量</span><span class="quantity-with-unit"><input type="number" id="in-quantity" min="0" /><span class="unit-hint" data-i18n="context.quantityUnit">單位</span><input type="text" id="in-quantity-unit" list="quantity-unit-suggestions" data-i18n-placeholder="context.quantityUnitPlaceholder" placeholder="例如：米、片、組、平方公尺" /></span><small class="field-guidance" data-i18n="input.suggestionUnit">可從常用單位選取，也可自行輸入。</small></label>
               </div>
               <div class="field-row">
                 <label class="field"><span data-i18n="context.revenue">預估訂單收入</span><input type="number" id="in-revenue" min="0" /></label>
@@ -1058,13 +1072,13 @@
                 <label class="field"><span data-i18n="context.timing">預計時程</span><input type="text" id="in-timing" /></label>
                 <label class="field"><span data-i18n="context.relationship">買方關係</span><select id="in-relationship"><option value="unknown" data-i18n="context.unknown">UNKNOWN</option><option value="new" data-i18n="context.newBuyer">新買方</option><option value="existing" data-i18n="context.existingBuyer">既有買方</option></select></label>
               </div>
-              <label class="field"><span data-i18n="context.source">商機來源</span><input type="text" id="in-source" /></label>
+              <label class="field"><span data-i18n="context.source">商機來源</span><input type="text" id="in-source" list="source-suggestions" /><small class="field-guidance" data-i18n="input.suggestionSource">可選常見來源，也可保留你的原始描述。</small></label>
             </details>
             <details class="card intake-section">
               <summary data-i18n="context.authoritySummary">Buyer & decision authority</summary>
               <p class="muted" data-i18n="context.authorityHelper">這些資料只用來整理決策鏈與準備下一輪對話，不會自動判斷買方。</p>
               <div class="field-row">
-                <label class="field"><span data-i18n="context.contactRole">目前聯絡人角色</span><input type="text" id="in-contact-role" /></label>
+                <label class="field"><span data-i18n="context.contactRole">目前聯絡人角色</span><input type="text" id="in-contact-role" list="contact-role-suggestions" /><small class="field-guidance" data-i18n="input.suggestionRole">可選常見角色，也可保留對方實際職稱。</small></label>
                 <label class="field"><span data-i18n="context.purchasingAuthority">採購權限已知？</span><select id="in-purchasing-authority"><option value="unknown" data-i18n="context.unknown">UNKNOWN</option><option value="yes" data-i18n="context.yes">是</option><option value="no" data-i18n="context.no">否</option></select></label>
               </div>
               <div class="field-row">

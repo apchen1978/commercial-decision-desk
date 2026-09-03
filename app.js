@@ -172,6 +172,8 @@ function momentumValueLabel(value) {
 
 function renderExecutiveSnapshot({ economics, tradeView, control, momentum, coverage, nextBestAction }) {
   const context = current.commercialContext || {};
+  const reportReference = current.id || tx("report.noReference");
+  const reportMarker = current.synthetic ? tx("report.synthetic") : tx("report.ownerEntered");
   const buyer = context.buyerCompany || current.buyers?.[0]?.label || tx("context.unknown");
   const currency = current.economics?.currency || "CNY";
   const revenue = economics.revenue === null ? tx("context.unknown") : economicsValue(economics.revenue, currency);
@@ -195,12 +197,28 @@ function renderExecutiveSnapshot({ economics, tradeView, control, momentum, cove
   const positiveDrivers = momentum.drivers.filter((driver) => driver.direction === "UP").slice(0, 3);
   const limitingDrivers = momentum.drivers.filter((driver) => driver.direction !== "UP").slice(0, 2);
   const coverageGaps = momentum.unknownDimensions.slice(0, 2);
+  const sampleGuide = current.synthetic === true
+    ? current.sampleGuide?.[language === "zh-TW" ? "zh" : "en"]
+    : null;
+  const sampleGuideHtml = sampleGuide ? `
+    <details class="sample-case-guide">
+      <summary>${tx("sampleGuide.summary")}</summary>
+      <p>${tx("sampleGuide.body")}</p>
+      <div class="sample-guide-grid">
+        ${Object.entries(sampleGuide).map(([key, value]) => `<div><span>${tx(`sampleGuide.${key}`)}</span><strong>${esc(value)}</strong></div>`).join("")}
+      </div>
+    </details>` : "";
   const driverLine = (driver) => {
     const symbol = driver.direction === "UP" ? "↑" : driver.direction === "DOWN" ? "↓" : "?";
     const value = driver.direction === "UNKNOWN" ? tx("status.unknown") : momentumValueLabel(driver.value);
     return `<li class="snapshot-driver ${driver.direction.toLowerCase()}"><b>${symbol}</b> ${momentumDimensionLabel(driver.id)}: ${value}</li>`;
   };
   $("executive-deal-snapshot").innerHTML = `
+    <div class="snapshot-report-meta">
+      <span>${tx("report.type")}</span>
+      <span>${tx("report.reference")}: ${snapshotValue(reportReference)}</span>
+      <strong>${reportMarker}</strong>
+    </div>
     <div class="snapshot-heading-row">
       <div>
         <span class="snapshot-kicker">${tx("snapshot.heading")}</span>
@@ -224,6 +242,7 @@ function renderExecutiveSnapshot({ economics, tradeView, control, momentum, cove
       <div class="snapshot-field snapshot-economics"><span>${tx("snapshot.netContribution")}</span><strong>${snapshotValue(netContribution)}</strong></div>
     </div>
     <div class="snapshot-control"><span>${tx("snapshot.control")}</span><strong>${snapshotValue(control)}</strong></div>
+    ${sampleGuideHtml}
   `;
 }
 

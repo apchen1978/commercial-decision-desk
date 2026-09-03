@@ -22,11 +22,31 @@ export const opportunity = {
     timing: "First shipment target: 15 Sep 2026; installation window: Oct–Nov 2026 (synthetic)",
     relationship: "new",
     source: "Synthetic RFP + synthetic referral call note",
-    contactRole: "Regional procurement manager (synthetic)",
+    contactRole: "Daniel Al-Mansoori — Regional Procurement Manager (synthetic contact)",
     purchasingAuthority: "yes",
     technicalAuthority: "yes",
     finalApprover: "unknown",
     accessDecisionMaker: "yes",
+  },
+  // Presentation-only teaching aid for the Sample path. It does not enter the
+  // Decision Core, Momentum, Coverage, or a manual assessment.
+  sampleGuide: {
+    zh: {
+      quantityPricing: "12,000 metres 為 RFP 規劃基準；目標單價 USD 40／metre，買方要求 5% 折讓。此數量尚非已承諾採購量。",
+      payment: "RFP 提到交付後 90 天付款；轉介紀錄僅提到 30% 預付款。其餘 70% 的觸發條件與日期仍為 UNKNOWN。",
+      specification: "遮光布、紗簾與裝飾簾頭；樣品／mockup 僅作規劃基準。飯店防焰與認證仍需以正式核准文件確認。",
+      authority: "Daniel Al-Mansoori 為合成採購聯絡人；採購與技術路徑已知，但最終商務核准人仍為 UNKNOWN。",
+      delivery: "合成基準報價為 CIF Khalifa Port；現場安裝、進口清關、關稅、保固與場地責任未被納入供貨範圍。",
+      economics: "已填入收入、產品成本、貿易／物流、專案成本與風險準備金；預期淨貢獻 USD 120,000，仍不是接受訂單的授權。",
+    },
+    en: {
+      quantityPricing: "12,000 metres is the RFP planning basis; target price is USD 40/metre with a requested 5% discount. It is not a committed purchase quantity.",
+      payment: "The RFP says payment 90 days after delivery; a referral note only mentions 30% advance. The trigger and date for the remaining 70% are still UNKNOWN.",
+      specification: "Blackout drapery, sheers and valances; the sample/mockup is planning-level only. Hospitality fire-rating and certification still need formal approval evidence.",
+      authority: "Daniel Al-Mansoori is the synthetic procurement contact. Purchasing and technical paths are known; final commercial authority remains UNKNOWN.",
+      delivery: "The synthetic baseline quote is CIF Khalifa Port. Site installation, import clearance, duty, warranty and site liability are outside the supply scope until confirmed.",
+      economics: "Revenue, product cost, trade/logistics, deal-specific cost and contingency are recorded; expected net contribution is USD 120,000, not authority to accept the deal.",
+    },
   },
   economics: {
     currency: "USD",
@@ -58,7 +78,8 @@ export const opportunity = {
     evidenceQuality: {
       value: "MEDIUM",
       evidence: [
-        { tier: "PRIMARY", note: "Product specification document reviewed (synthetic)." },
+        { tier: "PRIMARY", note: "Synthetic product specification reviewed: blackout, sheer and valance scope; sample/mockup approval recorded for the planning basis." },
+        { tier: "SUPPORTING", note: "Synthetic specification pack records drawing references, hospitality fire-rating requirements and certification review as part of the buyer's approval path; final acceptance evidence is not yet a released order condition." },
         { tier: "SUPPORTING", note: "Procurement notice + referral note (synthetic)." },
         { tier: "VERIFICATION_REQUIRED", note: "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)." },
       ],
@@ -72,8 +93,8 @@ export const opportunity = {
     commercialFeasibility: {
       value: "CONDITIONAL",
       evidence: [
-        { tier: "SUPPORTING", note: "MOQ and the Sep 2026 shipment window are feasible at current capacity (synthetic estimate)." },
-        { tier: "SUPPORTING", note: "The baseline quote is CIF Khalifa Port; local installation and importer obligations remain outside the baseline supply scope (synthetic)." },
+        { tier: "SUPPORTING", note: "The 12,000-metre MOQ baseline and Sep 2026 shipment window are feasible at current capacity (synthetic estimate)." },
+        { tier: "SUPPORTING", note: "The baseline quote is CIF Khalifa Port; local delivery, installation, import clearance and duty remain outside the baseline supply scope unless separately confirmed (synthetic)." },
       ],
     },
   },
@@ -89,9 +110,9 @@ export const opportunity = {
     },
   ],
   unknowns: [
-    { id: "UNK-1", label: "Released order volume", detail: "The 12,000-metre planning quantity is an indicative RFP baseline. The released purchase-order quantity remains UNKNOWN until confirmed.", blocksPursue: true, resolveWith: "Buyer-issued purchase order or released quantity schedule" },
-    { id: "UNK-2", label: "Final payment terms", detail: "Contradictory sources (CTR-1); the binding terms are UNKNOWN until confirmed in writing.", blocksPursue: true, resolveWith: "Written confirmation of binding payment terms" },
-    { id: "UNK-3", label: "Installation and importer liability", detail: "Whether local installation, import clearance, duty and site-side liability can be excluded from the supplier scope remains UNKNOWN.", blocksPursue: false, resolveWith: "Written responsibility matrix for installation, import and site delivery" },
+    { id: "UNK-1", label: "Released order volume", detail: "The 12,000-metre quantity is an indicative RFP planning baseline and the synthetic quote uses it as MOQ. The released purchase-order quantity, phased schedule and buyer commitment remain UNKNOWN until confirmed.", blocksPursue: true, resolveWith: "Buyer-issued purchase order or released quantity schedule confirming MOQ and phases" },
+    { id: "UNK-2", label: "Final payment terms", detail: "Contradictory sources (CTR-1): 90 days after delivery versus a verbal 30% advance. The trigger, timing and binding treatment of the remaining 70% balance are UNKNOWN until confirmed in writing.", blocksPursue: true, resolveWith: "Written confirmation of the buyer payment schedule, including the 30% / 70% triggers" },
+    { id: "UNK-3", label: "Installation and importer liability", detail: "Local installation, import clearance, duty, warranty/site liability and the final commercial approver remain UNKNOWN. Hospitality specification acceptance is evidenced only at planning level, not as a released commitment.", blocksPursue: false, resolveWith: "Written responsibility matrix, certification/approval checklist and named final approver" },
   ],
   whyNot: [
     "Payment-terms contradiction (CTR-1) is unresolved — proceeding on assumed terms would convert UNKNOWN into fact.",
@@ -99,15 +120,15 @@ export const opportunity = {
     "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier).",
   ],
   why: [
-    "Strong Buyer Fit: the synthetic procurement desk has a defined category, volume baseline and meeting path.",
+    "Strong Buyer Fit: the synthetic procurement desk has a defined category, indicative volume baseline and meeting path through Daniel Al-Mansoori (synthetic contact).",
     "Strong Category Fit: blackout drapery, sheers and valances match the core window-treatment category.",
     "Clear import openness: the synthetic RFP explicitly invites international suppliers for delivery to Abu Dhabi.",
-    "The USD 120,000 expected net contribution is above the synthetic owner reference of USD 96,000, before unresolved terms are accepted.",
+    "The USD 120,000 expected net contribution is above the synthetic owner reference of USD 96,000, before unresolved terms, scope and authority are accepted.",
   ],
   commercialTerms: {
     status: "INCOMPLETE",
     detail:
-      "SYNTHETIC planning basis: USD 480,000 CIF Khalifa Port, 60-day quote validity, 12,000-metre MOQ baseline and sample-approved production scope. The buyer's RFP states 90 days after delivery while a referral note suggests 30% advance; binding payment terms are therefore INCOMPLETE. Target price is USD 40/metre; a requested 5% discount and two competing supplier offers require scope-normalized comparison.",
+      "SYNTHETIC / HYPOTHETICAL planning basis: 12,000 metres at a target USD 40/metre = USD 480,000 expected revenue; CIF Khalifa Port; 60-day quote validity; MOQ baseline 12,000 metres; sample/mockup-approved planning scope. The buyer's RFP states 90 days after delivery while a referral note suggests 30% advance; the trigger and treatment of the remaining 70% balance are UNKNOWN, so binding payment terms are INCOMPLETE. A requested 5% discount and two competing supplier offers require scope-normalized comparison. The synthetic contact is a procurement path, not verified final authority.",
     resolveWith: "Binding commercial terms in writing (payment schedule, CIF named place and excluded installation/import scope)",
     paymentEvidence: [
       { id: "PEV-1", label: "Buyer RFP: 90 days after delivery", state: "PROPOSED", source: "Synthetic buyer RFP", fragment: "Payment at 90 days after delivery", asOf: "2026-06-18 (synthetic)", humanStatus: "PENDING_REVIEW" },

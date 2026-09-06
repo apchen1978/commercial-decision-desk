@@ -58,6 +58,31 @@ function structureQuality(value) {
   return { HIGH: tx("status.highConfidence"), MEDIUM: tx("status.someConfidence"), LOW: tx("status.lowConfidence"), UNKNOWN: tx("structure.unknown") }[value] || tx("structure.unknown");
 }
 
+// Gate status short labels — presentation only. ABSENT (not yet assessed) is
+// never presented as "clear"; it stays visibly "尚未評估 / not assessed".
+function kycGateLabel(value) {
+  return {
+    ABSENT: tx("structure.kycAbsent"), CLEAR: tx("structure.kycClear"),
+    KYC_INCOMPLETE: tx("structure.kycIncomplete"), SANCTIONS_VETO: tx("structure.kycVeto"),
+  }[value] || tx("context.unknown");
+}
+function marginGateLabel(value) {
+  return {
+    ABSENT: tx("structure.marginAbsent"), CLEAR: tx("structure.marginClear"),
+    BELOW_THRESHOLD: tx("structure.marginBelow"), COST_SHIFT: tx("structure.marginShift"),
+  }[value] || tx("context.unknown");
+}
+// A gate that still blocks or needs action; ABSENT and CLEAR are not blocking.
+function gateOpen(value) {
+  return value === "SANCTIONS_VETO" || value === "KYC_INCOMPLETE" || value === "BELOW_THRESHOLD" || value === "COST_SHIFT";
+}
+
+// Acceptance/remedy system copy — localized by i18nKey (presentation only).
+function remedyCondition(item) { return tx(`remedy.cond.${item.i18nKey}`); }
+function remedyAction(item) { return tx(`remedy.action.${item.i18nKey}`); }
+function remedyRerun(item) { return tx(item.i18nKey === "unknown" ? "remedy.rerun.unknown" : "remedy.rerun.evidence"); }
+function remedyBoundary(item) { return tx(item.i18nKey === "unknown" ? "remedy.boundary.unknown" : "remedy.boundary"); }
+
 function traceText(item) {
   const source = tx(`trace.${item.sourceType}`);
   const label = localizeEvidenceText(item.label, language);
@@ -288,7 +313,10 @@ function renderTradeDeal(view) {
   const paymentEvidence = view.structure.paymentEvidence;
   const acceptanceRemedy = view.structure.acceptanceRemedy;
   const evidenceRows = paymentEvidence.items.length ? paymentEvidence.items.map((item) => `<div class="payment-evidence-item"><strong>${esc(item.label)}</strong><span>${tx("trade.paymentState." + item.state)}</span><small>${esc(item.source || tx("trade.unknown"))}${item.asOf ? " · " + esc(item.asOf) : ""}</small><small>${item.humanStatus === "CONFIRMED_BY_OWNER" ? tx("trade.ownerConfirmed") : tx("trade.pendingOwnerConfirmation")}${item.fragment ? " · " + esc(item.fragment) : ""}</small></div>`).join("") : `<p class="muted">${tx("trade.noPaymentEvidence")}</p>`;
-  const termsDetail = p.termsDetail ? esc(p.termsDetail) : tx("trade.noTermsDetail");
+  // 合成範例的基準說明在 zh 模式顯示譯文（fixture raw 保留給 export/engine）；
+  // blank 模式是使用者自己輸入的原文，一律不翻譯。
+  const isSampleTerms = mode === "sample" && language === "zh-TW" && p.termsDetail;
+  const termsDetail = isSampleTerms ? tx("sample.termsDetail") : (p.termsDetail ? esc(p.termsDetail) : tx("trade.noTermsDetail"));
   const namedPlace = current?.trade?.namedPlace || tx("trade.notConfirmed");
   $("trade-deal-structure").innerHTML = [
     '<div class="trade-structure-brief"><span>' + tx("trade.workingBasis") + '</span><p>' + termsDetail + '</p></div>',
@@ -299,7 +327,7 @@ function renderTradeDeal(view) {
     '<dt>' + tx("trade.exposure") + '</dt><dd>' + exposure + '</dd>',
     '</dl></div>',
     '<div class="trade-block"><h3>' + tx("trade.paymentEvidenceHeading") + '</h3>' + evidenceRows + '<p class="trade-boundary">' + tx("trade.paymentEvidenceBoundary") + '</p></div>',
-    '<div class="trade-block"><h3>' + tx("trade.acceptanceRemedyHeading") + '</h3>' + (acceptanceRemedy.items.length ? acceptanceRemedy.items.map((item) => '<div class="acceptance-remedy-item"><strong>' + esc(item.condition) + '</strong><small>' + esc(item.evidence) + '</small><small>' + esc(item.boundary) + '</small></div>').join("") : '<p class="muted">' + tx("trade.acceptanceRemedyUnknown") + '</p>') + '</div>',
+    '<div class="trade-block"><h3>' + tx("trade.acceptanceRemedyHeading") + '</h3>' + (acceptanceRemedy.items.length ? acceptanceRemedy.items.map((item) => '<div class="acceptance-remedy-item"><strong>' + esc(remedyCondition(item)) + '</strong><small>' + esc(item.evidence) + '</small><small>' + esc(remedyBoundary(item)) + '</small></div>').join("") : '<p class="muted">' + tx("trade.acceptanceRemedyUnknown") + '</p>') + '</div>',
     '<div class="trade-block"><h3>' + tx("trade.deliveryHeading") + '</h3><dl>',
     '<dt>' + tx("trade.declaredTerm") + '</dt><dd>' + tradeTermLabel(d.declaredTerm) + '</dd>',
     '<dt>' + tx("trade.namedPlace") + '</dt><dd>' + esc(namedPlace) + '</dd>',
@@ -314,11 +342,11 @@ function renderNegotiationPrep(view) {
   $("negotiation-prep").innerHTML = view.negotiationPrep.length
     ? view.negotiationPrep.map((item) => [
       '<article class="prep-item"><div class="action-topline"><span class="action-priority">0' + item.priority + '</span><h3>' + tx("trade.prep." + item.type) + '</h3></div>',
-      '<p><strong>' + tx("trade.question") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? esc(item.question) : tx("trade.prep.question." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
-      '<p><strong>' + tx("trade.request") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? esc(item.request) : tx("trade.prep.request." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
-      '<p><strong>' + tx("trade.doNotCommit") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? esc(item.avoidCommitment) : tx("trade.prep.avoid." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
-      '<p><strong>' + tx("trade.ownerInput") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? esc(item.ownerInput) : tx("trade.prep.owner." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
-      '<p><strong>' + tx("trade.rerun") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? esc(item.rerunWhen) : tx("trade.prep.rerun." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
+      '<p><strong>' + tx("trade.question") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? esc(remedyAction(item)) : tx("trade.prep.question." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
+      '<p><strong>' + tx("trade.request") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? esc(item.evidence || item.request) : tx("trade.prep.request." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
+      '<p><strong>' + tx("trade.doNotCommit") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? esc(remedyBoundary(item)) : tx("trade.prep.avoid." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
+      '<p><strong>' + tx("trade.ownerInput") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? tx("remedy.ownerInput") : tx("trade.prep.owner." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
+      '<p><strong>' + tx("trade.rerun") + '</strong> ' + (item.type === "ACCEPTANCE_REMEDY" ? esc(remedyRerun(item)) : tx("trade.prep.rerun." + prepCopyKey(item, view.structure.delivery.confirmed))) + '</p>',
       '<p class="trade-trace"><strong>' + tx("trade.trace") + '</strong> ' + item.evidenceTrace.map(tradeTraceText).join(" · ") + '</p></article>',
     ].join("")).join("")
     : '<p class="muted">' + tx("trade.noPrep") + '</p>';
@@ -341,7 +369,7 @@ function renderCommercialStructure(view) {
       <div class="structure-item"><span>${tx("structure.category")}</span><strong>${structureFit(s.categoryFit)}</strong></div>
     </div>
     <p class="structure-open-items">${tx("structure.openItems")}: ${s.unknownCount} ${tx("structure.unknown")} · ${s.contradictionCount} ${tx("result.contradictions")}</p>
-    <div class="structure-controls"><h3>${tx("structure.acceptanceRemedy")}</h3>${acceptanceRemedy?.items?.length ? acceptanceRemedy.items.map((item) => `<div class="control-item"><strong>${esc(item.condition)}</strong><small>${esc(item.action)}</small><small>${esc(item.rerunWhen)}</small></div>`).join("") : `<p class="muted">${tx("structure.acceptanceRemedyUnknown")}</p>`}</div>
+    <div class="structure-controls"><h3>${tx("structure.acceptanceRemedy")}</h3>${acceptanceRemedy?.items?.length ? acceptanceRemedy.items.map((item) => `<div class="control-item"><strong>${esc(remedyCondition(item))}</strong><small>${esc(remedyAction(item))}</small><small>${esc(remedyRerun(item))}</small></div>`).join("") : `<p class="muted">${tx("structure.acceptanceRemedyUnknown")}</p>`}</div>
   `;
 }
 
@@ -358,7 +386,7 @@ function renderPriorityActions(view) {
         <p class="action-human"><strong>${tx("actions.human")}</strong> ${tx("action.humanBoundary")}</p>
       </article>`).join("")
     : `<p class="muted">${tx("result.noneRequired")}</p>`;
-  const controlHtml = controls.map((item) => `<article class="action-item acceptance-remedy-control"><div class="action-topline"><span class="action-priority">G6</span><h3>${esc(item.condition)}</h3></div><p class="action-why"><strong>${tx("actions.why")}</strong> ${esc(item.evidence)}</p><p><strong>${tx("actions.rerun")}</strong> ${esc(item.rerunWhen)}</p><p class="action-human"><strong>${tx("actions.human")}</strong> ${esc(item.boundary)}</p></article>`).join("");
+  const controlHtml = controls.map((item) => `<article class="action-item acceptance-remedy-control"><div class="action-topline"><span class="action-priority">G6</span><h3>${esc(remedyCondition(item))}</h3></div><p class="action-why"><strong>${tx("actions.why")}</strong> ${esc(item.evidence)}</p><p><strong>${tx("actions.rerun")}</strong> ${esc(remedyRerun(item))}</p><p class="action-human"><strong>${tx("actions.human")}</strong> ${esc(remedyBoundary(item))}</p></article>`).join("");
   $("priority-actions").innerHTML = actionHtml + controlHtml;
 }
 
@@ -460,10 +488,16 @@ function renderPreviewBand() {
     },
     {
       k: "5", title: tx("preview.cardGates"), body: tx("preview.cardGatesBody"),
-      big: [eng.kycGate !== "ABSENT" && eng.kycGate !== "CLEAR" ? "KYC" : null, eng.marginGate === "BELOW_THRESHOLD" ? "MARGIN" : null].filter(Boolean).join(" + ") || tx("preview.gatesClear"),
+      // Astra P0: ABSENT (not yet assessed) is never summarized as "all clear".
+      // Only when every gate is CLEAR may the card say 關卡全清.
+      big: gateOpen(eng.kycGate) || gateOpen(eng.marginGate)
+        ? (gateOpen(eng.kycGate) ? tx("structure.kyc") : "") + (gateOpen(eng.kycGate) && gateOpen(eng.marginGate) ? " + " : "") + (gateOpen(eng.marginGate) ? tx("structure.margin") : "")
+        : eng.kycGate === "CLEAR" && eng.marginGate === "CLEAR"
+          ? tx("preview.gatesClear")
+          : tx("preview.gatesPartial"),
       kv: [
-        [tx("preview.kyc"), eng.kycGate || "ABSENT"],
-        [tx("preview.margin"), eng.marginGate || "ABSENT"],
+        [tx("preview.gate.kycLabel"), kycGateLabel(eng.kycGate || "ABSENT")],
+        [tx("preview.gate.marginLabel"), marginGateLabel(eng.marginGate || "ABSENT")],
       ],
     },
     {
@@ -948,7 +982,7 @@ function renderResult() {
     <div class="dl-grid">
       <div class="glance-col"><h4>${tx("result.missing")}</h4><ul>${[
         ...g.blockingUnknowns.map((u) => `<li>${esc(displayEvidenceLabel(u))}</li>`),
-        ...(g.weakEvidence || g.strongEvidence === false ? [`<li>Evidence quality not strong</li>`] : []),
+        ...(g.weakEvidence || g.strongEvidence === false ? [`<li>${tx("result.evidenceNotStrong")}</li>`] : []),
         ...(g.kycGate === "ABSENT" && mode === "blank" ? [`<li>${tx("input.kyc")} — ${tx("result.notAssessed")}</li>`] : []),
         ...(g.marginGate === "ABSENT" && mode === "blank" ? [`<li>${tx("input.margin")} — ${tx("result.notAssessed")}</li>`] : []),
         ...(current.quoteComparabilityAssessed === false ? [`<li>${tx("input.quoteComparability")} — ${tx("result.notAssessed")}</li>`] : []),
@@ -968,13 +1002,21 @@ function renderResult() {
   const economics = buildEconomicsBridge(economicsInput);
   const momentum = buildCommercialMomentum(current, economics);
   const coverage = buildEvidenceCoverage(current, economics);
+  // Snapshot 控制原因：以實際矛盾／卡點標籤取代泛化句（僅由既有資料組裝，
+  // 不新增任何判斷或數字；Astra P0-3「把卡點講具體」）。
+  // 聚焦真正的控制因素（矛盾與阻塞未知）；terms/evidence 屬衍生狀態，
+  // 已在其專屬區塊呈現，不在此重複堆疊。
+  const controlFacts = [
+    ...g.materialContradictions.map((c) => displayEvidenceLabel(c)),
+    ...g.blockingUnknowns.map((u) => displayEvidenceLabel(u)),
+  ];
   renderExecutiveSnapshot({
     economics,
     tradeView,
     momentum,
     coverage,
     nextBestAction,
-    control: g.reasons.length ? localizeReason(g.reasons[0], language, current.quoteComparabilityAssessed !== false) : tx("context.unknown"),
+    control: controlFacts.length ? controlFacts.join(" · ") : tx("result.noBlockers"),
   });
   renderEconomicsBridge(economics, economicsInput.currency || "CNY");
   renderPriorityActions(commercialView);
@@ -1173,9 +1215,21 @@ $("btn-reset-2").addEventListener("click", () => $("btn-reset").click());
 
 $("btn-home").addEventListener("click", () => {
   mode = null;
+  if (window.location.hash) history.replaceState(null, "", window.location.pathname + window.location.search);
   showModeScreen();
 });
 
 // --- boot --------------------------------------------------------------------
 applyLanguage();
 showModeScreen();
+
+// Deep-link support (Astra P0): #mode-sample / #mode-blank auto-open the chosen
+// mode, so portfolio CTAs can take a first-time visitor straight into the
+// completed example instead of asking them to start working immediately.
+function bootFromHash() {
+  const h = window.location.hash;
+  if (h === "#mode-sample") $("mode-sample")?.click();
+  else if (h === "#mode-blank") $("mode-blank")?.click();
+}
+window.addEventListener("hashchange", bootFromHash);
+bootFromHash();

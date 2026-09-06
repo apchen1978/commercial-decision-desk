@@ -3,12 +3,12 @@
 // It is not a lifecycle state, legal interpretation, gate, score, or persistence model.
 
 const MARKERS = Object.freeze([
-  { marker: "ACCEPTANCE_EVIDENCE", condition: "buyer acceptance evidenced", action: "Confirm the acceptance record and any remaining exceptions." },
-  { marker: "REJECTION_EVIDENCE", condition: "buyer rejection evidenced", action: "Obtain the rejection scope and owner decision on the next commercial response." },
-  { marker: "CORRECTIVE_ACTION_PENDING", condition: "corrective action / replacement pending", action: "Confirm the corrective-action owner, due date, and completion evidence." },
-  { marker: "REMEDY_EVIDENCE_PENDING", condition: "remedy evidence pending", action: "Obtain the written remedy agreement or completion evidence." },
-  { marker: "REMEDY_DEADLINE", condition: "remedy deadline requires Owner attention", action: "Review the explicit remedy deadline and decide the next escalation or renegotiation step." },
-  { marker: "TERMINATION_EVIDENCE", condition: "explicit termination evidence", action: "Owner reviews the explicit termination record before stopping further commitment." },
+  { marker: "ACCEPTANCE_EVIDENCE", key: "buyerAcceptance", condition: "buyer acceptance evidenced", action: "Confirm the acceptance record and any remaining exceptions." },
+  { marker: "REJECTION_EVIDENCE", key: "buyerRejection", condition: "buyer rejection evidenced", action: "Obtain the rejection scope and owner decision on the next commercial response." },
+  { marker: "CORRECTIVE_ACTION_PENDING", key: "correctivePending", condition: "corrective action / replacement pending", action: "Confirm the corrective-action owner, due date, and completion evidence." },
+  { marker: "REMEDY_EVIDENCE_PENDING", key: "remedyPending", condition: "remedy evidence pending", action: "Obtain the written remedy agreement or completion evidence." },
+  { marker: "REMEDY_DEADLINE", key: "deadline", condition: "remedy deadline requires Owner attention", action: "Review the explicit remedy deadline and decide the next escalation or renegotiation step." },
+  { marker: "TERMINATION_EVIDENCE", key: "termination", condition: "explicit termination evidence", action: "Owner reviews the explicit termination record before stopping further commitment." },
 ]);
 
 const trace = (sourceId, label) => ({ sourceType: "evidence", sourceId, label });
@@ -30,6 +30,7 @@ export function buildAcceptanceRemedyPresentation(opportunity = {}) {
     const evidence = markerLine(termsDetail, marker);
     if (evidence) {
       items.push({
+        i18nKey: marker.key,
         condition: marker.condition,
         evidence,
         action: marker.action,
@@ -40,9 +41,19 @@ export function buildAcceptanceRemedyPresentation(opportunity = {}) {
     }
   }
 
-  const unknown = (opportunity.unknowns || []).find((item) => /acceptance|remedy/i.test(`${item.label || ""} ${item.detail || ""}`));
+  // Only an UNKNOWN whose *subject* is acceptance or remedy triggers the
+  // fallback item. A liability unknown that merely mentions the word
+  // "acceptance" in passing (e.g. "acceptance evidenced at planning level")
+  // is not an acceptance/remedy control item.
+  const unknown = (opportunity.unknowns || []).find((item) => {
+    const subject = `${item.label || ""} ${item.detail || ""}`;
+    return /(?:acceptance|remedy|驗收|補救)\s*(?:status|狀態|outcome|結果)?\s*(?:is|remains|仍|為|是)?\s*UNKNOWN/i.test(subject)
+      || /UNKNOWN\s*(?:acceptance|remedy|驗收|補救)/i.test(subject)
+      || /^(acceptance|remedy|驗收|補救)/i.test(item.label || "");
+  });
   if (!items.length && unknown) {
     items.push({
+      i18nKey: "unknown",
       condition: "acceptance/remedy status UNKNOWN",
       evidence: unknown.detail || unknown.label,
       action: "Obtain explicit acceptance, rejection, remedy, or termination evidence; do not infer status from silence.",

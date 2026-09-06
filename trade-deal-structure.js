@@ -59,6 +59,7 @@ export function buildNegotiationPrep(opportunity, engine, tradeStructure) {
   for (const item of tradeStructure.acceptanceRemedy?.items || []) {
     prep.push({
       type: "ACCEPTANCE_REMEDY",
+      i18nKey: item.i18nKey,
       priority: 1,
       question: item.action,
       request: item.evidence,

@@ -316,6 +316,20 @@
         border: 1px solid var(--gold); border-radius: 999px;
         background: #fdf6e4; color: #6b5214; font-size: 11px; font-weight: 700; letter-spacing: .04em;
       }
+      /* Product onboarding — a connected sequence, not a second card wall. */
+      .product-flow { margin:30px 0 10px; padding:22px 0 4px; border-top:1px solid var(--line); }
+      .product-flow-head { display:grid; grid-template-columns:minmax(0,.74fr) minmax(0,1.26fr); gap:22px; align-items:start; }
+      .product-flow-eyebrow { margin:0; color:var(--amber); font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+      .product-flow h2 { margin:5px 0 0; color:var(--forest); font-size:20px; }
+      .product-flow-intro { max-width:64ch; margin:0; color:var(--muted); font-size:13.5px; line-height:1.6; }
+      .product-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; margin:22px 0 0; padding:0; list-style:none; }
+      .product-step { min-width:0; padding:13px 0 0; border-top:2px solid var(--forest); }
+      .product-step:last-child { border-top-color:var(--brass, #a3873f); }
+      .product-step-number { color:var(--amber); font-size:11px; font-weight:800; letter-spacing:.1em; }
+      .product-step h3 { margin:7px 0 0; color:var(--forest); font-size:15px; }
+      .product-step p { margin:5px 0 0; color:var(--muted); font-size:12.5px; line-height:1.55; }
+      .product-flow-note { margin:18px 0 0; padding-top:12px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; line-height:1.55; }
+      @media (max-width:640px) { .product-flow-head, .product-steps { grid-template-columns:1fr; gap:14px; } .product-flow { margin-top:24px; } }
       /* Result navigation anchors */
       .result-nav {
         display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px;
@@ -1021,6 +1035,22 @@
             <span class="cta" data-i18n="mode.sample.cta">查看範例 →</span>
           </div>
         </div>
+
+        <section class="product-flow" aria-labelledby="product-flow-title">
+          <div class="product-flow-head">
+            <div>
+              <p class="product-flow-eyebrow" data-i18n="productFlow.eyebrow">CDD WORKFLOW</p>
+              <h2 id="product-flow-title" data-i18n="productFlow.title">從一筆商機，到能帶進會議的判斷。</h2>
+            </div>
+            <p class="product-flow-intro" data-i18n="productFlow.intro">不需要先完成所有資料。先建立評估，把缺口保留為 UNKNOWN，再以已確認的證據重新判斷。</p>
+          </div>
+          <ol class="product-steps">
+            <li class="product-step"><span class="product-step-number">01</span><h3 data-i18n="productFlow.step1.title">建立評估</h3><p data-i18n="productFlow.step1.body">輸入目前知道的買方、條件與交易脈絡；不知道的地方不需要猜。</p></li>
+            <li class="product-step"><span class="product-step-number">02</span><h3 data-i18n="productFlow.step2.title">補足證據</h3><p data-i18n="productFlow.step2.body">查看控制因素、矛盾與 UNKNOWN，帶著具體問題回到買方、報價或內部會議。</p></li>
+            <li class="product-step"><span class="product-step-number">03</span><h3 data-i18n="productFlow.step3.title">帶走 Decision Brief</h3><p data-i18n="productFlow.step3.body">整理目前建議、下一步與人的決定，匯出成可交接的交易工作底稿。</p></li>
+          </ol>
+          <p class="product-flow-note" data-i18n="productFlow.note">CDD 提供可重跑的決策支援；最終承諾仍由 owner 與相應專業人士確認。</p>
+        </section>
 
         <div class="capability-note">
           <p class="capability-eyebrow" data-i18n="capability.eyebrow">手動優先 · AI 可擴充 · 人類治理</p>

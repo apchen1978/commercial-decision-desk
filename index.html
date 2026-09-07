@@ -219,6 +219,16 @@
       @media (max-width:640px) { .import-meta { grid-template-columns:1fr; } .intake-preview { padding:14px; } }
       .intake-section { margin-top:14px; }
       .intake-section summary, .context-authority summary { cursor:pointer; color:var(--forest); font-weight:700; }
+      /* Progressive-disclosure group (SME-mode pivot Batch 2): the "進階"
+         wrapper groups the professional evidence blocks behind one disclosure;
+         it deliberately does not look like another required card. */
+      .intake-advanced {
+        margin-top: 18px; padding: 2px 0 2px 14px;
+        border-top: 1px dashed var(--line); border-left: 3px solid var(--forest);
+      }
+      .intake-advanced > summary { color: var(--muted-2); font-size: 12.5px; font-weight: 700; letter-spacing: .02em; }
+      .intake-advanced[open] > summary { color: var(--forest); margin-bottom: 4px; }
+      .intake-advanced > p { color: var(--muted-2); font-size: 11.5px; }
       .context-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
       .context-grid > div { min-width:0; padding:10px 11px; border:1px solid var(--line); border-radius:9px; background:#fafbf7; }
       .context-grid span { display:block; color:var(--muted); font-size:11px; }
@@ -1152,26 +1162,44 @@
             <label class="field"><span data-i18n="input.opportunityName">商機名稱</span></label>
             <input type="text" id="in-name" data-i18n-placeholder="input.opportunityNamePlaceholder" placeholder="例如：杜拜飯店集團 — 窗簾供應" />
             <details class="card intake-section" open>
-              <summary data-i18n="context.quickSummary">Quick commercial context</summary>
-              <p class="muted" data-i18n="context.quickHelper">先建立交易骨架；不知道就保留 UNKNOWN，之後仍可補充。</p>
+              <summary data-i18n="intake.quickSummary">快速三問：收款／完工／投入</summary>
+              <p class="muted" data-i18n="intake.quickHelper">先填你確定的事；不知道就保留 UNKNOWN，之後仍可補充。完整證據與關卡在下方「進階」。</p>
               <div class="field-row">
                 <label class="field"><span data-i18n="context.product">產品／服務</span><input type="text" id="in-product" /></label>
                 <label class="field"><span data-i18n="context.buyerCompany">買方／公司</span><input type="text" id="in-buyer-company" /></label>
-              </div>
-              <div class="field-row">
-                <label class="field"><span data-i18n="context.market">國家／市場</span><input type="text" id="in-market" /></label>
-                <label class="field"><span data-i18n="context.quantity">預估數量</span><span class="quantity-with-unit"><input type="number" id="in-quantity" min="0" /><span class="unit-hint" data-i18n="context.quantityUnit">單位</span><input type="text" id="in-quantity-unit" list="quantity-unit-suggestions" data-i18n-placeholder="context.quantityUnitPlaceholder" placeholder="例如：米、片、組、平方公尺" /></span><small class="field-guidance" data-i18n="input.suggestionUnit">可從常用單位選取，也可自行輸入。</small></label>
               </div>
               <div class="field-row">
                 <label class="field"><span data-i18n="context.revenue">預估訂單收入</span><input type="number" id="in-revenue" min="0" /></label>
                 <label class="field"><span data-i18n="context.currency">幣別</span><select id="in-currency"><option value="CNY">CNY</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="TWD">TWD</option><option value="OTHER">Other</option></select></label>
               </div>
               <div class="field-row">
-                <label class="field"><span data-i18n="context.timing">預計時程</span><input type="text" id="in-timing" /></label>
-                <label class="field"><span data-i18n="context.relationship">買方關係</span><select id="in-relationship"><option value="unknown" data-i18n="context.unknown">UNKNOWN</option><option value="new" data-i18n="context.newBuyer">新買方</option><option value="existing" data-i18n="context.existingBuyer">既有買方</option></select></label>
+                <label class="field"><span data-i18n="context.timing">交期／完工時程</span><input type="text" id="in-timing" /></label>
+                <label class="field"><span data-i18n="intake.paymentTermStatus">收款條件（談到哪？）</span>
+                  <select id="in-terms">
+                    <option value="unknown" data-i18n="status.unknown">未知</option>
+                    <option value="agreed" data-i18n="status.agreed">已書面確認</option>
+                    <option value="notAgreed" data-i18n="status.notAgreed">尚未確認</option>
+                  </select>
+                </label>
               </div>
-              <label class="field"><span data-i18n="context.source">商機來源</span><input type="text" id="in-source" list="source-suggestions" /><small class="field-guidance" data-i18n="input.suggestionSource">可選常見來源，也可保留你的原始描述。</small></label>
+              <label class="field"><span data-i18n="intake.paymentTermDetail">收款條件細節（選填）</span></label>
+              <input type="text" id="in-terms-detail" data-i18n-placeholder="input.termsDetailPlaceholder" placeholder="例如：30% 預付款，出貨前付清尾款" />
             </details>
+            <details class="card intake-section">
+              <summary data-i18n="intake.contextMoreSummary">更多商機脈絡（選填）</summary>
+              <p class="muted" data-i18n="intake.contextMoreHelper">市場、數量、買方關係與來源——有資料才填，不影響第一輪快速評估。</p>
+              <div class="field-row">
+                <label class="field"><span data-i18n="context.market">國家／市場</span><input type="text" id="in-market" /></label>
+                <label class="field"><span data-i18n="context.quantity">預估數量</span><span class="quantity-with-unit"><input type="number" id="in-quantity" min="0" /><span class="unit-hint" data-i18n="context.quantityUnit">單位</span><input type="text" id="in-quantity-unit" list="quantity-unit-suggestions" data-i18n-placeholder="context.quantityUnitPlaceholder" placeholder="例如：米、片、組、平方公尺" /></span><small class="field-guidance" data-i18n="input.suggestionUnit">可從常用單位選取，也可自行輸入。</small></label>
+              </div>
+              <div class="field-row">
+                <label class="field"><span data-i18n="context.relationship">買方關係</span><select id="in-relationship"><option value="unknown" data-i18n="context.unknown">UNKNOWN</option><option value="new" data-i18n="context.newBuyer">新買方</option><option value="existing" data-i18n="context.existingBuyer">既有買方</option></select></label>
+                <label class="field"><span data-i18n="context.source">商機來源</span><input type="text" id="in-source" list="source-suggestions" /><small class="field-guidance" data-i18n="input.suggestionSource">可選常見來源，也可保留你的原始描述。</small></label>
+              </div>
+            </details>
+            <details class="intake-advanced">
+              <summary data-i18n="intake.advancedSummary">進階：完整證據、關卡與交易細節（選填）</summary>
+              <p class="muted" data-i18n="intake.advancedHelper">給需要完整審查的評估使用；留空不會擋住快速評估，缺項會在結果中以 UNKNOWN 標示。</p>
             <details class="card intake-section">
               <summary data-i18n="context.authoritySummary">Buyer & decision authority</summary>
               <p class="muted" data-i18n="context.authorityHelper">這些資料只用來整理決策鏈與準備下一輪對話，不會自動判斷買方。</p>
@@ -1235,25 +1263,14 @@
                 <option value="weak" data-i18n="status.lowConfidence">信心低</option>
               </select>
             </label>
-            <div class="field-row">
-              <label class="field"><span data-i18n="input.terms">商務條件</span>
-                <select id="in-terms">
-                  <option value="unknown" data-i18n="status.unknown">未知</option>
-                  <option value="agreed" data-i18n="status.agreed">已書面確認</option>
-                  <option value="notAgreed" data-i18n="status.notAgreed">尚未確認</option>
-                </select>
-              </label>
-              <label class="field"><span data-i18n="input.kyc">客戶查核（KYC／制裁名單）</span>
-                <select id="in-kyc">
-                  <option value="notAssessed" data-i18n="status.notAssessed">尚未評估</option>
-                  <option value="clear" data-i18n="status.verifiedClear">查核結果清楚</option>
-                  <option value="incomplete" data-i18n="status.incomplete">資料不完整</option>
-                  <option value="sanctionsConcern" data-i18n="status.sanctionsConcern">制裁／不利資訊疑慮</option>
-                </select>
-              </label>
-            </div>
-            <label class="field"><span data-i18n="input.termsDetail">條件細節（選填）</span></label>
-            <input type="text" id="in-terms-detail" data-i18n-placeholder="input.termsDetailPlaceholder" placeholder="例如：30% 預付款，出貨前付清尾款" />
+            <label class="field"><span data-i18n="input.kyc">客戶查核（KYC／制裁名單）</span>
+              <select id="in-kyc">
+                <option value="notAssessed" data-i18n="status.notAssessed">尚未評估</option>
+                <option value="clear" data-i18n="status.verifiedClear">查核結果清楚</option>
+                <option value="incomplete" data-i18n="status.incomplete">資料不完整</option>
+                <option value="sanctionsConcern" data-i18n="status.sanctionsConcern">制裁／不利資訊疑慮</option>
+              </select>
+            </label>
             <div class="field-row">
               <label class="field"><span data-i18n="input.margin">毛利政策</span>
                 <select id="in-margin-status">
@@ -1318,6 +1335,7 @@
             <textarea id="in-whynot"></textarea>
             <label class="field"><span data-i18n="input.notes">備註（選填）</span></label>
             <textarea id="in-note"></textarea>
+            </details>
           </div>
         </div>
 

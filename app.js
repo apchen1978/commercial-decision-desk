@@ -281,11 +281,64 @@ function renderExecutiveSnapshot({ economics, tradeView, control, momentum, cove
   `;
 }
 
-function renderBossThree(view) {
+function renderBossThree(view, extras = {}) {
   const root = $("boss-three");
   if (!root) return;
   root.hidden = false;
   const fill = (template, args = {}) => Object.entries(args).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, esc(value)), tx(template));
+  // L1 executive strip — the 30-second reading. All values come from data the
+  // engine/view models already produced; nothing is invented here.
+  const positionTone = tagClass(extras.recommended);
+  const doNotCommit = extras.recommended && extras.recommended !== "PURSUE_NOW";
+  const execEl = $("boss-executive");
+  if (execEl) {
+    execEl.hidden = false;
+    const execFields = [
+      [tx("exec.value"), extras.revenueDisplay || tx("context.unknown")],
+      [tx("exec.net"), extras.netDisplay || tx("economics.notCalculated")],
+      [tx("exec.controls"), extras.controlsText || tx("result.noBlockers")],
+    ];
+    execEl.innerHTML = `
+      <div class="boss-exec-top">
+        <span class="boss-exec-label">${tx("exec.sub")}</span>
+        <span class="rec-tag ${positionTone}">${stateLabel(extras.recommended)}</span>
+      </div>
+      <div class="boss-exec-fields">
+        ${execFields.map(([label, value]) => `<div class="boss-exec-field"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`).join("")}
+        <div class="boss-exec-field boss-exec-next"><span>${tx("exec.next")}</span><strong>${esc(extras.nextBestAction || tx("next.nothingBlocks"))}</strong></div>
+      </div>
+      ${doNotCommit ? `<p class="boss-exec-note">${tx("exec.doNotCommit")} · ${tx("exec.boundary")}</p>` : `<p class="boss-exec-note">${tx("exec.boundary")}</p>`}
+    `;
+  }
+  // auxiliary context chips — momentum/coverage are descriptors, never controls
+  const auxEl = $("boss-aux");
+  if (auxEl) {
+    const momentumScore = Number.isFinite(extras.momentumScore) ? `${extras.momentumScore}<small>/100</small>` : tx("status.unknown");
+    const coverageScore = Number.isFinite(extras.coverageScore) ? `${extras.coverageScore}<small>%</small>` : tx("status.unknown");
+    auxEl.hidden = false;
+    auxEl.innerHTML = `
+      <span class="boss-aux-chip">${tx("exec.momentum")} <strong>${momentumScore}</strong></span>
+      <span class="boss-aux-chip">${tx("exec.coverage")} <strong>${coverageScore}</strong></span>
+    `;
+  }
+  // 30-second lead sentence — assembled strictly from recorded evidence
+  const leadEl = $("boss-lead-sentence");
+  if (leadEl) {
+    const parts = [];
+    if (extras.controlsText && extras.controlsText !== tx("result.noBlockers")) {
+      parts.push(fill(extras.hasValue ? "exec.lead.blocked" : "exec.lead.blocked", { controls: extras.controlsText }));
+    }
+    if (extras.nextBestAction) parts.push(fill("exec.lead.next", { next: extras.nextBestAction }));
+    if (parts.length) {
+      leadEl.hidden = false;
+      leadEl.textContent = fill(extras.hasValue ? "exec.lead.withValue" : "exec.lead.noValue", {
+        value: extras.revenueDisplay || tx("context.unknown"),
+        nextLead: parts.join(" "),
+      }) + " " + tx("exec.lead.boundary");
+    } else {
+      leadEl.hidden = true;
+    }
+  }
   $("boss-three-rows").innerHTML = view.rows.map((row) => `
     <div class="boss-row">
       <div class="boss-row-head">
@@ -305,6 +358,47 @@ function renderBossThree(view) {
   } else {
     economicsEl.hidden = true;
   }
+}
+
+// Room summary chips (Evidence Room) — short factual state per block. Only
+// values the renderers already produced; a hidden room mirrors its content.
+function setRoomStatus(id, text, tone = "") {
+  const chip = $(id);
+  if (!chip) return;
+  chip.textContent = text || "";
+  chip.className = "room-status" + (tone ? ` ${tone}` : "");
+}
+function roomStateChip(id, tone) {
+  const chip = $(id);
+  if (chip) chip.className = "room-status" + (tone ? ` ${tone}` : "");
+}
+
+function syncEvidenceRooms({ economics, commercialView, tradeView, momentum, coverage, nextBestAction, recommended, currency, g }) {
+  const economicsInput = current?.economics || {};
+  const revenueDisplay = economics.revenue == null ? null : economicsValue(economics.revenue, economicsInput.currency || "CNY");
+  const netDisplay = economics.expectedNetContribution == null ? null : economicsValue(economics.expectedNetContribution, economicsInput.currency || "CNY");
+  // 1. boss-three executive strip (rendered inside renderBossThree) is fed here.
+  // 2. room chips:
+  setRoomStatus("room-snapshot-status", coverage.score != null ? `${coverage.score}%` : "", coverage.score == null ? "unk" : "");
+  setRoomStatus("room-decision-status", recommended ? stateLabel(recommended) : "", recommended ? (["ESCALATE", "DO_NOT_PURSUE"].includes(recommended) ? "warn" : recommended === "PURSUE_NOW" ? "ok" : "unk") : "unk");
+  setRoomStatus("room-brief-status", revenueDisplay || "", revenueDisplay ? "ok" : "unk");
+  setRoomStatus("room-economics-status", netDisplay || tx("economics.notCalculated"), economics.calculationStatus === "CALCULATED" ? "ok" : "unk");
+  setRoomStatus("room-actions-status", `${commercialView.actions.length}`, commercialView.actions.length ? "" : "unk");
+  setRoomStatus("room-negotiation-status", `${tradeView.negotiationPrep.length}`, tradeView.negotiationPrep.length ? "" : "unk");
+  const openItems = (g.blockingUnknowns?.length || 0) + (g.materialContradictions?.length || 0);
+  setRoomStatus("room-structure-status", `${openItems}`, openItems ? "warn" : "ok");
+  setRoomStatus("room-trade-status", tradeView.structure.payment?.termsStatus === "COMPLETE" ? tx("trade.confirmed") : tx("trade.notConfirmed"), tradeView.structure.payment?.termsStatus === "COMPLETE" ? "ok" : "warn");
+  const pathArea = $("decision-path-area");
+  setRoomStatus("room-path-status", pathArea && !pathArea.hidden && decisionPathExperiment ? `${decisionPathExperiment.paths.length}` : "");
+  setRoomStatus("room-export-status", "MD · TXT · JSON");
+  // 3. room visibility mirrors its content section (mode-specific blocks)
+  const econInner = $("blank-economics-result");
+  const econRoom = $("room-economics");
+  if (econRoom && econInner) econRoom.hidden = econInner.hidden;
+  const pathRoom = $("room-path");
+  if (pathRoom && pathArea) pathRoom.hidden = pathArea.hidden;
+  const evidenceRoom = $("evidence-room");
+  if (evidenceRoom) evidenceRoom.hidden = false;
 }
 
 function renderCommercialContext(context = {}) {
@@ -1089,6 +1183,9 @@ function renderResult() {
     ...g.materialContradictions.map((c) => displayEvidenceLabel(c)),
     ...g.blockingUnknowns.map((u) => displayEvidenceLabel(u)),
   ];
+  const currency = economicsInput.currency || "CNY";
+  const revenueDisplay = economics.revenue == null ? null : economicsValue(economics.revenue, currency);
+  const netDisplay = economics.expectedNetContribution == null ? null : economicsValue(economics.expectedNetContribution, currency);
   renderBossThree(buildBossThree({
     paymentEvidence: tradeView.structure.paymentEvidence,
     delivery: tradeView.structure.delivery,
@@ -1096,8 +1193,17 @@ function renderResult() {
     recommended: g.recommended,
     controls: nControl,
     economics,
-    currency: economicsInput.currency || "CNY",
-  }));
+    currency,
+  }), {
+    recommended: g.recommended,
+    revenueDisplay,
+    netDisplay,
+    hasValue: economics.revenue != null,
+    controlsText: controlFacts.length ? controlFacts.join(" · ") : tx("result.noBlockers"),
+    nextBestAction,
+    momentumScore: momentum.score,
+    coverageScore: coverage.score,
+  });
   renderExecutiveSnapshot({
     economics,
     tradeView,
@@ -1125,6 +1231,7 @@ function renderResult() {
   }
   renderDecisionPath();
   $("export-status").textContent = tx("export.ready") + " " + current.name;
+  syncEvidenceRooms({ economics, commercialView, tradeView, momentum, coverage, nextBestAction, recommended: g.recommended, currency, g });
 
   // human decision — separate from the engine recommendation
   $("human-state-buttons").innerHTML = DECISION_STATES.map(

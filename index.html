@@ -1042,9 +1042,81 @@
       .boss-chip.unk { background: color-mix(in srgb, var(--muted) 12%, transparent); color: var(--muted-2); }
       .boss-row-answer { margin: 0; color: #4c5049; font-size: 12.5px; line-height: 1.6; }
       .boss-row-trace { margin-top: auto; padding-top: 8px; border-top: 1px dashed var(--hairline); color: var(--muted-2); font-size: 10.5px; letter-spacing: .04em; }
+      /* L1 executive strip — the 30-second reading (Codex two-layer slice) */
+      .boss-executive { margin: 0 0 14px; padding: 0 0 13px; border-bottom: 1px solid var(--hairline); }
+      .boss-exec-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+      .boss-exec-label { color: var(--brass); font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+      .boss-exec-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+      .boss-exec-field { min-width: 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); }
+      .boss-exec-field span { display: block; color: var(--muted-2); font-size: 10px; font-weight: 750; letter-spacing: .05em; text-transform: uppercase; }
+      .boss-exec-field strong { display: block; margin-top: 3px; color: var(--ink); font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+      .boss-exec-next { grid-column: span 2; }
+      .boss-exec-note { margin: 11px 0 0; color: var(--muted-2); font-size: 11.5px; line-height: 1.55; }
+      .boss-aux { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 13px; }
+      .boss-aux-chip { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-2); color: var(--muted); font-size: 11px; font-weight: 600; }
+      .boss-aux-chip strong { color: var(--forest); font-family: "Geist Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; font-size: 12px; }
+      .boss-aux-chip small { font-size: 9px; color: var(--muted-2); }
+      @media (max-width: 700px) {
+        .boss-exec-fields { grid-template-columns: 1fr 1fr; }
+        .boss-exec-next { grid-column: auto; }
+      }
+      @media (max-width: 420px) {
+        .boss-exec-fields { grid-template-columns: 1fr; }
+      }
       .boss-three-economics { margin: 14px 0 0; padding: 10px 13px; border-left: 3px solid var(--forest); background: var(--surface-2); color: var(--forest); font-size: 12.5px; line-height: 1.55; }
       .boss-three-boundary { margin: 12px 0 0; color: var(--muted-2); font-size: 11px; line-height: 1.5; }
       @media (max-width: 860px) { .boss-three-grid { grid-template-columns: 1fr; } .boss-row-trace { margin-top: 0; } }
+      /* ================================================================
+         TWO-LAYER EXECUTIVE READING (Codex slice v0.1) — presentation only.
+         Layer 1: boss-three card is the executive reading (value, position,
+         what controls, cash/delivery risk, next action, human boundary).
+         Layer 2: Evidence Room — each deep block is a <details> with a
+         one-line summary (state · why · what you will see), expanded on demand.
+         ================================================================ */
+      #result-area > h2 { margin: 0 0 2px; }
+      .result-heading-sub { margin: 0 0 12px; color: var(--muted-2); font-size: 12px; line-height: 1.5; max-width: 80ch; }
+      .evidence-room { margin-top: 18px; }
+      .evidence-room-head {
+        display: flex; align-items: baseline; justify-content: space-between;
+        gap: 10px; flex-wrap: wrap; margin: 0 0 10px;
+      }
+      .evidence-room-head h3 { margin: 0; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-2); font-weight: 800; }
+      .evidence-room-head span { font-size: 11.5px; color: var(--muted-2); }
+      .room {
+        border: 1px solid var(--line); border-radius: var(--radius-md);
+        background: var(--surface); margin: 10px 0 0; overflow: hidden;
+        box-shadow: var(--shadow-1);
+      }
+      .room > summary {
+        list-style: none; cursor: pointer; padding: 12px 16px;
+        display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        transition: background .15s;
+      }
+      .room > summary::-webkit-details-marker { display: none; }
+      .room > summary:hover { background: var(--surface-2); }
+      .room > summary .room-chevron { margin-left: auto; color: var(--forest); font-weight: 800; transition: transform .15s; }
+      .room[open] > summary .room-chevron { transform: rotate(90deg); }
+      .room-title { font-weight: 750; color: var(--ink); font-size: 13.5px; }
+      .room-status {
+        font-size: 11.5px; color: var(--muted-2); font-weight: 600;
+        background: var(--surface-2); border: 1px solid var(--line);
+        padding: 2px 9px; border-radius: 999px; white-space: nowrap;
+      }
+      .room-status.ok { color: var(--forest); background: color-mix(in srgb, var(--forest) 8%, transparent); border-color: color-mix(in srgb, var(--forest) 22%, transparent); }
+      .room-status.warn { color: #8a6d1f; background: color-mix(in srgb, var(--amber) 12%, transparent); border-color: color-mix(in srgb, var(--amber) 24%, transparent); }
+      .room-status.unk { color: var(--muted-2); }
+      .room-body { padding: 2px 16px 16px; border-top: 1px solid var(--hairline); }
+      /* deep sections that were <section class="card-ish"> keep working inside .room-body */
+      .room-body .executive-snapshot, .room-body .decision-lead,
+      .room-body .trade-detail, .room-body .commercial-structure,
+      .room-body .priority-actions, .room-body .brief-preview,
+      .room-body .deal-brief-export { margin: 12px 0 0; box-shadow: none; }
+      .room-body section { border: 0; }
+      @media (max-width: 640px) {
+        .room > summary { padding: 11px 13px; }
+        .room-status { order: 3; width: 100%; white-space: normal; }
+        .room-body { padding: 2px 12px 12px; }
+      }
     </style>
   </head>
   <body>
@@ -1365,98 +1437,191 @@
 
         <!-- result -->
         <div id="result-area" hidden>
-          <div class="result-nav" aria-label="結果導覽">
-            <a href="#executive-deal-snapshot" data-i18n="result.navDeal">商機</a>
-            <a href="#result-decision" data-i18n="result.navDecision">決策</a>
-            <a href="#blank-economics-result" data-i18n="result.navEconomics">經濟</a>
-            <a href="#result-priority" data-i18n="result.navActions">下一步</a>
-            <a href="#result-evidence" data-i18n="result.navEvidence">證據</a>
-            <a href="#result-export" data-i18n="result.navExport">匯出</a>
-          </div>
-          <h2 data-i18n="result.heading">工作台建議</h2>
+          <h2 data-i18n="result.heading">現在應該怎麼做</h2>
+          <p class="result-heading-sub" data-i18n="result.headingSub">一份 30 秒讀完的執行摘要；詳細證據在下方 Evidence Room，想看再展開。</p>
 
-          <!-- 三問速答：結果首屏先用老闆語言回答 收款／完工／投入（SME-mode pivot Batch 1）。
-               只重述既有證據狀態；無證據即 UNKNOWN，不做產能或付款保證。 -->
+          <!-- ============ LAYER 1 — Executive reading ============
+               boss-three is the first-layer card: deal value + net contribution,
+               current position, the three owner questions (cash/delivery/commit
+               risk), momentum/coverage as small auxiliary chips, human boundary. -->
           <section id="boss-three" class="boss-three" hidden aria-live="polite">
             <div class="boss-three-card">
-              <p class="boss-three-kicker" data-i18n="boss.kicker">先回答老闆問的三件事</p>
-              <p class="boss-three-lead" data-i18n="boss.lead">這筆單現在能不能接？先用三句話看：收不收得到錢、做不做得完、該不該現在投入。</p>
+              <div id="boss-executive" class="boss-executive" hidden></div>
+              <p class="boss-three-lead" id="boss-lead-sentence" hidden></p>
+              <p class="boss-three-kicker" data-i18n="boss.kicker">三問速答：收不收得到錢 · 做不做得完 · 該不該投入</p>
               <div class="boss-three-grid" id="boss-three-rows"></div>
               <p class="boss-three-economics" id="boss-three-economics" hidden></p>
-              <p class="boss-three-boundary" data-i18n="boss.boundary">三問速答只重述已登錄的證據；沒有證據的事維持 UNKNOWN，不會被推測。完整結構與明細在下方。</p>
+              <div class="boss-aux" id="boss-aux" hidden></div>
+              <p class="boss-three-boundary" data-i18n="boss.boundary">三問速答只重述已登錄的證據；沒有證據的事維持 UNKNOWN，不會被推測。完整結構與明細在下方 Evidence Room。</p>
             </div>
           </section>
 
-          <section id="executive-deal-snapshot" class="executive-snapshot" hidden aria-live="polite"></section>
-
-          <!-- Decision lead: recommendation + control + next + do-not-commit + human status -->
-          <div id="result-rec" class="decision-lead" aria-live="polite"></div>
-
-          <!-- 帶走什麼：Deal Brief 可讀預覽（Astra P1-1：前移簡報預覽） -->
-          <section id="brief-preview-area" class="trade-detail brief-preview" aria-live="polite">
-            <h2 data-i18n="brief.previewHeading">帶走什麼：Deal Brief 預覽</h2>
-            <div class="card" id="brief-preview-body"></div>
-          </section>
-
-          <section id="blank-economics-result" class="trade-detail" hidden aria-live="polite">
-            <h2 data-i18n="economics.heading">Deal Economics Bridge</h2>
-            <div class="card">
-              <div id="economics-bridge"></div>
-              <p class="economics-trace" id="economics-trace"></p>
+          <!-- ============ LAYER 2 — Evidence Room ============ -->
+          <div class="evidence-room" id="evidence-room" hidden>
+            <div class="evidence-room-head">
+              <h3 data-i18n="room.heading">Evidence Room · 完整證據與細節</h3>
+              <span data-i18n="room.helper">想看哪一塊再展開；未展開不影響上面的執行摘要。</span>
             </div>
-          </section>
 
-          <section id="result-priority" class="priority-actions" aria-live="polite">
-            <h2 data-i18n="actions.heading">優先行動</h2>
-            <div class="card" id="priority-actions"></div>
-          </section>
-
-          <section id="result-negotiation" class="trade-detail" aria-live="polite">
-            <h2 data-i18n="trade.prepHeading">下一輪對話準備</h2>
-            <div class="card negotiation-prep" id="negotiation-prep"></div>
-          </section>
-
-          <section id="result-evidence" class="commercial-structure" aria-live="polite">
-            <h2 data-i18n="structure.heading">交易結構</h2>
-            <div class="card" id="commercial-structure"></div>
-          </section>
-
-          <section id="blank-context-result" class="commercial-structure" hidden aria-live="polite">
-            <h2 data-i18n="context.resultHeading">商機骨架</h2>
-            <div class="card" id="blank-commercial-context"></div>
-          </section>
-
-          <section class="trade-detail" aria-live="polite">
-            <h2 data-i18n="trade.heading">貿易交易結構</h2>
-            <div class="card" id="trade-deal-structure"></div>
-          </section>
-
-          <section class="decision-path" id="decision-path-area" hidden aria-live="polite">
-            <h2 data-i18n="path.heading">Decision Path：證據如何影響判斷</h2>
-            <div class="card" id="decision-path-current"></div>
-            <div class="card">
-              <h3 data-i18n="path.tryChange">試跑一個假設的證據變化</h3>
-              <div class="path-options" id="decision-path-options"></div>
-              <p class="muted" id="decision-path-empty" data-i18n="path.noSelection">選擇一個假設的證據變化，查看同一套規則會如何重新判斷。</p>
-            </div>
-            <div class="card path-detail" id="decision-path-detail" hidden></div>
-          </section>
-
-          <section id="result-export" class="deal-brief-export" aria-live="polite">
-            <div class="export-heading-row">
-              <div>
-                <h2 data-i18n="export.heading">匯出 Deal Brief</h2>
-                <p class="muted" data-i18n="export.helper">把這筆商機整理成可獨立閱讀的 Markdown 或純文字 brief。</p>
+            <details class="room" id="room-snapshot">
+              <summary>
+                <span class="room-title" data-i18n="room.snapshotTitle">商機總覽（詳細欄位與動能）</span>
+                <span class="room-status" id="room-snapshot-status"></span>
+                <span class="room-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="room-body">
+                <section id="executive-deal-snapshot" class="executive-snapshot" aria-live="polite"></section>
               </div>
-              <div class="btn-row export-actions">
-                <button type="button" class="secondary" id="btn-export-md" data-i18n="export.markdown">下載 Markdown</button>
-                <button type="button" class="secondary" id="btn-export-txt" data-i18n="export.text">下載純文字</button>
-                <button type="button" class="secondary" id="btn-export-ledger" data-i18n="export.ledger">匯出決策快照</button>
-              </div>
-            </div>
-            <p class="export-status muted" id="export-status"></p>
-          </section>
+            </details>
 
+            <details class="room" id="room-decision">
+              <summary>
+                <span class="room-title" data-i18n="room.decisionTitle">現在應該怎麼做（工作台建議明細）</span>
+                <span class="room-status" id="room-decision-status"></span>
+                <span class="room-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="room-body">
+                <div id="result-rec" class="decision-lead" aria-live="polite"></div>
+              </div>
+            </details>
+
+            <details class="room" id="room-brief">
+              <summary>
+                <span class="room-title" data-i18n="room.briefTitle">帶走什麼：Deal Brief 預覽</span>
+                <span class="room-status" id="room-brief-status"></span>
+                <span class="room-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="room-body">
+                <section id="brief-preview-area" class="trade-detail brief-preview" aria-live="polite">
+                  <h2 data-i18n="brief.previewHeading">帶走什麼：Deal Brief 預覽</h2>
+                  <div class="card" id="brief-preview-body"></div>
+                </section>
+              </div>
+            </details>
+
+            <details class="room" id="room-economics">
+              <summary>
+                <span class="room-title" data-i18n="room.economicsTitle">這筆單目前可能賺多少（經濟計算）</span>
+                <span class="room-status" id="room-economics-status"></span>
+                <span class="room-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="room-body">
+                <section id="blank-economics-result" class="trade-detail" aria-live="polite">
+                  <h2 data-i18n="economics.heading">Deal Economics Bridge</h2>
+                  <div class="card">
+                    <div id="economics-bridge"></div>
+                    <p class="economics-trace" id="economics-trace"></p>
+                  </div>
+                </section>
+              </div>
+            </details>
+
+            <details class="room" id="room-actions">
+              <summary>
+                <span class="room-title" data-i18n="room.actionsTitle">下一步先做什麼（優先行動）</span>
+                <span class="room-status" id="room-actions-status"></span>
+                <span class="room-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="room-body">
+                <section id="result-priority" class="priority-actions" aria-live="polite">
+                  <h2 data-i18n="actions.heading">優先行動</h2>
+                  <div class="card" id="priority-actions"></div>
+                </section>
+              </div>
+            </details>
+
+            <details class="room" id="room-negotiation">
+              <summary>
+                <span class="room-title" data-i18n="room.negotiationTitle">下一輪談判準備</span>
+                <span class="room-status" id="room-negotiation-status"></span>
+                <span class="room-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="room-body">
+                <section id="result-negotiation" class="trade-detail" aria-live="polite">
+                  <h2 data-i18n="trade.prepHeading">下一輪對話準備</h2>
+                  <div class="card negotiation-prep" id="negotiation-prep"></div>
+                </section>
+              </div>
+            </details>
+
+            <details class="room" id="room-structure">
+              <summary>
+                <span class="room-title" data-i18n="room.structureTitle">這筆交易怎麼運作（交易結構）</span>
+                <span class="room-status" id="room-structure-status"></span>
+                <span class="room-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="room-body">
+                <section id="result-evidence" class="commercial-structure" aria-live="polite">
+                  <h2 data-i18n="structure.heading">交易結構</h2>
+                  <div class="card" id="commercial-structure"></div>
+                </section>
+                <section id="blank-context-result" class="commercial-structure" aria-live="polite">
+                  <h2 data-i18n="context.resultHeading">商機骨架</h2>
+                  <div class="card" id="blank-commercial-context"></div>
+                </section>
+              </div>
+            </details>
+
+            <details class="room" id="room-trade">
+              <summary>
+                <span class="room-title" data-i18n="room.tradeTitle">付款／交付／驗收結構</span>
+                <span class="room-status" id="room-trade-status"></span>
+                <span class="room-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="room-body">
+                <section class="trade-detail" aria-live="polite">
+                  <h2 data-i18n="trade.heading">貿易交易結構</h2>
+                  <div class="card" id="trade-deal-structure"></div>
+                </section>
+              </div>
+            </details>
+
+            <details class="room" id="room-path">
+              <summary>
+                <span class="room-title" data-i18n="room.pathTitle">哪個證據會改變判斷（Decision Path）</span>
+                <span class="room-status" id="room-path-status"></span>
+                <span class="room-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="room-body">
+                <section class="decision-path" id="decision-path-area" hidden aria-live="polite">
+                  <h2 data-i18n="path.heading">Decision Path：證據如何影響判斷</h2>
+                  <div class="card" id="decision-path-current"></div>
+                  <div class="card">
+                    <h3 data-i18n="path.tryChange">試跑一個假設的證據變化</h3>
+                    <div class="path-options" id="decision-path-options"></div>
+                    <p class="muted" id="decision-path-empty" data-i18n="path.noSelection">選擇一個假設的證據變化，查看同一套規則會如何重新判斷。</p>
+                  </div>
+                  <div class="card path-detail" id="decision-path-detail" hidden></div>
+                </section>
+              </div>
+            </details>
+
+            <details class="room" id="room-export">
+              <summary>
+                <span class="room-title" data-i18n="room.exportTitle">我可以帶什麼進會議（匯出）</span>
+                <span class="room-status" id="room-export-status"></span>
+                <span class="room-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="room-body">
+                <section id="result-export" class="deal-brief-export" aria-live="polite">
+                  <div class="export-heading-row">
+                    <div>
+                      <h2 data-i18n="export.heading">匯出 Deal Brief</h2>
+                      <p class="muted" data-i18n="export.helper">把這筆商機整理成可獨立閱讀的 Markdown 或純文字 brief。</p>
+                    </div>
+                    <div class="btn-row export-actions">
+                      <button type="button" class="secondary" id="btn-export-md" data-i18n="export.markdown">下載 Markdown</button>
+                      <button type="button" class="secondary" id="btn-export-txt" data-i18n="export.text">下載純文字</button>
+                      <button type="button" class="secondary" id="btn-export-ledger" data-i18n="export.ledger">匯出決策快照</button>
+                    </div>
+                  </div>
+                  <p class="export-status muted" id="export-status"></p>
+                </section>
+              </div>
+            </details>
+          </div>
+
+          <!-- Human decision: stays outside Evidence Room, clearly separate -->
           <h2 data-i18n="result.yourDecision">你的決定</h2>
           <div class="card">
             <div class="human-boundary">

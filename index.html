@@ -358,6 +358,19 @@
       .dl-grid .glance-col h4 { color: var(--forest); font-size: 11.5px; }
       .dl-next .glance-col { border-left-color: var(--amber); }
       .dl-note { margin-top: 14px; }
+      /* 詳細證據明細：預設收合，展開才顯示重複細節（Astra P1-1） */
+      .dl-detail { margin-top: 14px; border: 1px solid var(--line); border-radius: 10px; background: #fafbf7; padding: 4px 14px 12px; }
+      .dl-detail > summary { cursor: pointer; color: var(--forest); font-size: 13px; font-weight: 700; padding: 10px 0; }
+      .dl-detail-grid { border-top: 1px dashed var(--hairline); padding-top: 12px; }
+      .dl-detail .dl-grid { margin-top: 0; }
+      /* 帶走什麼：四問 Deal Brief 預覽（Astra P1-1） */
+      .brief-four { display: grid; }
+      .brief-row { display: grid; grid-template-columns: 150px minmax(0,1fr); gap: 14px; padding: 13px 2px; border-bottom: 1px solid var(--hairline); align-items: baseline; }
+      .brief-row-last { border-bottom: 0; }
+      .brief-q { font-size: 12.5px; font-weight: 800; color: var(--amber); }
+      .brief-a strong { display: block; color: var(--ink); font-size: 14.5px; }
+      .brief-a span { display: block; margin-top: 3px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+      @media (max-width: 560px) { .brief-row { grid-template-columns: 1fr; gap: 4px; } }
       /* Body/typography lift */
       h2 { font-size: 20px; }
       .card { border-radius: 12px; }
@@ -1304,6 +1317,12 @@
 
           <!-- Decision lead: recommendation + control + next + do-not-commit + human status -->
           <div id="result-rec" class="decision-lead" aria-live="polite"></div>
+
+          <!-- 帶走什麼：Deal Brief 可讀預覽（Astra P1-1：前移簡報預覽） -->
+          <section id="brief-preview-area" class="trade-detail brief-preview" aria-live="polite">
+            <h2 data-i18n="brief.previewHeading">帶走什麼：Deal Brief 預覽</h2>
+            <div class="card" id="brief-preview-body"></div>
+          </section>
 
           <section id="blank-economics-result" class="trade-detail" hidden aria-live="polite">
             <h2 data-i18n="economics.heading">Deal Economics Bridge</h2>

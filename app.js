@@ -338,6 +338,53 @@ function renderTradeDeal(view) {
   ].join("");
 }
 
+// 帶走什麼：以既有 Deal Brief view model 渲染第一層四問的可讀摘要
+// （Astra P1-1：前移簡報預覽，讓客戶先看到能帶走的成果；不新增任何資料）。
+function renderDealBriefPreview({ engine: g, economics, tradeView, nextBestAction }) {
+  const area = $("brief-preview-area");
+  const body = $("brief-preview-body");
+  if (!area || !body) return;
+  area.hidden = false;
+  const currency = current?.economics?.currency || "CNY";
+  const revenue = economics.revenue === null ? tx("context.unknown") : economicsValue(economics.revenue, currency);
+  const netContribution = economics.expectedNetContribution === null
+    ? tx("economics.notCalculated")
+    : economicsValue(economics.expectedNetContribution, currency);
+  const blockers = g.materialContradictions.length || g.blockingUnknowns.length
+    ? [
+        ...g.materialContradictions.map((c) => esc(displayEvidenceLabel(c))),
+        ...g.blockingUnknowns.map((u) => esc(displayEvidenceLabel(u))),
+      ].join(" · ")
+    : tx("result.noBlockers");
+  const firstAsk = tradeView.negotiationPrep[0];
+  const firstAskText = firstAsk
+    ? (firstAsk.type === "ACCEPTANCE_REMEDY"
+        ? tx("remedy.action." + (firstAsk.i18nKey || "unknown"))
+        : tx("trade.prep.question." + prepCopyKey(firstAsk, tradeView.structure.delivery.confirmed)))
+    : "";
+
+  body.innerHTML = `
+    <div class="brief-four">
+      <div class="brief-row">
+        <span class="brief-q">${tx("brief.previewQ1")}</span>
+        <div class="brief-a"><strong>${tx("brief.revenue")} ${revenue}</strong><span>${tx("snapshot.netContribution")} ${netContribution}</span></div>
+      </div>
+      <div class="brief-row">
+        <span class="brief-q">${tx("brief.previewQ2")}</span>
+        <div class="brief-a"><strong>${stateLabel(g.recommended)}</strong><span>${blockers}</span></div>
+      </div>
+      <div class="brief-row">
+        <span class="brief-q">${tx("brief.previewQ3")}</span>
+        <div class="brief-a"><strong>${esc(nextBestAction)}</strong>${firstAskText ? `<span>${esc(firstAskText)}</span>` : ""}</div>
+      </div>
+      <div class="brief-row brief-row-last">
+        <span class="brief-q">${tx("brief.previewQ4")}</span>
+        <div class="brief-a"><span>${tx("brief.previewTakeaway")}</span></div>
+      </div>
+    </div>
+  `;
+}
+
 function renderNegotiationPrep(view) {
   $("negotiation-prep").innerHTML = view.negotiationPrep.length
     ? view.negotiationPrep.map((item) => [
@@ -979,20 +1026,25 @@ function renderResult() {
       <span class="muted dl-label">${tx("result.nextBestAction")}</span>
       <strong>${esc(nextBestAction)}</strong>
     </div>
-    <div class="dl-grid">
-      <div class="glance-col"><h4>${tx("result.missing")}</h4><ul>${[
-        ...g.blockingUnknowns.map((u) => `<li>${esc(displayEvidenceLabel(u))}</li>`),
-        ...(g.weakEvidence || g.strongEvidence === false ? [`<li>${tx("result.evidenceNotStrong")}</li>`] : []),
-        ...(g.kycGate === "ABSENT" && mode === "blank" ? [`<li>${tx("input.kyc")} — ${tx("result.notAssessed")}</li>`] : []),
-        ...(g.marginGate === "ABSENT" && mode === "blank" ? [`<li>${tx("input.margin")} — ${tx("result.notAssessed")}</li>`] : []),
-        ...(current.quoteComparabilityAssessed === false ? [`<li>${tx("input.quoteComparability")} — ${tx("result.notAssessed")}</li>`] : []),
-      ].join("") || `<span class="muted">${tx("result.none")}</span>`}</ul></div>
-      <div class="glance-col"><h4>${tx("result.contradictions")}</h4>${current.contradictions.length ? `<ul>${current.contradictions.map((c) => `<li>${esc(displayEvidenceLabel(c))}${c.material ? ` (${tx("input.material")})` : ""} — ${c.status === "RESOLVED" ? tx("input.resolved") : tx("result.unresolved")}</li>`).join("")}</ul>` : `<span class="muted">${tx("result.noneRecorded")}</span>`}</div>
-    </div>
-    <div class="dl-grid dl-next">
-      <div class="glance-col"><h4>${tx("result.verifyNext")}</h4>${next.length ? `<ul>${next.map((n) => `<li>${esc(localizeEvidenceText(n, language))}</li>`).join("")}</ul>` : `<span class="muted">${tx("result.noFurtherEvidence")}</span>`}</div>
-      <div class="glance-col"><h4>${tx("result.wouldChange")}</h4><ul>${wouldChange.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>
-    </div>
+    <details class="dl-detail" ${mode === "blank" ? "" : ""}>
+      <summary>${tx("result.detailToggle")}</summary>
+      <div class="dl-detail-grid">
+        <div class="dl-grid">
+          <div class="glance-col"><h4>${tx("result.missing")}</h4><ul>${[
+            ...g.blockingUnknowns.map((u) => `<li>${esc(displayEvidenceLabel(u))}</li>`),
+            ...(g.weakEvidence || g.strongEvidence === false ? [`<li>${tx("result.evidenceNotStrong")}</li>`] : []),
+            ...(g.kycGate === "ABSENT" && mode === "blank" ? [`<li>${tx("input.kyc")} — ${tx("result.notAssessed")}</li>`] : []),
+            ...(g.marginGate === "ABSENT" && mode === "blank" ? [`<li>${tx("input.margin")} — ${tx("result.notAssessed")}</li>`] : []),
+            ...(current.quoteComparabilityAssessed === false ? [`<li>${tx("input.quoteComparability")} — ${tx("result.notAssessed")}</li>`] : []),
+          ].join("") || `<span class="muted">${tx("result.none")}</span>`}</ul></div>
+          <div class="glance-col"><h4>${tx("result.contradictions")}</h4>${current.contradictions.length ? `<ul>${current.contradictions.map((c) => `<li>${esc(displayEvidenceLabel(c))}${c.material ? ` (${tx("input.material")})` : ""} — ${c.status === "RESOLVED" ? tx("input.resolved") : tx("result.unresolved")}</li>`).join("")}</ul>` : `<span class="muted">${tx("result.noneRecorded")}</span>`}</div>
+        </div>
+        <div class="dl-grid dl-next">
+          <div class="glance-col"><h4>${tx("result.verifyNext")}</h4>${next.length ? `<ul>${next.map((n) => `<li>${esc(localizeEvidenceText(n, language))}</li>`).join("")}</ul>` : `<span class="muted">${tx("result.noFurtherEvidence")}</span>`}</div>
+          <div class="glance-col"><h4>${tx("result.wouldChange")}</h4><ul>${wouldChange.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>
+        </div>
+      </div>
+    </details>
     <p class="glance-note dl-note">${tx("boundary.note")}</p>
   `;
 
@@ -1028,6 +1080,13 @@ function renderResult() {
     currency: current.economics?.currency,
   });
   renderTradeDeal(tradeView);
+  renderDealBriefPreview({ engine: g, economics, tradeView, nextBestAction });
+  // P1-2：sample 模式自動示範一次「補了證據，判斷會如何改變」——
+  // 預設選取第一個會改變建議的假設（Decision Path 仍可手動切換）。
+  if (decisionPathExperiment && mode === "sample" && !selectedPathId) {
+    const firstChange = decisionPathExperiment.paths.find((p) => p.comparison?.decisionChanged);
+    if (firstChange) selectedPathId = firstChange.id;
+  }
   renderDecisionPath();
   $("export-status").textContent = tx("export.ready") + " " + current.name;
 

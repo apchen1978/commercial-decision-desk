@@ -219,6 +219,19 @@
       @media (max-width:640px) { .import-meta { grid-template-columns:1fr; } .intake-preview { padding:14px; } }
       .intake-section { margin-top:14px; }
       .intake-section summary, .context-authority summary { cursor:pointer; color:var(--forest); font-weight:700; }
+      /* Voice-input placeholder (SME-mode pivot Batch 3): an honest, inert
+         affordance. No voice API, no recording, no upload — reserved UX only. */
+      .voice-placeholder { margin: 2px 0 12px; }
+      .voice-placeholder summary {
+        display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+        color: var(--muted-2); font-size: 12px; font-weight: 600;
+        padding: 3px 10px; border: 1px dashed var(--line); border-radius: 999px;
+        background: transparent; list-style: none; user-select: none;
+      }
+      .voice-placeholder summary::-webkit-details-marker { display: none; }
+      .voice-placeholder summary:hover { color: var(--forest); border-color: var(--forest); }
+      .voice-placeholder[open] summary { border-style: solid; color: var(--forest); }
+      .voice-placeholder > p { margin: 8px 2px 0; color: var(--muted-2); font-size: 11.5px; line-height: 1.55; max-width: 72ch; }
       /* Progressive-disclosure group (SME-mode pivot Batch 2): the "進階"
          wrapper groups the professional evidence blocks behind one disclosure;
          it deliberately does not look like another required card. */
@@ -1156,6 +1169,10 @@
         <div id="intake-area" hidden>
           <div class="card">
             <h3 data-i18n="input.heading">你目前知道這個商機的哪些事？</h3>
+            <details class="voice-placeholder" title="voice input placeholder">
+              <summary data-i18n="input.voicePlaceholder">🎙 語音輸入（規劃中）</summary>
+              <p class="muted" data-i18n="input.voiceHelper">此版本不使用語音 API、不上傳任何錄音；語音輸入僅為未來的輸入方式預留，目前請以打字輸入。</p>
+            </details>
             <datalist id="quantity-unit-suggestions"><option value="metres"></option><option value="pieces"></option><option value="sets"></option><option value="rolls"></option><option value="m²"></option><option value="pairs"></option></datalist>
             <datalist id="source-suggestions"><option value="Inbound enquiry"></option><option value="Referral"></option><option value="Trade show"></option><option value="Existing buyer"></option><option value="RFQ / tender"></option><option value="Website enquiry"></option></datalist>
             <datalist id="contact-role-suggestions"><option value="Owner / founder"></option><option value="Purchasing manager"></option><option value="Technical lead"></option><option value="Project manager"></option><option value="Finance"></option><option value="Sales contact"></option></datalist>

@@ -15,6 +15,7 @@ import { buildDealBriefViewModel, downloadDealBrief } from "./deal-brief.js";
 import { downloadLedgerSnapshot } from "./workbench-ledger.js";
 import { buildFinalDecisionSummaryState } from "./final-decision-summary.js";
 import { createImportPreview, reviewImportSignal, confirmImportContext, buildConfirmedInput } from "./intake-import.js";
+import { buildBossThree } from "./boss-three.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -278,6 +279,32 @@ function renderExecutiveSnapshot({ economics, tradeView, control, momentum, cove
     <div class="snapshot-control"><span>${tx("snapshot.control")}</span><strong>${snapshotValue(control)}</strong></div>
     ${sampleGuideHtml}
   `;
+}
+
+function renderBossThree(view) {
+  const root = $("boss-three");
+  if (!root) return;
+  root.hidden = false;
+  const fill = (template, args = {}) => Object.entries(args).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, esc(value)), tx(template));
+  $("boss-three-rows").innerHTML = view.rows.map((row) => `
+    <div class="boss-row">
+      <div class="boss-row-head">
+        <p class="boss-row-question">${tx(row.questionKey)}</p>
+        <span class="boss-chip ${esc(row.tone)}">${tx(row.chipKey)}</span>
+      </div>
+      <p class="boss-row-answer">${fill(row.answerKey, row.args)}</p>
+      <p class="boss-row-trace">${tx(row.traceKey)}</p>
+    </div>`).join("");
+  const economicsEl = $("boss-three-economics");
+  if (view.economicsLine && view.economicsLine.net !== null) {
+    economicsEl.hidden = false;
+    economicsEl.textContent = fill("boss.economics", {
+      net: economicsValue(view.economicsLine.net, view.economicsLine.currency),
+      min: economicsValue(view.economicsLine.min, view.economicsLine.currency),
+    });
+  } else {
+    economicsEl.hidden = true;
+  }
 }
 
 function renderCommercialContext(context = {}) {
@@ -1062,6 +1089,15 @@ function renderResult() {
     ...g.materialContradictions.map((c) => displayEvidenceLabel(c)),
     ...g.blockingUnknowns.map((u) => displayEvidenceLabel(u)),
   ];
+  renderBossThree(buildBossThree({
+    paymentEvidence: tradeView.structure.paymentEvidence,
+    delivery: tradeView.structure.delivery,
+    timing: current.commercialContext?.timing || "",
+    recommended: g.recommended,
+    controls: nControl,
+    economics,
+    currency: economicsInput.currency || "CNY",
+  }));
   renderExecutiveSnapshot({
     economics,
     tradeView,

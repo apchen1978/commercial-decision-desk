@@ -995,6 +995,33 @@
       .preview-card .kv div { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; color: var(--muted); padding: 2px 0; border-top: 1px dashed var(--hairline); }
       .preview-card .kv div:first-child { border-top: 0; }
       .preview-note { margin-top: 10px; font-size: 11.5px; color: var(--muted-2); }
+      /* ================================================================
+         BOSS-THREE — result first screen answers the three owner questions
+         (收款 / 完工 / 投入) in plain language. Presentation only; states
+         mirror recorded evidence, never invent capacity or guarantees.
+         ================================================================ */
+      .boss-three-card {
+        margin: 14px 0 18px; padding: 18px 20px;
+        background: var(--surface); border: 1px solid var(--line);
+        border-top: 3px solid var(--brass); border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-2);
+      }
+      .boss-three-kicker { margin: 0; color: var(--brass); font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+      .boss-three-lead { margin: 6px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; max-width: 78ch; }
+      .boss-three-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+      .boss-row { min-width: 0; padding: 14px 15px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-2); display: flex; flex-direction: column; gap: 8px; }
+      .boss-row-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+      .boss-row-question { margin: 0; font-size: 14px; font-weight: 750; color: var(--ink); }
+      .boss-chip { flex: 0 0 auto; padding: 3px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 800; letter-spacing: .04em; white-space: nowrap; }
+      .boss-chip.ok { background: color-mix(in srgb, var(--forest) 12%, transparent); color: var(--forest); }
+      .boss-chip.warn { background: color-mix(in srgb, var(--amber) 16%, transparent); color: #8a6d1f; }
+      .boss-chip.drop { background: color-mix(in srgb, var(--rust) 14%, transparent); color: var(--rust); }
+      .boss-chip.unk { background: color-mix(in srgb, var(--muted) 12%, transparent); color: var(--muted-2); }
+      .boss-row-answer { margin: 0; color: #4c5049; font-size: 12.5px; line-height: 1.6; }
+      .boss-row-trace { margin-top: auto; padding-top: 8px; border-top: 1px dashed var(--hairline); color: var(--muted-2); font-size: 10.5px; letter-spacing: .04em; }
+      .boss-three-economics { margin: 14px 0 0; padding: 10px 13px; border-left: 3px solid var(--forest); background: var(--surface-2); color: var(--forest); font-size: 12.5px; line-height: 1.55; }
+      .boss-three-boundary { margin: 12px 0 0; color: var(--muted-2); font-size: 11px; line-height: 1.5; }
+      @media (max-width: 860px) { .boss-three-grid { grid-template-columns: 1fr; } .boss-row-trace { margin-top: 0; } }
     </style>
   </head>
   <body>
@@ -1312,6 +1339,18 @@
             <a href="#result-export" data-i18n="result.navExport">匯出</a>
           </div>
           <h2 data-i18n="result.heading">工作台建議</h2>
+
+          <!-- 三問速答：結果首屏先用老闆語言回答 收款／完工／投入（SME-mode pivot Batch 1）。
+               只重述既有證據狀態；無證據即 UNKNOWN，不做產能或付款保證。 -->
+          <section id="boss-three" class="boss-three" hidden aria-live="polite">
+            <div class="boss-three-card">
+              <p class="boss-three-kicker" data-i18n="boss.kicker">先回答老闆問的三件事</p>
+              <p class="boss-three-lead" data-i18n="boss.lead">這筆單現在能不能接？先用三句話看：收不收得到錢、做不做得完、該不該現在投入。</p>
+              <div class="boss-three-grid" id="boss-three-rows"></div>
+              <p class="boss-three-economics" id="boss-three-economics" hidden></p>
+              <p class="boss-three-boundary" data-i18n="boss.boundary">三問速答只重述已登錄的證據；沒有證據的事維持 UNKNOWN，不會被推測。完整結構與明細在下方。</p>
+            </div>
+          </section>
 
           <section id="executive-deal-snapshot" class="executive-snapshot" hidden aria-live="polite"></section>
 

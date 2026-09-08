@@ -466,11 +466,6 @@ function renderDealBriefPreview({ engine: g, economics, tradeView, nextBestActio
   const body = $("brief-preview-body");
   if (!area || !body) return;
   area.hidden = false;
-  const currency = current?.economics?.currency || "CNY";
-  const revenue = economics.revenue === null ? tx("context.unknown") : economicsValue(economics.revenue, currency);
-  const netContribution = economics.expectedNetContribution === null
-    ? tx("economics.notCalculated")
-    : economicsValue(economics.expectedNetContribution, currency);
   const blockers = g.materialContradictions.length || g.blockingUnknowns.length
     ? [
         ...g.materialContradictions.map((c) => esc(displayEvidenceLabel(c))),
@@ -483,24 +478,35 @@ function renderDealBriefPreview({ engine: g, economics, tradeView, nextBestActio
         ? tx("remedy.action." + (firstAsk.i18nKey || "unknown"))
         : tx("trade.prep.question." + prepCopyKey(firstAsk, tradeView.structure.delivery.confirmed)))
     : "";
+  const firstObtainText = firstAsk
+    ? (firstAsk.type === "ACCEPTANCE_REMEDY"
+        ? (firstAsk.evidence || firstAsk.request || tx("brief.notRecorded"))
+        : tx("trade.prep.request." + prepCopyKey(firstAsk, tradeView.structure.delivery.confirmed)))
+    : tx("brief.noMeetingAgenda");
+  const firstRerunText = firstAsk
+    ? (firstAsk.type === "ACCEPTANCE_REMEDY"
+        ? remedyRerun(firstAsk)
+        : tx("trade.prep.rerun." + prepCopyKey(firstAsk, tradeView.structure.delivery.confirmed)))
+    : tx("brief.noRerun");
 
   body.innerHTML = `
+    <p class="brief-preview-intro">${tx("brief.previewIntro")}</p>
     <div class="brief-four">
       <div class="brief-row">
         <span class="brief-q">${tx("brief.previewQ1")}</span>
-        <div class="brief-a"><strong>${tx("brief.revenue")} ${revenue}</strong><span>${tx("snapshot.netContribution")} ${netContribution}</span></div>
+        <div class="brief-a"><strong>${esc(stateLabel(g.recommended))}</strong><span>${blockers}</span></div>
       </div>
       <div class="brief-row">
         <span class="brief-q">${tx("brief.previewQ2")}</span>
-        <div class="brief-a"><strong>${stateLabel(g.recommended)}</strong><span>${blockers}</span></div>
+        <div class="brief-a"><strong>${esc(nextBestAction)}</strong>${firstAskText ? `<span>${esc(firstAskText)}</span>` : ""}</div>
       </div>
       <div class="brief-row">
         <span class="brief-q">${tx("brief.previewQ3")}</span>
-        <div class="brief-a"><strong>${esc(nextBestAction)}</strong>${firstAskText ? `<span>${esc(firstAskText)}</span>` : ""}</div>
+        <div class="brief-a"><strong>${esc(firstObtainText)}</strong><span>${tx("brief.previewEvidenceNote")}</span></div>
       </div>
       <div class="brief-row brief-row-last">
         <span class="brief-q">${tx("brief.previewQ4")}</span>
-        <div class="brief-a"><span>${tx("brief.previewTakeaway")}</span></div>
+        <div class="brief-a"><strong>${esc(firstRerunText)}</strong><span>${tx("brief.previewTakeaway")}</span></div>
       </div>
     </div>
   `;

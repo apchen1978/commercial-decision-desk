@@ -66,14 +66,20 @@
       .muted { color: var(--muted); font-size: 13.5px; }
       .mode-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
       @media (max-width: 640px) { .mode-row { grid-template-columns: 1fr; } }
+      .mode-orientation { max-width: 760px; margin: 26px 0 0; }
+      .mode-orientation .mode-kicker { margin: 0 0 7px; color: var(--gold); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+      .mode-orientation h2 { margin-bottom: 6px; color: var(--forest); font-size: 23px; }
+      .mode-orientation p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.65; max-width: 62ch; }
       .mode-card {
         border: 1px solid var(--line); border-radius: 14px; background: #fff;
         padding: 20px 20px 16px; cursor: pointer; transition: border-color .12s, box-shadow .12s;
+        display: block; width: 100%; text-align: left; color: inherit; font-weight: inherit;
       }
       .mode-card:hover { border-color: var(--forest); box-shadow: 0 2px 10px rgba(31,77,58,.10); }
       .mode-card h3 { margin: 0 0 6px; font-size: 17px; }
       .mode-card p { margin: 0 0 12px; color: var(--muted); font-size: 13.5px; }
       .mode-card .cta { font-weight: 700; color: var(--forest); font-size: 13.5px; }
+      .mode-card:focus-visible { outline: 3px solid color-mix(in srgb, var(--gold) 55%, transparent); outline-offset: 3px; }
       label.field { display: block; margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--muted); }
       input[type="text"], input[type="number"], textarea, select {
         font: inherit; width: 100%; margin-top: 4px; padding: 9px 11px;
@@ -325,15 +331,17 @@
       .language-switch { margin-bottom: 0; }
       /* Mode cards — primary (work) vs secondary (guided tour) */
       .mode-row { gap: 16px; margin-top: 18px; }
-      .mode-card { padding: 24px 22px 18px; }
+      .mode-card { padding: 24px 22px 18px; border-radius: 14px; color: var(--ink); font-weight: 400; }
       .mode-card.mode-primary {
         border: 2px solid var(--forest); background: #fff;
         box-shadow: 0 8px 24px -14px rgba(31,77,58,.35);
       }
       .mode-card.mode-primary h3 { font-size: 19px; color: var(--forest); }
       .mode-card.mode-primary .cta { font-size: 14.5px; }
+      .mode-card.mode-primary { min-height: 184px; }
       .mode-card.mode-secondary { border-style: dashed; opacity: .96; }
       .mode-card.mode-secondary h3 { font-size: 15.5px; }
+      .mode-card.mode-secondary { min-height: 184px; }
       .mode-badge {
         display: inline-block; margin-bottom: 8px; padding: 3px 10px;
         border: 1px solid var(--gold); border-radius: 999px;
@@ -1141,6 +1149,24 @@
 
       <!-- MODE SCREEN -->
       <section id="mode-screen">
+        <div class="mode-orientation">
+          <p class="mode-kicker" data-i18n="mode.kicker">COMMERCIAL DECISION DESK</p>
+          <h2 data-i18n="mode.heading">先選擇你要怎麼開始</h2>
+          <p data-i18n="mode.orientation">CDD 先把商機中的已知、缺口與承諾風險整理清楚，再把下一步交回人的判斷。</p>
+        </div>
+        <div class="mode-row" aria-label="CDD entry paths">
+          <button type="button" class="mode-card mode-primary" id="mode-blank" aria-describedby="mode-blank-description">
+            <h3 data-i18n="mode.blank.title">評估我的商機</h3>
+            <p id="mode-blank-description" data-i18n="mode.blank.description">用你目前知道的資訊開始。未知就保留為「未知」，不會被推測。</p>
+            <span class="cta" data-i18n="mode.blank.cta">建立評估 →</span>
+          </button>
+          <button type="button" class="mode-card mode-secondary" id="mode-sample" aria-describedby="mode-sample-description">
+            <span class="mode-badge" data-i18n="mode.sample.badge">合成 · 僅供導覽</span>
+            <h3 data-i18n="mode.sample.title">看看完整案例</h3>
+            <p id="mode-sample-description" data-i18n="mode.sample.description">先看一筆完整案例，理解 CDD 如何從證據走到下一個商業問題。</p>
+            <span class="cta" data-i18n="mode.sample.cta">查看範例 →</span>
+          </button>
+        </div>
         <div class="scenario-intro">
           <p class="scenario-kicker" data-i18n="scenario.eyebrow">SYNTHETIC DEAL SCENARIO</p>
           <h2 data-i18n="scenario.title">看似可接的訂單，真正還卡在哪裡？</h2>
@@ -1159,21 +1185,6 @@
           <p class="scenario-boundary" data-i18n="scenario.boundary">CDD 不會替你補完缺失資料。它保留 UNKNOWN，指出控制項目與下一個需要確認的事實。</p>
           <a class="scenario-sample-link" href="#mode-sample" data-i18n="scenario.sampleLink">查看這筆合成商機如何被整理 →</a>
         </div>
-        <h2 data-i18n="mode.heading">開始</h2>
-        <div class="mode-row">
-          <div class="mode-card mode-primary" id="mode-blank">
-            <h3 data-i18n="mode.blank.title">建立新的商機評估</h3>
-            <p data-i18n="mode.blank.description">用你目前知道的資訊開始。未知就保留為「未知」，不會被推測。</p>
-            <span class="cta" data-i18n="mode.blank.cta">建立評估 →</span>
-          </div>
-          <div class="mode-card mode-secondary" id="mode-sample">
-            <span class="mode-badge" data-i18n="mode.sample.badge">合成 · 僅供導覽</span>
-            <h3 data-i18n="mode.sample.title">查看完成範例</h3>
-            <p data-i18n="mode.sample.description">看 CDD 如何把證據變成建議與會議簡報。這是合成教學案例，不會影響你的評估。</p>
-            <span class="cta" data-i18n="mode.sample.cta">查看範例 →</span>
-          </div>
-        </div>
-
         <section class="product-flow" aria-labelledby="product-flow-title">
           <div class="product-flow-head">
             <div>

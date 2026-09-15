@@ -1067,12 +1067,19 @@
       .boss-aux-chip { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-2); color: var(--muted); font-size: 11px; font-weight: 600; }
       .boss-aux-chip strong { color: var(--forest); font-family: "Geist Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; font-size: 12px; }
       .boss-aux-chip small { font-size: 9px; color: var(--muted-2); }
+      .boss-aux-boundary { margin: 8px 0 0; color: var(--muted-2); font-size: 11px; line-height: 1.5; }
+      .boss-three.sample-mode .boss-aux { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 18px 0 0; padding: 14px 0 0; border-top: 1px solid var(--hairline); }
+      .boss-three.sample-mode .boss-aux-chip { display: block; padding: 12px 14px; border: 1px solid var(--line); border-top: 3px solid var(--brass); border-radius: 9px; background: var(--surface-2); font-size: 11px; letter-spacing: .02em; }
+      .boss-three.sample-mode .boss-aux-chip strong { display: block; margin-top: 3px; font-size: 30px; line-height: 1.1; letter-spacing: -.025em; }
+      .boss-three.sample-mode .boss-aux-chip small { font-size: 13px; }
+      .boss-three.sample-mode .boss-aux-boundary { margin-top: 9px; }
       @media (max-width: 700px) {
         .boss-exec-fields { grid-template-columns: 1fr 1fr; }
         .boss-exec-next { grid-column: auto; }
       }
       @media (max-width: 420px) {
         .boss-exec-fields { grid-template-columns: 1fr; }
+        .boss-three.sample-mode .boss-aux { grid-template-columns: 1fr; }
       }
       .boss-three-economics { margin: 14px 0 0; padding: 10px 13px; border-left: 3px solid var(--forest); background: var(--surface-2); color: var(--forest); font-size: 12.5px; line-height: 1.55; }
       .boss-three-boundary { margin: 12px 0 0; color: var(--muted-2); font-size: 11px; line-height: 1.5; }
@@ -1466,6 +1473,7 @@
               <div class="boss-three-grid" id="boss-three-rows"></div>
               <p class="boss-three-economics" id="boss-three-economics" hidden></p>
               <div class="boss-aux" id="boss-aux" hidden></div>
+              <p class="boss-aux-boundary" data-i18n="exec.signalBoundary">這兩項是目前已知訊號的摘要，不是成交機率、信用評分或成功保證。</p>
               <p class="boss-three-boundary" data-i18n="boss.boundary">三問速答只重述已登錄的證據；沒有證據的事維持 UNKNOWN，不會被推測。完整結構與明細在下方 Evidence Room。</p>
             </div>
           </section>

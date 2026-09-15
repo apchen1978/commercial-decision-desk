@@ -285,6 +285,7 @@ function renderBossThree(view, extras = {}) {
   const root = $("boss-three");
   if (!root) return;
   root.hidden = false;
+  root.classList.toggle("sample-mode", mode === "sample");
   const fill = (template, args = {}) => Object.entries(args).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, esc(value)), tx(template));
   // L1 executive strip — the 30-second reading. All values come from data the
   // engine/view models already produced; nothing is invented here.

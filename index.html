@@ -1124,6 +1124,49 @@
       .room-status.warn { color: #8a6d1f; background: color-mix(in srgb, var(--amber) 12%, transparent); border-color: color-mix(in srgb, var(--amber) 24%, transparent); }
       .room-status.unk { color: var(--muted-2); }
       .room-body { padding: 2px 16px 16px; border-top: 1px solid var(--hairline); }
+      /* BOUNDED VISUAL POLISH: distinguish the two entry intents and make the
+         synthetic case read as a short decision story before the data wall. */
+      #mode-screen .mode-row { align-items: stretch; gap: 18px; }
+      #mode-screen .mode-card { position: relative; min-height: 202px; padding: 28px 24px 20px; overflow: hidden; }
+      #mode-screen .mode-card::after { content: ""; position: absolute; right: 22px; bottom: 18px; width: 34px; height: 1px; background: var(--gold); opacity: .7; }
+      #mode-screen .mode-card.mode-primary { border-top: 5px solid var(--forest); background: linear-gradient(180deg, #fff 0%, #fbfcf8 100%); }
+      #mode-screen .mode-card.mode-primary::before { content: "01 · OWNER INPUT"; display: block; margin-bottom: 18px; color: var(--amber); font-size: 10px; font-weight: 800; letter-spacing: .14em; }
+      #mode-screen .mode-card.mode-secondary { border: 1px solid var(--brass); border-top: 5px solid var(--brass); background: var(--surface-2); opacity: 1; }
+      #mode-screen .mode-card.mode-secondary::before { content: "02 · GUIDED CASE"; display: block; margin-bottom: 14px; color: var(--brass); font-size: 10px; font-weight: 800; letter-spacing: .14em; }
+      #mode-screen .mode-card.mode-secondary .mode-badge { margin-bottom: 10px; border: 0; border-radius: 0; padding: 0; background: transparent; color: var(--brass); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+      #mode-screen .mode-card.mode-secondary h3 { font-size: 18px; color: var(--charcoal); }
+      #mode-screen .mode-card p { max-width: 38ch; line-height: 1.6; }
+      #mode-screen .mode-card .cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; padding-bottom: 3px; border-bottom: 1px solid currentColor; }
+      #mode-screen .scenario-intro { max-width: none; margin-top: 38px; padding: 28px 0 0; border-top: 2px solid var(--forest); }
+      #mode-screen .scenario-intro h2 { max-width: 26ch; font-size: clamp(24px, 3vw, 32px); line-height: 1.18; }
+      #mode-screen .scenario-lead { max-width: 60ch; margin-top: 10px; font-size: 15px; color: var(--charcoal); }
+      #mode-screen .scenario-facts { margin-top: 24px; border: 0; border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); border-radius: 0; background: transparent; }
+      #mode-screen .scenario-fact { min-height: 96px; padding: 18px 16px 16px; background: var(--surface-2); }
+      #mode-screen .scenario-fact:first-child { background: var(--ivory); }
+      #mode-screen .scenario-fact:nth-child(2) { border-top: 3px solid var(--rust); }
+      #mode-screen .scenario-fact:nth-child(4) { border-top: 3px solid var(--brass); }
+      #mode-screen .scenario-fact strong { color: var(--charcoal); font-size: 13px; }
+      #mode-screen .scenario-fact span { color: #6b6a5e; }
+      #mode-screen .scenario-flow { position: relative; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 14px; margin-top: 24px; padding: 17px 0 15px; border-bottom: 1px solid var(--hairline); }
+      #mode-screen .scenario-flow::before { content: "JUDGMENT TURN"; position: absolute; left: 50%; top: -8px; transform: translateX(-50%); padding: 0 8px; background: var(--surface); color: var(--brass); font-size: 9px; font-weight: 800; letter-spacing: .14em; }
+      #mode-screen .scenario-flow > div:nth-of-type(2) { padding: 11px 14px; border: 1px solid var(--brass); background: #fffaf0; box-shadow: 0 6px 18px -16px rgba(116,76,29,.55); }
+      #mode-screen .scenario-flow > div:nth-of-type(2) strong { color: var(--charcoal); }
+      #mode-screen .scenario-boundary { margin-top: 18px; border-left-color: var(--rust); background: var(--surface-2); padding: 11px 14px; }
+      #mode-screen .scenario-sample-link { margin-top: 17px; font-size: 13.5px; }
+      @media (max-width: 640px) {
+        #mode-screen .mode-row { gap: 12px; }
+        #mode-screen .mode-card { min-height: 0; padding: 22px 18px 18px; }
+        #mode-screen .mode-card.mode-primary::before, #mode-screen .mode-card.mode-secondary::before { margin-bottom: 12px; }
+        #mode-screen .scenario-intro { margin-top: 30px; padding-top: 22px; }
+        #mode-screen .scenario-intro h2 { max-width: none; font-size: 24px; }
+        #mode-screen .scenario-facts { grid-template-columns: 1fr; gap: 0; }
+        #mode-screen .scenario-fact { min-height: 0; padding: 14px 15px; border-bottom: 1px solid var(--hairline); }
+        #mode-screen .scenario-fact:last-child { border-bottom: 0; }
+        #mode-screen .scenario-flow { grid-template-columns: 1fr; gap: 8px; padding-top: 22px; }
+        #mode-screen .scenario-flow::before { left: 0; transform: none; }
+        #mode-screen .scenario-flow .arrow { justify-self: start; margin-left: 12px; transform: rotate(90deg); }
+        #mode-screen .scenario-flow > div:nth-of-type(2) { order: 3; }
+      }
       /* deep sections that were <section class="card-ish"> keep working inside .room-body */
       .room-body .executive-snapshot, .room-body .decision-lead,
       .room-body .trade-detail, .room-body .commercial-structure,

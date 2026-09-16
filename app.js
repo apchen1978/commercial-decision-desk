@@ -124,6 +124,21 @@ function ownerEvidenceLabel(item) {
       .trim();
 }
 
+// Owner-facing localization of raw fixture strings that arrive in English.
+// Fixture data is untouched; this only affects how the sample story reads.
+// Precise commercial terms (CIF / USD / dates) are deliberately left as-is.
+function localizeOwnerFact(text) {
+  const v = String(text || "");
+  if (language !== "zh-TW") return v;
+  return v
+    .replace(/First shipment target:/gi, "首批出貨目標：")
+    .replace(/installation window:/gi, "安裝期：")
+    .replace(/\(synthetic\)/gi, "")
+    .replace(/metres?/gi, "公尺")
+    .replace(/;/g, "；")
+    .trim();
+}
+
 function tradeTermLabel(term) {
   return term === "UNKNOWN" || term === "notAssessed" ? tx("trade.notConfirmed") : term;
 }
@@ -389,10 +404,10 @@ function renderCommitmentReview({ economics, exposure }) {
   }
   const fill = (template, args = {}) => Object.entries(args).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, esc(value)), tx(template));
   const context = current.commercialContext || {};
-  const quantity = context.quantity ? `${context.quantity} ${context.quantityUnit || ""}`.trim() : tx("context.unknown");
-  const timing = context.timing || tx("context.unknown");
+  const quantity = context.quantity ? `${Number(context.quantity).toLocaleString("en-US")} ${localizeOwnerFact(context.quantityUnit || "")}`.trim() : tx("context.unknown");
+  const timing = context.timing ? localizeOwnerFact(context.timing) : tx("context.unknown");
   const delivery = current.trade?.deliveryTerm
-    ? `${current.trade.deliveryTerm}${current.trade.namedPlace ? ` ${current.trade.namedPlace}` : ""}`
+    ? localizeOwnerFact(`${current.trade.deliveryTerm}${current.trade.namedPlace ? ` ${current.trade.namedPlace}` : ""}`)
     : tx("context.unknown");
   const currency = current.economics?.currency || "CNY";
   const revenue = economics.revenue == null ? tx("economics.unknown") : economicsValue(economics.revenue, currency);
@@ -1252,7 +1267,7 @@ function renderResult() {
   renderBossThree(buildBossThree({
     paymentEvidence: tradeView.structure.paymentEvidence,
     delivery: tradeView.structure.delivery,
-    timing: current.commercialContext?.timing || "",
+    timing: localizeOwnerFact(current.commercialContext?.timing || ""),
     recommended: g.recommended,
     controls: nControl,
     economics,

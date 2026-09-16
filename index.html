@@ -1073,6 +1073,22 @@
       .boss-three.sample-mode .boss-aux-chip strong { display: block; margin-top: 3px; font-size: 30px; line-height: 1.1; letter-spacing: -.025em; }
       .boss-three.sample-mode .boss-aux-chip small { font-size: 13px; }
       .boss-three.sample-mode .boss-aux-boundary { margin-top: 9px; }
+      /* Synthetic Case: orientation is deliberately quiet so Commitment Review
+         reads as the single decision climax rather than another dashboard. */
+      .boss-three.sample-mode .boss-three-card { margin: 14px 0 0; padding: 14px 0 0; background: transparent; border: 0; border-top: 1px solid var(--hairline); border-radius: 0; box-shadow: none; }
+      .boss-three.sample-mode .boss-executive { margin-bottom: 18px; padding-bottom: 16px; }
+      .boss-three.sample-mode .boss-exec-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
+      .boss-three.sample-mode .boss-exec-field { padding: 0 14px; border: 0; border-left: 1px solid var(--hairline); border-radius: 0; background: transparent; }
+      .boss-three.sample-mode .boss-exec-field:first-child { padding-left: 0; border-left: 0; }
+      .boss-three.sample-mode .boss-exec-field strong { font-size: 14px; }
+      .boss-three.sample-mode .boss-exec-next { grid-column: 1 / -1; margin-top: 15px; padding: 14px 0 0; border-left: 0; border-top: 1px solid var(--hairline); }
+      .boss-three.sample-mode .boss-three-grid { gap: 24px; margin-top: 22px; }
+      .boss-three.sample-mode .boss-row { padding: 14px 0; border: 0; border-top: 1px solid var(--hairline); border-radius: 0; background: transparent; }
+      .boss-three.sample-mode .boss-aux { display: flex; gap: 14px; margin: 16px 0 0; padding: 12px 0 0; border-top: 1px solid var(--hairline); }
+      .boss-three.sample-mode .boss-aux-chip { display: inline-flex; align-items: baseline; gap: 6px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; font-size: 11px; }
+      .boss-three.sample-mode .boss-aux-chip + .boss-aux-chip { padding-left: 14px; border-left: 1px solid var(--hairline); }
+      .boss-three.sample-mode .boss-aux-chip strong { display: inline; margin: 0; font-size: 15px; line-height: 1.2; letter-spacing: 0; }
+      .boss-three.sample-mode .boss-aux-chip small { font-size: 10px; }
       @media (max-width: 700px) {
         .boss-exec-fields { grid-template-columns: 1fr 1fr; }
         .boss-exec-next { grid-column: auto; }
@@ -1083,6 +1099,33 @@
       }
       .boss-three-economics { margin: 14px 0 0; padding: 10px 13px; border-left: 3px solid var(--forest); background: var(--surface-2); color: var(--forest); font-size: 12.5px; line-height: 1.55; }
       .boss-three-boundary { margin: 12px 0 0; color: var(--muted-2); font-size: 11px; line-height: 1.5; }
+      /* Commitment Review — a presentation layer over existing fixture facts. */
+       .commitment-review { margin: 66px 0 42px; padding: 40px 34px 28px; border-top: 4px solid var(--forest); border-bottom: 1px solid var(--line); background: var(--surface-2); }
+       .commitment-review-head { display: flex; justify-content: space-between; align-items: end; gap: 28px; padding-bottom: 22px; border-bottom: 1px solid var(--hairline); }
+      .commitment-review-kicker { margin: 0 0 7px; color: var(--brass); font-size: 10.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+       .commitment-review h3 { margin: 0; max-width: 20ch; color: var(--forest); font-size: 34px; line-height: 1.1; letter-spacing: -.03em; }
+       .commitment-review-head p { max-width: 38ch; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; text-align: right; }
+       .commitment-review-lead { margin: 20px 0 0; color: var(--ink); font-size: 15px; line-height: 1.55; max-width: 68ch; }
+      .commitment-review-lead strong { color: var(--forest); }
+       .commitment-review-grid { display: grid; grid-template-columns: minmax(0, .86fr) minmax(0, 1.14fr); gap: 0 30px; margin-top: 20px; }
+       .commitment-review-block { min-width: 0; padding: 21px 0 19px; border-top: 1px solid var(--hairline); }
+      .commitment-review-block h4 { margin: 0 0 7px; color: var(--brass); font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+       .commitment-review-block p, .commitment-review-block ul { margin: 0; color: #4c5049; font-size: 13.5px; line-height: 1.65; }
+      .commitment-review-block ul { padding-left: 18px; }
+      .commitment-review-block li + li { margin-top: 5px; }
+       .commitment-review-block.commitment { padding: 22px 22px 21px; border-top: 0; border-left: 4px solid var(--gold); background: var(--surface); }
+       .commitment-review-block.commitment h4 { color: var(--forest); }
+       .commitment-review-grid .commitment-review-block:nth-child(3) { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(150px, .36fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+       .commitment-review-next { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 18px; margin-top: 8px; padding: 20px 18px 4px; border-top: 2px solid var(--forest); background: #f8f4eb; }
+      .commitment-review-next h4 { margin: 0; color: var(--brass); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; }
+       .commitment-review-next p { margin: 0; color: var(--ink); font-size: 15px; font-weight: 750; line-height: 1.58; }
+       .commitment-review-owner { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--hairline); }
+      .commitment-review-owner h4 { margin: 0 0 4px; color: var(--forest); font-size: 13px; }
+      .commitment-review-owner p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+      .commitment-review-owner strong { flex: 0 0 auto; color: var(--forest); font-size: 13px; }
+       @media (max-width: 700px) { .boss-three.sample-mode .boss-exec-fields { grid-template-columns: 1fr 1fr; } }
+       @media (max-width: 640px) { .commitment-review { margin: 44px 0 30px; padding: 26px 16px 18px; } .commitment-review-head { display: block; } .commitment-review-head p { margin-top: 12px; text-align: left; } .commitment-review h3 { font-size: 25px; } .commitment-review-grid { grid-template-columns: 1fr; gap: 0; } .commitment-review-block { padding: 18px 0 17px; } .commitment-review-block.commitment { padding: 18px 16px 17px; } .commitment-review-grid .commitment-review-block:nth-child(3) { display: block; } .commitment-review-next { grid-template-columns: 1fr; gap: 7px; margin-top: 6px; padding: 18px 14px 2px; } .commitment-review-next p { font-size: 14px; } .commitment-review-owner { display: block; } .commitment-review-owner strong { display: block; margin-top: 9px; } }
+       @media (max-width: 420px) { .boss-three.sample-mode .boss-exec-fields { grid-template-columns: 1fr; } .boss-three.sample-mode .boss-exec-field { padding: 10px 0; border-left: 0; border-top: 1px solid var(--hairline); } .boss-three.sample-mode .boss-exec-field:first-child { padding-top: 0; border-top: 0; } .boss-three.sample-mode .boss-exec-next { margin-top: 0; padding-top: 10px; } .boss-three.sample-mode .boss-aux { display: block; } .boss-three.sample-mode .boss-aux-chip + .boss-aux-chip { display: block; margin-top: 8px; padding: 8px 0 0; border-left: 0; border-top: 1px solid var(--hairline); } }
       @media (max-width: 860px) { .boss-three-grid { grid-template-columns: 1fr; } .boss-row-trace { margin-top: 0; } }
       /* ================================================================
          TWO-LAYER EXECUTIVE READING (Codex slice v0.1) — presentation only.
@@ -1519,6 +1562,10 @@
               <p class="boss-aux-boundary" data-i18n="exec.signalBoundary">這兩項是目前已知訊號的摘要，不是成交機率、信用評分或成功保證。</p>
               <p class="boss-three-boundary" data-i18n="boss.boundary">三問速答只重述已登錄的證據；沒有證據的事維持 UNKNOWN，不會被推測。完整結構與明細在下方 Evidence Room。</p>
             </div>
+          </section>
+
+          <section id="commitment-review" class="commitment-review" hidden aria-labelledby="commitment-review-title">
+            <div id="commitment-review-content"></div>
           </section>
 
           <!-- ============ LAYER 2 — Evidence Room ============ -->

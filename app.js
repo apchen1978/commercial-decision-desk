@@ -107,6 +107,23 @@ function displayEvidenceLabel(item) {
   return id ? `${label} (${id})` : label;
 }
 
+// Owner layer: retain the commercial meaning, without making the reader decode
+// internal trace IDs. Evidence Room and Decision Path continue to use
+// displayEvidenceLabel(), where both meaning and traceability belong together.
+function ownerEvidenceLabel(item) {
+  const value = typeof item === "string" ? item : item?.label;
+  const ownerKey = {
+    "Payment-terms contradiction": "exec.ownerControl.paymentConflict",
+    "Released order volume": "exec.ownerControl.releasedOrderVolume",
+    "Final payment terms": "exec.ownerControl.finalPaymentTerms",
+  }[String(value || "")];
+  return ownerKey
+    ? tx(ownerKey)
+    : localizeEvidenceText(String(value || ""), language)
+      .replace(/\s*\((?:CTR|UNK)-\d+(?:\s*\/\s*(?:CTR|UNK)-\d+)*\)/g, "")
+      .trim();
+}
+
 function tradeTermLabel(term) {
   return term === "UNKNOWN" || term === "notAssessed" ? tx("trade.notConfirmed") : term;
 }
@@ -359,6 +376,41 @@ function renderBossThree(view, extras = {}) {
   } else {
     economicsEl.hidden = true;
   }
+}
+
+function renderCommitmentReview({ economics, exposure }) {
+  const root = $("commitment-review");
+  const content = $("commitment-review-content");
+  if (!root || !content) return;
+  root.hidden = mode !== "sample";
+  if (mode !== "sample") {
+    content.innerHTML = "";
+    return;
+  }
+  const fill = (template, args = {}) => Object.entries(args).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, esc(value)), tx(template));
+  const context = current.commercialContext || {};
+  const quantity = context.quantity ? `${context.quantity} ${context.quantityUnit || ""}`.trim() : tx("context.unknown");
+  const timing = context.timing || tx("context.unknown");
+  const delivery = current.trade?.deliveryTerm
+    ? `${current.trade.deliveryTerm}${current.trade.namedPlace ? ` ${current.trade.namedPlace}` : ""}`
+    : tx("context.unknown");
+  const currency = current.economics?.currency || "CNY";
+  const revenue = economics.revenue == null ? tx("economics.unknown") : economicsValue(economics.revenue, currency);
+  const net = economics.expectedNetContribution == null ? tx("economics.unknown") : economicsValue(economics.expectedNetContribution, currency);
+  const committed = exposure?.computed ? economicsValue(exposure.totalCommittedCny, "CNY") : tx("economics.unknown");
+  content.innerHTML = `
+    <div class="commitment-review-head">
+      <div><p class="commitment-review-kicker">${tx("commitment.kicker")}</p><h3 id="commitment-review-title">${tx("commitment.title")}</h3></div>
+      <p>${tx("commitment.intro")}</p>
+    </div>
+    <div class="commitment-review-grid">
+      <div class="commitment-review-block"><h4>${tx("commitment.upside")}</h4><p>${fill("commitment.upsideBody", { revenue, net })}</p></div>
+      <div class="commitment-review-block commitment"><h4>${tx("commitment.commitment")}</h4><p>${fill("commitment.commitmentBody", { quantity, timing, exposure: committed, delivery })}</p></div>
+      <div class="commitment-review-block"><h4>${tx("commitment.notReady")}</h4><p>${tx("commitment.notReadyBody")}</p></div>
+    </div>
+    <div class="commitment-review-next"><h4>${tx("commitment.nextQuestion")}</h4><p>${tx("commitment.nextQuestionBody")}</p></div>
+    <div class="commitment-review-owner"><div><h4>${tx("commitment.owner")}</h4><p>${tx("commitment.ownerBody")}</p></div><strong>${tx("commitment.ownerPrompt")}</strong></div>
+  `;
 }
 
 // Room summary chips (Evidence Room) — short factual state per block. Only
@@ -1186,7 +1238,11 @@ function renderResult() {
   // 不新增任何判斷或數字；Astra P0-3「把卡點講具體」）。
   // 聚焦真正的控制因素（矛盾與阻塞未知）；terms/evidence 屬衍生狀態，
   // 已在其專屬區塊呈現，不在此重複堆疊。
-  const controlFacts = [
+  const ownerControlFacts = [
+    ...g.materialContradictions.map((c) => ownerEvidenceLabel(c)),
+    ...g.blockingUnknowns.map((u) => ownerEvidenceLabel(u)),
+  ];
+  const traceControlFacts = [
     ...g.materialContradictions.map((c) => displayEvidenceLabel(c)),
     ...g.blockingUnknowns.map((u) => displayEvidenceLabel(u)),
   ];
@@ -1206,18 +1262,19 @@ function renderResult() {
     revenueDisplay,
     netDisplay,
     hasValue: economics.revenue != null,
-    controlsText: controlFacts.length ? controlFacts.join(" · ") : tx("result.noBlockers"),
+    controlsText: ownerControlFacts.length ? ownerControlFacts.join(" · ") : tx("result.noBlockers"),
     nextBestAction,
     momentumScore: momentum.score,
     coverageScore: coverage.score,
   });
+  renderCommitmentReview({ economics, exposure: g.exposure });
   renderExecutiveSnapshot({
     economics,
     tradeView,
     momentum,
     coverage,
     nextBestAction,
-    control: controlFacts.length ? controlFacts.join(" · ") : tx("result.noBlockers"),
+    control: traceControlFacts.length ? traceControlFacts.join(" · ") : tx("result.noBlockers"),
   });
   renderEconomicsBridge(economics, economicsInput.currency || "CNY");
   renderPriorityActions(commercialView);

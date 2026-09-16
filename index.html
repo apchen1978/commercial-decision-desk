@@ -643,7 +643,7 @@
         --ok: #236b46;
         --unk: #7c6b1e;
         /* Unified surface hierarchy */
-        --surface: #ffffff;
+        --surface: #fffdf8;
         --surface-2: #fafcfb;
         --surface-3: #f3f7f4;
         --hairline: #e6ece8;
@@ -840,15 +840,15 @@
       :root {
         /* Near-hueless neutral scale (zinc-like, cool, not green) */
         --ink: #16191d;
-        --muted: #5c6570;
+        --muted: #5f5a4b;
         --muted-2: #8b929c;
-        --line: #e2e6ea;
-        --bone: #f7f8f9;
-        --paper: #eef0f3;
-        --surface: #ffffff;
-        --surface-2: #f9fafb;
-        --surface-3: #f2f4f6;
-        --hairline: #e7eaee;
+        --line: #ded3c0;
+        --bone: #f5efe3;
+        --paper: #ece4d4;
+        --surface: #fffdf8;
+        --surface-2: #faf6ec;
+        --surface-3: #f3ede0;
+        --hairline: #e3dbc9;
         /* Single saturated accent — forest stays brand, slightly deeper */
         --forest: #0e4f2f;
         --forest-hover: #0a3d24;
@@ -863,8 +863,8 @@
         --unk: #7c6b1e;
         --unk-soft: rgba(124, 107, 30, 0.10);
         /* Elevation — cool-tinted, near-invisible at rest */
-        --shadow-1: 0 1px 2px rgba(22, 25, 29, 0.04), 0 4px 12px -6px rgba(22, 25, 29, 0.06);
-        --shadow-2: 0 2px 4px rgba(22, 25, 29, 0.05), 0 16px 36px -20px rgba(22, 25, 29, 0.16);
+        --shadow-1: 0 1px 2px rgba(80, 64, 34, 0.05), 0 4px 14px -8px rgba(80, 64, 34, 0.10);
+        --shadow-2: 0 2px 4px rgba(80, 64, 34, 0.06), 0 20px 44px -22px rgba(80, 64, 34, 0.20);
       }
       body { background: var(--bone); color: var(--ink); }
       /* Buttons — forest primary, precise hover, cool-tinted focus */
@@ -1103,8 +1103,8 @@
        .commitment-review-head p { max-width: 38ch; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; text-align: right; }
        .commitment-review-lead { margin: 20px 0 0; color: var(--ink); font-size: 15px; line-height: 1.55; max-width: 68ch; }
       .commitment-review-lead strong { color: var(--forest); }
-       .commitment-review-grid { display: grid; grid-template-columns: minmax(0, .86fr) minmax(0, 1.14fr); gap: 0 30px; margin-top: 20px; }
-       .commitment-review-block { min-width: 0; padding: 21px 0 19px; border-top: 1px solid var(--hairline); }
+       .commitment-review-grid { display: grid; grid-template-columns: minmax(0, .86fr) minmax(0, 1.14fr); gap: 18px 24px; margin-top: 20px; }
+       .commitment-review-block { min-width: 0; padding: 20px 20px 18px; border: 1px solid var(--hairline); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-1); }
       .commitment-review-block h4 { margin: 0 0 7px; color: var(--brass); font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
        .commitment-review-block p, .commitment-review-block ul { margin: 0; color: #4c5049; font-size: 13.5px; line-height: 1.65; }
       .commitment-review-block ul { padding-left: 18px; }
@@ -1120,7 +1120,7 @@
       .commitment-review-owner p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
       .commitment-review-owner strong { flex: 0 0 auto; color: var(--forest); font-size: 13px; }
        @media (max-width: 700px) { .boss-three.sample-mode .boss-exec-fields { grid-template-columns: 1fr 1fr; } }
-       @media (max-width: 640px) { .commitment-review { margin: 44px 0 30px; padding: 26px 16px 18px; } .commitment-review-head { display: block; } .commitment-review-head p { margin-top: 12px; text-align: left; } .commitment-review h3 { font-size: 25px; } .commitment-review-grid { grid-template-columns: 1fr; gap: 0; } .commitment-review-block { padding: 18px 0 17px; } .commitment-review-block.commitment { padding: 18px 16px 17px; } .commitment-review-grid .commitment-review-block:nth-child(3) { display: block; } .commitment-review-next { grid-template-columns: 1fr; gap: 7px; margin-top: 6px; padding: 18px 14px 2px; } .commitment-review-next p { font-size: 14px; } .commitment-review-owner { display: block; } .commitment-review-owner strong { display: block; margin-top: 9px; } }
+       @media (max-width: 640px) { .commitment-review { margin: 44px 0 30px; padding: 26px 16px 18px; } .commitment-review-head { display: block; } .commitment-review-head p { margin-top: 12px; text-align: left; } .commitment-review h3 { font-size: 25px; } .commitment-review-grid { grid-template-columns: 1fr; gap: 14px; } .commitment-review-block { padding: 18px 16px 17px; } .commitment-review-block.commitment { padding: 18px 16px 17px; } .commitment-review-grid .commitment-review-block:nth-child(3) { display: block; } .commitment-review-next { grid-template-columns: 1fr; gap: 7px; margin-top: 6px; padding: 18px 14px 2px; } .commitment-review-next p { font-size: 14px; } .commitment-review-owner { display: block; } .commitment-review-owner strong { display: block; margin-top: 9px; } }
        @media (max-width: 420px) { .boss-three.sample-mode .boss-exec-fields { grid-template-columns: 1fr; } .boss-three.sample-mode .boss-exec-field { padding: 10px 0; border-left: 0; border-top: 1px solid var(--hairline); } .boss-three.sample-mode .boss-exec-field:first-child { padding-top: 0; border-top: 0; } .boss-three.sample-mode .boss-exec-next { margin-top: 0; padding-top: 10px; } .boss-three.sample-mode .boss-aux { display: block; } .boss-three.sample-mode .boss-aux-chip + .boss-aux-chip { display: block; margin-top: 8px; padding: 8px 0 0; border-left: 0; border-top: 1px solid var(--hairline); } }
       @media (max-width: 860px) { .boss-three-grid { grid-template-columns: 1fr; } .boss-row-trace { margin-top: 0; } }
       /* ================================================================

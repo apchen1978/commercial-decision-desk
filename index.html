@@ -15,11 +15,11 @@
         --forest: #1f4d3a;
         --pine: #14281f;
         --moss: #3a6b52;
-        --amber: #a05a10;
-        --gold: #b3924a;
+        --amber: #9a6b1f;
+        --gold: #a3873f;
         --bad: #a14a32;
         --ok: #33634a;
-        --unk: #8a6d1a;
+        --unk: #7c6b1e;
       }
       * { box-sizing: border-box; }
       body {
@@ -637,11 +637,11 @@
         --forest: #14532d;
         --pine: #0b2b1d;
         --moss: #2c6647;
-        --amber: #9a6a1a;
+        --amber: #9a6b1f;
         --gold: #a3873f;
-        --bad: #b0412b;
+        --bad: #a14a32;
         --ok: #236b46;
-        --unk: #7d6b1f;
+        --unk: #7c6b1e;
         /* Unified surface hierarchy */
         --surface: #ffffff;
         --surface-2: #fafcfb;
@@ -701,7 +701,7 @@
         --ivory: #ffffff;
         --charcoal: #16211c;
         --brass: #a3873f;
-        --rust: #b0412b;
+        --rust: #a14a32;
         --sage: #236b46;
         --hairline: #e6ece8;
         color: var(--charcoal);
@@ -813,7 +813,7 @@
         --bone: #f5f7f6;
         /* accent stays forest; warm accents demoted to near-zero usage */
         --forest: #0f4d2e;
-        --gold: #9c8a5c;
+        --gold: #a3873f;
       }
       body {
         font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
@@ -855,9 +855,9 @@
         --forest-soft: rgba(14, 79, 47, 0.08);
         /* Semantic — tuned to the same cool family, restrained */
         --amber: #9a6b1f;
-        --gold: #8f7d4a;
-        --bad: #b3402b;
-        --bad-soft: rgba(179, 64, 43, 0.08);
+        --gold: #a3873f;
+        --bad: #a14a32;
+        --bad-soft: rgba(161, 74, 50, 0.08);
         --ok: #1f6b46;
         --ok-soft: rgba(31, 107, 70, 0.10);
         --unk: #7c6b1e;
@@ -1048,7 +1048,7 @@
       .boss-row-question { margin: 0; font-size: 14px; font-weight: 750; color: var(--ink); }
       .boss-chip { flex: 0 0 auto; padding: 3px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 800; letter-spacing: .04em; white-space: nowrap; }
       .boss-chip.ok { background: color-mix(in srgb, var(--forest) 12%, transparent); color: var(--forest); }
-      .boss-chip.warn { background: color-mix(in srgb, var(--amber) 16%, transparent); color: #8a6d1f; }
+      .boss-chip.warn { background: color-mix(in srgb, var(--amber) 16%, transparent); color: #7c6b1e; }
       .boss-chip.drop { background: color-mix(in srgb, var(--rust) 14%, transparent); color: var(--rust); }
       .boss-chip.unk { background: color-mix(in srgb, var(--muted) 12%, transparent); color: var(--muted-2); }
       .boss-row-answer { margin: 0; color: #4c5049; font-size: 12.5px; line-height: 1.6; }
@@ -1098,7 +1098,8 @@
        .commitment-review { margin: 66px 0 42px; padding: 40px 34px 28px; border-top: 4px solid var(--forest); border-bottom: 1px solid var(--line); background: var(--surface-2); }
        .commitment-review-head { display: flex; justify-content: space-between; align-items: end; gap: 28px; padding-bottom: 22px; border-bottom: 1px solid var(--hairline); }
       .commitment-review-kicker { margin: 0 0 7px; color: var(--brass); font-size: 10.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-       .commitment-review h3 { margin: 0; max-width: 20ch; color: var(--forest); font-size: 34px; line-height: 1.1; letter-spacing: -.03em; }
+       .commitment-review h3 { font-family: Georgia, "Times New Roman", "Noto Serif TC", "PMingLiU", "Songti SC", serif; letter-spacing: -.02em; }
+      .commitment-review h3 { margin: 0; max-width: 20ch; color: var(--forest); font-size: 34px; line-height: 1.1; letter-spacing: -.03em; }
        .commitment-review-head p { max-width: 38ch; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; text-align: right; }
        .commitment-review-lead { margin: 20px 0 0; color: var(--ink); font-size: 15px; line-height: 1.55; max-width: 68ch; }
       .commitment-review-lead strong { color: var(--forest); }
@@ -1159,7 +1160,7 @@
         padding: 2px 9px; border-radius: 999px; white-space: nowrap;
       }
       .room-status.ok { color: var(--forest); background: color-mix(in srgb, var(--forest) 8%, transparent); border-color: color-mix(in srgb, var(--forest) 22%, transparent); }
-      .room-status.warn { color: #8a6d1f; background: color-mix(in srgb, var(--amber) 12%, transparent); border-color: color-mix(in srgb, var(--amber) 24%, transparent); }
+      .room-status.warn { color: #7c6b1e; background: color-mix(in srgb, var(--amber) 12%, transparent); border-color: color-mix(in srgb, var(--amber) 24%, transparent); }
       .room-status.unk { color: var(--muted-2); }
       .room-body { padding: 2px 16px 16px; border-top: 1px solid var(--hairline); }
       /* BOUNDED VISUAL POLISH: distinguish the two entry intents and make the

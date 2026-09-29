@@ -788,6 +788,8 @@ function applyLanguage() {
   });
   document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => { el.placeholder = tx(el.dataset.i18nPlaceholder); });
   document.querySelectorAll("[data-i18n-aria-label]").forEach((el) => { el.setAttribute("aria-label", tx(el.dataset.i18nAriaLabel)); });
+  // The lead-discovery demo also honours ?lang=, so the previous link keeps the language.
+  $("nav-prev").href = "https://apchen1978.github.io/overseas-lead-discovery-demo/" + (language === "en" ? "?lang=en" : "");
   $("lang-zh").classList.toggle("active", language === "zh-TW");
   $("lang-en").classList.toggle("active", language === "en");
   $("lang-zh").setAttribute("aria-pressed", String(language === "zh-TW"));

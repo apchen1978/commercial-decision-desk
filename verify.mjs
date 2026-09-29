@@ -1,7 +1,7 @@
 // verify.mjs — automated hard-rule + determinism checks for Commercial Decision Desk.
 // Node-only; exercises the pure modules exactly as the browser does.
 import { readFileSync } from "node:fs";
-import { opportunity, dimensions } from "./fixtures.js";
+import { opportunity, dimensions, GOODS_COST_USD, PLANNING_FX_CNY_PER_USD } from "./fixtures.js";
 import { DECISION_STATES, paymentExposure, evaluateDecision, buildBrief } from "./decision-engine.js";
 
 const results = [];
@@ -42,10 +42,23 @@ check("R4 quote bases not comparable", opportunity.quoteBasesComparable === fals
   check("R4 comparable bases allow ranking context", e.quoteBasesComparable === true);
 }
 
+// Cross-consistency — supplier payments must reconcile to the fixture's own
+// economics. A factory is paid for product cost, never for the sale price; if
+// committed payments exceed product cost the demo contradicts its own margin.
+{
+  const committed = paymentExposure(opportunity.paymentEvents);
+  const committedUsd = committed.totalCommittedCny / PLANNING_FX_CNY_PER_USD;
+  const e = opportunity.economics;
+  check("payment basis: fixture directCost is the declared product cost", e.directCost === GOODS_COST_USD);
+  check("payment basis: factory payments do not exceed product cost", committedUsd <= e.directCost + 1);
+  check("payment basis: factory payments reconcile to product cost (30/70 of directCost)", Math.abs(committedUsd - e.directCost) < 1);
+  check("payment basis: factory payments stay below revenue (margin is not paid out)", committedUsd < e.revenue);
+}
+
 // Hard rule 5 — payment exposure only from complete events; incomplete → UNKNOWN.
 {
   const e1 = paymentExposure(opportunity.paymentEvents);
-  check("R5 exposure computed from complete events", e1.computed === true && e1.totalCommittedCny === 1080000 + 2520000);
+  check("R5 exposure computed from complete events", e1.computed === true && e1.totalCommittedCny === 594000 + 1386000);
   const mixed = paymentExposure([...opportunity.paymentEvents, { label: "Unconfirmed bond", status: "INCOMPLETE" }]);
   check("R5 incomplete events reported as UNKNOWN", mixed.incompleteCount === 1 && mixed.incompleteLabels.includes("Unconfirmed bond"));
   const onlyIncomplete = paymentExposure([{ status: "INCOMPLETE" }]);
@@ -175,7 +188,7 @@ function cleanScenario() {
 }
 {
   const e = paymentExposure(opportunity.paymentEvents);
-  check("audit payment semantics unchanged", e.computed && e.totalCommittedCny === 3600000 && e.peakWindowCny === 2520000);
+  check("audit payment semantics unchanged", e.computed && e.totalCommittedCny === 1980000 && e.peakWindowCny === 1386000);
 }
 {
   const engineSrc = readFileSync(new URL("./decision-engine.js", import.meta.url), "utf8");

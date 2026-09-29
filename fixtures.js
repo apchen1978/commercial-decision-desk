@@ -6,6 +6,13 @@
 export const SYNTHETIC_LABEL =
   "SYNTHETIC FIXTURE — every record is fabricated for demonstration. No real prospect, company, or financial figure.";
 
+// Synthetic planning basis for supplier payments. The 30% deposit / 70% balance
+// applies to PRODUCT COST (economics.directCost), never to the sale price: a
+// factory is paid for the goods it makes, and the gap between price and cost is
+// the deal's margin. Hypothetical FX, for demonstration only.
+export const GOODS_COST_USD = 264000;
+export const PLANNING_FX_CNY_PER_USD = 7.5;
+
 export const opportunity = {
   id: "OPP-2026-008",
   synthetic: true,
@@ -51,7 +58,7 @@ export const opportunity = {
   economics: {
     currency: "USD",
     revenue: 480000,
-    directCost: 264000,
+    directCost: GOODS_COST_USD,
     tradeCost: 42000,
     dealSpecificCost: 36000,
     contingency: 18000,
@@ -154,8 +161,8 @@ export const opportunity = {
   ],
   quoteBasesComparable: false, // rule 4: non-comparable bases → never ranked
   paymentEvents: [
-    { id: "PE-1", label: "Internal factory deposit — 30% of USD 480,000 at synthetic planning FX 7.50 CNY/USD", amountCny: 1080000, daysFromSign: 0, status: "COMPLETE" },
-    { id: "PE-2", label: "Internal factory balance — 70% of USD 480,000 at synthetic planning FX 7.50 CNY/USD", amountCny: 2520000, daysFromSign: 45, status: "COMPLETE" },
+    { id: "PE-1", label: "Internal factory deposit — 30% of USD 264,000 product cost at synthetic planning FX 7.50 CNY/USD", amountCny: Math.round(GOODS_COST_USD * 0.3 * PLANNING_FX_CNY_PER_USD), daysFromSign: 0, status: "COMPLETE" },
+    { id: "PE-2", label: "Internal factory balance — 70% of USD 264,000 product cost at synthetic planning FX 7.50 CNY/USD", amountCny: Math.round(GOODS_COST_USD * 0.7 * PLANNING_FX_CNY_PER_USD), daysFromSign: 45, status: "COMPLETE" },
   ],
   kyc: {
     status: "CLEAR",

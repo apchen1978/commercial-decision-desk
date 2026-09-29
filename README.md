@@ -8,7 +8,10 @@ Decision-support for one question: **"Should we pursue this overseas commercial
 opportunity now?"**
 
 A convergence proof — **not** a production product. No backend, no database,
-no persistence, no network calls, no API keys, no real prospect data.
+no persistence, no API keys, no real prospect data. The decision engine and every
+assessment make no network calls; the single exception is the optional,
+user-initiated **reference exchange rate** (see *Payment security and currency*),
+a GET that carries only a currency pair.
 
 > Every feature/gate decision is measured against the north star: does it make the
 > workbench *smaller* or *more credible* for a single-opportunity, owner-driven
@@ -34,7 +37,7 @@ python -m http.server 8080
 ## Workbench tools (companion pages, no engine changes)
 
 Small deterministic companions to the desk — pure client-side, no API key,
-no backend, no network, no persistence. They **present and classify only**;
+no backend, no persistence, and no network of their own. They **present and classify only**;
 every threshold, ranking and decision stays with the human.
 
 - `margin.html` — **Trade Margin & Cost Calculator** (`margin-calculator.js`,
@@ -143,7 +146,7 @@ node verify.mjs
 
 Checks: all hard rules, UNKNOWN stays UNKNOWN, contradiction visible,
 deterministic payment reproducible (two runs identical), disclosure present,
-human approval required, no network/persistence usage, no real records.
+human approval required, network policy (only the optional rate source may make a request, and only a plain GET with a currency pair), no persistence in the engine, no real records.
 
 ## Documented boundaries (evidence-depth experiment findings)
 
@@ -294,3 +297,14 @@ deterministic** (see `scenario-test/outputs/run-log.txt`).
 - **Vetoes and reassessments** (sanctions, declared margin threshold, weak category fit) are terminal: more documents cannot change them, so no route is offered.
 - **Economic headroom is presentation-only**, like `economics-bridge.js`. It shows how far net contribution sits above the owner's reference minimum and never gates the engine, unless the owner declares `margin.thresholdBps`.
 - Works for the synthetic sample and for a user-entered opportunity. Test: `node flip-map.test.mjs`.
+
+## Payment security and currency (L/C, credit insurance, FX)
+
+Three dimensions that decide whether a deal's money actually arrives and what is left after conversion. The decision engine is **unchanged**: they reach it only as registered UNKNOWNs (`derived-unknowns.js`), the documented caller discipline.
+
+- **Letter of credit and credit insurance** (`payment-security.js`). The open receivable is revenue less any confirmed advance (an unconfirmed advance leaves the whole revenue as an upper bound). An L/C counts only when it is in place **and confirmed by a bank**; insurance counts by its coverage. When both cover the same receivable the larger coverage is used, not the sum. A receivable with no cover registers a **blocking** UNKNOWN (`UNK-SEC`); it clears with cover, a sufficient advance, or the owner's written acceptance of the residual risk. An opportunity with no security information registers nothing and never reads as covered.
+- **Currency exposure** (`fx-exposure.js`). Cost paid in a currency other than the quote currency, less any hedge, is sized against the headroom above the owner's reference minimum: the break-even move, and the impact of 3 / 5 / 10% moves. It registers a **non-blocking** UNKNOWN (`UNK-FX`): a reminder, never a veto. The declared rate carries a date and a source; an unknown date is reported as unknown, not as stale.
+- **Reference exchange rate** (`fx-rate-source.js`, optional). A button reads one public rate (European Central Bank reference via Frankfurter, falling back to open.er-api.com for currencies the ECB does not publish, such as TWD). It is a plain GET carrying only the currency pair, needs no API key, is cached in memory and rate-limited on the client, and fails closed. The result is shown next to the declared rate and never rewrites it, so a recorded assessment stays reproducible from its declared inputs.
+- **Network policy.** Owner-revised from "no network calls": the engine and all assessments stay network-free, and `verify.mjs` enforces that only `fx-rate-source.js` makes a request, that it is a body-less GET, that it carries no opportunity data, and that only the UI layer imports it.
+
+Tests: `node payment-security.test.mjs`, `node fx-exposure.test.mjs`, `node fx-rate-source.test.mjs` (the network is faked; nothing touches the internet).

@@ -17,11 +17,11 @@ check(JSON.stringify(opportunity) === before, "building the map never mutates th
 check(JSON.stringify(buildFlipMap(opportunity)) === JSON.stringify(map), "the map is deterministic");
 check(map.current === "ESCALATE" && state(opportunity) === "ESCALATE", "the sample starts at ESCALATE (unresolved material contradiction)");
 
-// Upside route follows the gate chain: contradiction, terms, blocking unknown, then strong evidence.
+// Upside route follows the gate chain: contradiction, terms, blocking unknowns (volume, payment security), then strong evidence.
 const route = map.route;
-check(route.steps.map((s) => s.id).join(",") === "CTR-1,terms,UNK-1,evidence-strong", "steps follow the engine's priority order");
-check(route.steps.map((s) => s.after).join(",") === "HOLD_FOR_EVIDENCE,HOLD_FOR_EVIDENCE,PURSUE_CONDITIONALLY,PURSUE_NOW", "state after each step");
-check(route.steps.map((s) => s.flips).join(",") === "true,false,true,true", "completing the terms alone changes nothing yet");
+check(route.steps.map((s) => s.id).join(",") === "CTR-1,terms,UNK-1,UNK-SEC,evidence-strong", "steps follow the engine's priority order");
+check(route.steps.map((s) => s.after).join(",") === "HOLD_FOR_EVIDENCE,HOLD_FOR_EVIDENCE,HOLD_FOR_EVIDENCE,PURSUE_CONDITIONALLY,PURSUE_NOW", "state after each step");
+check(route.steps.map((s) => s.flips).join(",") === "true,false,false,true,true", "terms and the volume alone change nothing while payment security is open");
 check(route.reachedPursueNow && route.stoppedBecause === null, "the route reaches PURSUE_NOW");
 check(JSON.stringify(route.steps[0].clears) === JSON.stringify(["CTR-1", "UNK-2"]), "the contradiction step also clears the unknown its resolveWith names");
 check(route.steps[0].resolveWith.includes("binding payment terms"), "the step carries the document the case says would resolve it");
@@ -34,9 +34,11 @@ check(state(manual) === "HOLD_FOR_EVIDENCE", "hand patch 1 agrees with the engin
 manual.commercialTerms.status = "COMPLETE";
 check(state(manual) === "HOLD_FOR_EVIDENCE", "hand patch 2 agrees: UNK-1 still blocks");
 manual.unknowns = manual.unknowns.filter((u) => u.id !== "UNK-1");
-check(state(manual) === "PURSUE_CONDITIONALLY", "hand patch 3 agrees: evidence is only medium");
+check(state(manual) === "HOLD_FOR_EVIDENCE", "hand patch 3 agrees: the open receivable still blocks");
+manual.unknowns = manual.unknowns.filter((u) => u.id !== "UNK-SEC");
+check(state(manual) === "PURSUE_CONDITIONALLY", "hand patch 4 agrees: evidence is only medium");
 manual.dimensions.evidenceQuality.value = "HIGH";
-check(state(manual) === "PURSUE_NOW", "hand patch 4 agrees");
+check(state(manual) === "PURSUE_NOW", "hand patch 5 agrees");
 
 // The contradiction masks every other single confirmation.
 const flipping = map.singles.filter((s) => s.flips).map((s) => s.id);

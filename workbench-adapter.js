@@ -71,6 +71,22 @@ export function blankAssessmentDefaults() {
     marginStatus: "notAssessed",
     marginBps: "",
     marginThresholdBps: "",
+    // payment security (letter of credit / credit insurance) and currency; optional.
+    // "notAssessed" keeps the field ABSENT, so nothing is registered and nothing reads as covered.
+    secAdvancePct: "",
+    lcStatus: "notAssessed",
+    lcConfirmed: "unknown",
+    lcCoveragePct: "",
+    insStatus: "notAssessed",
+    insCoveragePct: "",
+    secAccept: false,
+    fxCostCurrency: "",
+    fxCostSharePct: "",
+    fxHedge: "unknown",
+    fxHedgedPct: "",
+    fxRate: "",
+    fxAsOf: "",
+    fxSource: "",
     note: "",
   };
 }
@@ -82,6 +98,10 @@ function fin(v) {
 }
 
 // --- core: normalize business input -> opportunity contract -----------------
+const INSTRUMENT_MAP = { unknown: "UNKNOWN", notUsed: "NOT_USED", requested: "REQUESTED", inPlace: "IN_PLACE" };
+const CONFIRMED_MAP = { yes: "YES", no: "NO", unknown: "UNKNOWN" };
+const HEDGE_MAP = { unknown: "UNKNOWN", none: "NONE", natural: "NATURAL", forward: "FORWARD" };
+
 export function buildOpportunityFromInput(input) {
   const in_ = { ...blankAssessmentDefaults(), ...(input || {}) };
 
@@ -145,6 +165,37 @@ export function buildOpportunityFromInput(input) {
     // if numbers missing/invalid, margin stays null -> ABSENT (no invented threshold)
   }
 
+  // payment security — optional; nothing entered => field ABSENT (never renders as covered)
+  const lcStatus = INSTRUMENT_MAP[in_.lcStatus] || null;
+  const insStatus = INSTRUMENT_MAP[in_.insStatus] || null;
+  const advance = fin(in_.secAdvancePct);
+  let paymentSecurity = null;
+  if (lcStatus || insStatus || advance !== null || in_.secAccept === true) {
+    paymentSecurity = {
+      advancePct: advance,
+      lc: { status: lcStatus || "UNKNOWN", confirmed: CONFIRMED_MAP[in_.lcConfirmed] || "UNKNOWN", coveragePct: fin(in_.lcCoveragePct), feePct: null },
+      insurance: { status: insStatus || "UNKNOWN", coveragePct: fin(in_.insCoveragePct), premiumPct: null },
+      ownerAcceptsUnsecured: in_.secAccept === true,
+    };
+  }
+
+  // currency — optional; needs a cost currency and the share of cost paid in it
+  const fxCurrency = String(in_.fxCostCurrency || "").trim().toUpperCase();
+  const fxShare = fin(in_.fxCostSharePct);
+  let fx = null;
+  if (/^[A-Z]{3}$/.test(fxCurrency) && fxShare !== null) {
+    fx = {
+      quoteCurrency: in_.economics?.currency ? String(in_.economics.currency).trim().toUpperCase() : null,
+      costCurrency: fxCurrency,
+      costSharePct: fxShare,
+      rate: fin(in_.fxRate),
+      asOf: /^\d{4}-\d{2}-\d{2}$/.test(String(in_.fxAsOf || "")) ? String(in_.fxAsOf) : null,
+      source: String(in_.fxSource || "").trim() || null,
+      hedge: HEDGE_MAP[in_.fxHedge] || "UNKNOWN",
+      hedgedPct: fin(in_.fxHedgedPct),
+    };
+  }
+
   // quote comparability — explicit; "not assessed" => not comparable (never ranked)
   const quoteBasesComparable = in_.quotesComparable === "yes";
 
@@ -178,6 +229,8 @@ export function buildOpportunityFromInput(input) {
     paymentDisclosure: PAYMENT_DISCLOSURE,
     ...(kyc ? { kyc } : {}),
     ...(margin ? { margin } : {}),
+    ...(paymentSecurity ? { paymentSecurity } : {}),
+    ...(fx ? { fx } : {}),
   };
 }
 

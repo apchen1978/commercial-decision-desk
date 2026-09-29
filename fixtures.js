@@ -13,7 +13,9 @@ export const SYNTHETIC_LABEL =
 export const GOODS_COST_USD = 264000;
 export const PLANNING_FX_CNY_PER_USD = 7.5;
 
-export const opportunity = {
+import { withDerivedUnknowns } from "./derived-unknowns.js";
+
+const baseOpportunity = {
   id: "OPP-2026-008",
   synthetic: true,
   name: "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
@@ -164,6 +166,27 @@ export const opportunity = {
     { id: "PE-1", label: "Internal factory deposit — 30% of USD 264,000 product cost at synthetic planning FX 7.50 CNY/USD", amountCny: Math.round(GOODS_COST_USD * 0.3 * PLANNING_FX_CNY_PER_USD), daysFromSign: 0, status: "COMPLETE" },
     { id: "PE-2", label: "Internal factory balance — 70% of USD 264,000 product cost at synthetic planning FX 7.50 CNY/USD", amountCny: Math.round(GOODS_COST_USD * 0.7 * PLANNING_FX_CNY_PER_USD), daysFromSign: 45, status: "COMPLETE" },
   ],
+  // Payment security for the open receivable (letter of credit / credit insurance).
+  // Nothing has been discussed yet, so every instrument is UNKNOWN and the RFP's
+  // 90-days-after-delivery term leaves the receivable uncovered.
+  paymentSecurity: {
+    advancePct: null, // UNKNOWN: the 30% advance is only a verbal indication (CTR-1)
+    lc: { status: "UNKNOWN", confirmed: "UNKNOWN", coveragePct: null, feePct: null },
+    insurance: { status: "UNKNOWN", coveragePct: null, premiumPct: null },
+    ownerAcceptsUnsecured: false,
+  },
+  // Currency exposure: goods are paid in CNY while the quote is in USD. The rate is
+  // the synthetic planning rate, not a market quote, and its date is UNKNOWN.
+  fx: {
+    quoteCurrency: "USD",
+    costCurrency: "CNY",
+    costSharePct: 100,
+    rate: PLANNING_FX_CNY_PER_USD,
+    asOf: null,
+    source: "SYNTHETIC planning rate (hypothetical, not a market quote)",
+    hedge: "UNKNOWN",
+    hedgedPct: null,
+  },
   kyc: {
     status: "CLEAR",
     beneficialOwnerVerified: true,
@@ -173,6 +196,8 @@ export const opportunity = {
   paymentDisclosure:
     "SYNTHETIC planning note: payment exposure is calculated from complete internal supplier-commitment events only, using the stated hypothetical planning FX. It is NOT cash balance, liquidity, affordability, cash shortfall, credit capacity, or binding buyer payment terms.",
 };
+
+export const opportunity = withDerivedUnknowns(baseOpportunity);
 
 export const dimensions = [
   { key: "buyerFit", label: "Buyer Fit" },

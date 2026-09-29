@@ -1133,6 +1133,24 @@
          ================================================================ */
       #result-area > h2 { margin: 0 0 2px; }
       .result-heading-sub { margin: 0 0 12px; color: var(--muted-2); font-size: 12px; line-height: 1.5; max-width: 80ch; }
+      /* Payment security and currency */
+      .security-fx h2 { margin: 6px 0 4px; font-size: 18px; }
+      .sec-state { display: inline-block; margin: 4px 0 10px; padding: 5px 12px; border-radius: 8px; font-size: 14px; font-weight: 750; border: 1px solid var(--hairline); }
+      .sec-state.warn { color: #7c6b1e; background: color-mix(in srgb, var(--amber) 12%, transparent); border-color: color-mix(in srgb, var(--amber) 28%, transparent); }
+      .sec-state.ok { color: var(--forest); background: color-mix(in srgb, var(--forest) 8%, transparent); border-color: color-mix(in srgb, var(--forest) 24%, transparent); }
+      .sec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px 20px; margin: 0; }
+      .sec-grid > div { border-top: 1px solid var(--hairline); padding-top: 8px; min-width: 0; }
+      .sec-grid dt { font-size: 12.5px; color: var(--muted-2); }
+      .sec-grid dd { margin: 2px 0 0; font-size: 14.5px; font-weight: 650; overflow-wrap: anywhere; }
+      .sec-grid dd small { display: block; font-size: 12.5px; font-weight: 400; color: var(--muted-2); }
+      .sec-note { font-size: 13px; color: var(--muted-2); line-height: 1.55; }
+      .fx-moves { margin: 6px 0 0; padding-left: 18px; font-size: 14px; line-height: 1.7; }
+      .fx-stale { color: #9a4e2e; }
+      .fx-ref { margin-top: 12px; padding: 10px 12px; border: 1px solid var(--hairline); border-radius: 8px; background: var(--surface-2); }
+      .fx-ref p { margin: 4px 0; }
+      .fx-fetch { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+      .fx-msg { font-size: 13px; color: #9a4e2e; }
+      .checkbox-field { display: flex; align-items: center; gap: 10px; }
       /* Flip map (what would change the recommendation) */
       .flip-map h2 { margin: 6px 0 4px; font-size: 18px; }
       #result-area .flip-map span.rec-tag { font-size: 14px; line-height: 1.3; letter-spacing: 0; }
@@ -1513,6 +1531,81 @@
               </label>
             </div>
 
+            <div class="card" style="margin-top:14px" id="security-input-card">
+              <h3 data-i18n="input.securityGroup">付款保障與匯率（選填）</h3>
+              <div class="field-row">
+                <label class="field"><span data-i18n="input.secAdvance">已確認的預付款比例（%）</span>
+                  <input type="number" id="in-sec-advance" min="0" max="100" step="any" />
+                </label>
+                <label class="field"><span data-i18n="input.lcStatus">信用狀（L/C）</span>
+                  <select id="in-lc-status">
+                    <option value="notAssessed" data-i18n="status.notAssessed">尚未評估</option>
+                    <option value="unknown" data-i18n="sec.status.UNKNOWN">未知</option>
+                    <option value="notUsed" data-i18n="sec.status.NOT_USED">不使用</option>
+                    <option value="requested" data-i18n="sec.status.REQUESTED">已申請，尚未生效</option>
+                    <option value="inPlace" data-i18n="sec.status.IN_PLACE">已生效</option>
+                  </select>
+                </label>
+                <label class="field"><span data-i18n="input.lcConfirmed">L/C 是否由銀行保兌</span>
+                  <select id="in-lc-confirmed">
+                    <option value="unknown" data-i18n="sec.confirmed.UNKNOWN">保兌情況未知</option>
+                    <option value="yes" data-i18n="sec.confirmed.YES">已由銀行保兌</option>
+                    <option value="no" data-i18n="sec.confirmed.NO">未保兌</option>
+                  </select>
+                </label>
+                <label class="field"><span data-i18n="input.lcCoverage">L/C 涵蓋比例（%）</span>
+                  <input type="number" id="in-lc-coverage" min="0" max="100" step="any" />
+                </label>
+              </div>
+              <div class="field-row">
+                <label class="field"><span data-i18n="input.insStatus">出口信用保險（信保）</span>
+                  <select id="in-ins-status">
+                    <option value="notAssessed" data-i18n="status.notAssessed">尚未評估</option>
+                    <option value="unknown" data-i18n="sec.status.UNKNOWN">未知</option>
+                    <option value="notUsed" data-i18n="sec.status.NOT_USED">不使用</option>
+                    <option value="requested" data-i18n="sec.status.REQUESTED">已申請，尚未生效</option>
+                    <option value="inPlace" data-i18n="sec.status.IN_PLACE">已生效</option>
+                  </select>
+                </label>
+                <label class="field"><span data-i18n="input.insCoverage">保險涵蓋比例（%）</span>
+                  <input type="number" id="in-ins-coverage" min="0" max="100" step="any" />
+                </label>
+                <label class="field checkbox-field"><span data-i18n="input.secAccept">我書面接受未涵蓋部分的風險</span>
+                  <input type="checkbox" id="in-sec-accept" />
+                </label>
+              </div>
+              <div class="field-row">
+                <label class="field"><span data-i18n="input.fxCostCurrency">成本幣別（3 碼，例如 CNY）</span>
+                  <input type="text" id="in-fx-currency" maxlength="3" autocomplete="off" />
+                </label>
+                <label class="field"><span data-i18n="input.fxShare">成本中以該幣別支付的比例（%）</span>
+                  <input type="number" id="in-fx-share" min="0" max="100" step="any" />
+                </label>
+                <label class="field"><span data-i18n="input.fxHedge">避險方式</span>
+                  <select id="in-fx-hedge">
+                    <option value="unknown" data-i18n="fx.hedge.UNKNOWN">避險情況未知</option>
+                    <option value="none" data-i18n="fx.hedge.NONE">沒有避險</option>
+                    <option value="natural" data-i18n="fx.hedge.NATURAL">自然避險</option>
+                    <option value="forward" data-i18n="fx.hedge.FORWARD">遠期避險</option>
+                  </select>
+                </label>
+                <label class="field"><span data-i18n="input.fxHedged">已避險比例（%）</span>
+                  <input type="number" id="in-fx-hedged" min="0" max="100" step="any" />
+                </label>
+              </div>
+              <div class="field-row">
+                <label class="field"><span data-i18n="input.fxRate">你宣告的匯率（1 單位報價幣別 = 幾單位成本幣別）</span>
+                  <input type="number" id="in-fx-rate" min="0" step="any" />
+                </label>
+                <label class="field"><span data-i18n="input.fxAsOf">匯率日期</span>
+                  <input type="date" id="in-fx-asof" />
+                </label>
+                <label class="field"><span data-i18n="input.fxSource">匯率來源</span>
+                  <input type="text" id="in-fx-source" autocomplete="off" />
+                </label>
+              </div>
+            </div>
+
             <div id="contradiction-rows-wrap" style="margin-top:14px">
               <div class="card" style="margin-top:0">
                 <h3 data-i18n="input.contradictions">互相矛盾的資訊</h3>
@@ -1710,6 +1803,16 @@
               </div>
             </details>
 
+            <details class="room" id="room-security">
+              <summary>
+                <span class="room-title" data-i18n="room.securityTitle">付款保障與匯率（信用狀・信保・匯率）</span>
+                <span class="room-status" id="room-security-status"></span>
+                <span class="room-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="room-body">
+                <section class="security-fx" id="security-fx-area" aria-live="polite"></section>
+              </div>
+            </details>
             <details class="room" id="room-flip">
               <summary>
                 <span class="room-title" data-i18n="room.flipTitle">什麼條件會翻轉判斷（翻轉地圖）</span>
@@ -1804,7 +1907,7 @@
       </section>
 
       <footer class="foot">
-        <span data-i18n="result.footer">以人工輸入為主的決策支援。無 AI、無 API 金鑰、無後端、無資料庫、無網路呼叫。所有範例資料皆為合成資料。</span>
+        <span data-i18n="result.footer">以人工輸入為主的決策支援。無 AI、無 API 金鑰、無後端、無資料庫。判斷引擎不做任何網路呼叫；唯一的網路請求是你按下「取得今日參考匯率」時，向公開匯率服務讀取一個匯率，不含任何案件資料。所有範例資料皆為合成資料。</span>
       </footer>
     </div>
     <script type="module" src="./app.js"></script>

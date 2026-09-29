@@ -8,7 +8,10 @@ Decision-support for one question: **"Should we pursue this overseas commercial
 opportunity now?"**
 
 A convergence proof — **not** a production product. No backend, no database,
-no persistence, no network calls, no API keys, no real prospect data.
+no persistence, no API keys, no real prospect data. The decision engine and every
+assessment make no network calls; the single exception is the optional,
+user-initiated **reference exchange rate** (see *Payment security and currency*),
+a GET that carries only a currency pair.
 
 > Every feature/gate decision is measured against the north star: does it make the
 > workbench *smaller* or *more credible* for a single-opportunity, owner-driven
@@ -34,7 +37,7 @@ python -m http.server 8080
 ## Workbench tools (companion pages, no engine changes)
 
 Small deterministic companions to the desk — pure client-side, no API key,
-no backend, no network, no persistence. They **present and classify only**;
+no backend, no persistence, and no network of their own. They **present and classify only**;
 every threshold, ranking and decision stays with the human.
 
 - `margin.html` — **Trade Margin & Cost Calculator** (`margin-calculator.js`,
@@ -143,7 +146,7 @@ node verify.mjs
 
 Checks: all hard rules, UNKNOWN stays UNKNOWN, contradiction visible,
 deterministic payment reproducible (two runs identical), disclosure present,
-human approval required, no network/persistence usage, no real records.
+human approval required, network policy (only the optional rate source may make a request, and only a plain GET with a currency pair), no persistence in the engine, no real records.
 
 ## Documented boundaries (evidence-depth experiment findings)
 
@@ -283,3 +286,25 @@ S15 future flip. S16–S18 are tagged `SYNTHETIC` + `KYC-GATE` (sanctions veto /
 KYC-incomplete HOLD / clear pass-through). See "Documented boundaries".
 Current matrix: **21 scenarios — 19 PASS, 2 BASELINE_FIX_CONFIRMED, 0 FAIL,
 deterministic** (see `scenario-test/outputs/run-log.txt`).
+
+## Flip map (what would change the recommendation)
+
+`flip-map.js` is an overview room, "What would flip the decision", that sits beside the Decision Path. It is **not a second decision engine**: every state it shows is produced by `evaluateDecision()` run on a hypothetical copy of the opportunity. It never mutates the opportunity, persists anything, or counts as evidence, and the human decision stays separate and final.
+
+- **Route forward.** Confirmations are cleared one at a time in the engine's own gate order (KYC, contradictions, evidence floor, terms, payment events, blocking unknowns, then strong buyer fit and evidence) and the engine is re-run after each. A step shows the state it produces, or that the state does not move yet. Where a contradiction's `resolveWith` names another item (for example `CTR-1 / UNK-2`), that item is cleared with it. A missing fact that cannot be simulated (complete payment events) stops the route and asks for real data.
+- **Masking.** Each confirmation is also tested alone. In the sample, only resolving CTR-1 changes the state on its own; every other confirmation stays masked behind that higher-priority gate.
+- **The other direction.** Adverse findings (sanctions hit, unverified beneficial owner, weak category fit, low evidence, a declared margin threshold that is missed) are run through the real engine. One that changes nothing is reported as masked by a higher-priority gate.
+- **Vetoes and reassessments** (sanctions, declared margin threshold, weak category fit) are terminal: more documents cannot change them, so no route is offered.
+- **Economic headroom is presentation-only**, like `economics-bridge.js`. It shows how far net contribution sits above the owner's reference minimum and never gates the engine, unless the owner declares `margin.thresholdBps`.
+- Works for the synthetic sample and for a user-entered opportunity. Test: `node flip-map.test.mjs`.
+
+## Payment security and currency (L/C, credit insurance, FX)
+
+Three dimensions that decide whether a deal's money actually arrives and what is left after conversion. The decision engine is **unchanged**: they reach it only as registered UNKNOWNs (`derived-unknowns.js`), the documented caller discipline.
+
+- **Letter of credit and credit insurance** (`payment-security.js`). The open receivable is revenue less any confirmed advance (an unconfirmed advance leaves the whole revenue as an upper bound). An L/C counts only when it is in place **and confirmed by a bank**; insurance counts by its coverage. When both cover the same receivable the larger coverage is used, not the sum. A receivable with no cover registers a **blocking** UNKNOWN (`UNK-SEC`); it clears with cover, a sufficient advance, or the owner's written acceptance of the residual risk. An opportunity with no security information registers nothing and never reads as covered.
+- **Currency exposure** (`fx-exposure.js`). Cost paid in a currency other than the quote currency, less any hedge, is sized against the headroom above the owner's reference minimum: the break-even move, and the impact of 3 / 5 / 10% moves. It registers a **non-blocking** UNKNOWN (`UNK-FX`): a reminder, never a veto. The declared rate carries a date and a source; an unknown date is reported as unknown, not as stale.
+- **Reference exchange rate** (`fx-rate-source.js`, optional). A button reads one public rate (European Central Bank reference via Frankfurter, falling back to open.er-api.com for currencies the ECB does not publish, such as TWD). It is a plain GET carrying only the currency pair, needs no API key, is cached in memory and rate-limited on the client, and fails closed. The result is shown next to the declared rate and never rewrites it, so a recorded assessment stays reproducible from its declared inputs.
+- **Network policy.** Owner-revised from "no network calls": the engine and all assessments stay network-free, and `verify.mjs` enforces that only `fx-rate-source.js` makes a request, that it is a body-less GET, that it carries no opportunity data, and that only the UI layer imports it.
+
+Tests: `node payment-security.test.mjs`, `node fx-exposure.test.mjs`, `node fx-rate-source.test.mjs` (the network is faked; nothing touches the internet).

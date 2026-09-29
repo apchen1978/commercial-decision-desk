@@ -112,6 +112,29 @@ check("R4 quote bases not comparable", opportunity.quoteBasesComparable === fals
   check("engine has no network/persistence calls", !/fetch\(|localStorage|XMLHttpRequest|WebSocket/.test(engineSrc));
 }
 
+// Network policy (owner-revised): the decision engine and every assessment make no
+// network request. The one exception is the optional, user-initiated reference
+// exchange rate, isolated in fx-rate-source.js: a GET carrying only a currency
+// pair, never a body. Everything else stays network-free.
+{
+  const { readdirSync } = await import("node:fs");
+  const sources = readdirSync(new URL("./", import.meta.url)).filter((f) => f.endsWith(".js"));
+  const read = (f) => readFileSync(new URL(`./${f}`, import.meta.url), "utf8");
+  // Real network primitives only: a UI label containing the word "fetch" must not count.
+  const NET = /globalThis\.fetch|window\.fetch|\bfetch\s*\(|XMLHttpRequest|WebSocket|sendBeacon|EventSource/;
+  const withNet = sources.filter((f) => NET.test(read(f)));
+  check("only fx-rate-source.js makes network requests", JSON.stringify(withNet) === JSON.stringify(["fx-rate-source.js"]), JSON.stringify(withNet));
+  const rateSrc = read("fx-rate-source.js");
+  check("the rate request is a plain GET: no body, no POST, no credentials", !/\bbody\s*:|method\s*:\s*["']POST|credentials\s*:\s*["']include/i.test(rateSrc));
+  const codeOnly = rateSrc.split("\n").filter((line) => !line.trim().startsWith("//")).join("\n");
+  check("the rate request carries no opportunity data (only quote/cost currency codes)", /\(quote, cost\)/.test(codeOnly) && !/\bopp\b|opportunity/.test(codeOnly));
+  const importers = sources.filter((f) => /from\s+["']\.\/fx-rate-source\.js["']/.test(read(f)));
+  check("only the UI layer imports the rate source, so no assessment can trigger a request", JSON.stringify(importers) === JSON.stringify(["app.js"]), JSON.stringify(importers));
+  for (const f of ["decision-engine.js", "flip-map.js", "payment-security.js", "fx-exposure.js", "derived-unknowns.js", "economics-bridge.js", "workbench-adapter.js"]) {
+    check(`${f} is network-free`, !NET.test(read(f)));
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Next-evidence dedup (final polish): identical requests appear only once,
 // first-occurrence order preserved, no text rewriting.

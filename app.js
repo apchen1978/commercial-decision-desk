@@ -1,5 +1,7 @@
 // app.js — Commercial Decision Workbench controller (Slice #1).
 // Manual-first, human-led. No AI, no API key, no backend, no persistence.
+// The decision engine makes no network calls; the only request is the optional,
+// user-initiated reference exchange rate (fx-rate-source.js), a GET with a currency pair.
 // Decision logic stays in decision-engine.js (unchanged); this file only wires
 // business-facing input -> adapter -> engine -> result view -> human decision.
 import { opportunity, dimensions, SYNTHETIC_LABEL } from "./fixtures.js";
@@ -7,6 +9,11 @@ import { DECISION_STATES, dedupePreserveOrder, evaluateDecision, buildBrief, pay
 import { blankAssessmentDefaults, buildOpportunityFromInput, summarizeInput } from "./workbench-adapter.js";
 import { localizeEvidenceText, presentReason as localizeReason, stateLabels, t } from "./i18n.js";
 import { createDecisionPathExperiment } from "./decision-path.js";
+import { buildFlipMap } from "./flip-map.js";
+import { assessPaymentSecurity } from "./payment-security.js";
+import { assessFx } from "./fx-exposure.js";
+import { fetchReferenceRateGuarded } from "./fx-rate-source.js";
+import { withDerivedUnknowns } from "./derived-unknowns.js";
 import { buildCommercialViewModel } from "./commercial-action-layer.js";
 import { buildTradeDealViewModel } from "./trade-deal-structure.js";
 import { buildEconomicsBridge, economicsEvidenceTrace, economicsReading } from "./economics-bridge.js";
@@ -22,6 +29,11 @@ const $ = (id) => document.getElementById(id);
 // --- mode -------------------------------------------------------------------
 let mode = null; // "sample" | "blank"
 let current = null; // current normalized opportunity
+let fxReference = null; // reference rate for comparison only; never rewrites the declared rate
+let fxFetchMessage = "";
+let fxFetching = false;
+let lastSecurity = null;
+let lastFx = null;
 let engine = null;
 let humanDecision = null;
 let humanNote = "";
@@ -458,6 +470,8 @@ function syncEvidenceRooms({ economics, commercialView, tradeView, momentum, cov
   setRoomStatus("room-trade-status", tradeView.structure.payment?.termsStatus === "COMPLETE" ? tx("trade.confirmed") : tx("trade.notConfirmed"), tradeView.structure.payment?.termsStatus === "COMPLETE" ? "ok" : "warn");
   const pathArea = $("decision-path-area");
   setRoomStatus("room-path-status", pathArea && !pathArea.hidden && decisionPathExperiment ? `${decisionPathExperiment.paths.length}` : "");
+  setRoomStatus("room-flip-status", lastFlipMap ? (lastFlipMap.terminal.length ? "!" : lastFlipMap.route.steps.length ? `${lastFlipMap.route.steps.length}` : "") : "", lastFlipMap && lastFlipMap.terminal.length ? "warn" : "");
+  { const attention = (lastSecurity?.needsAttention ? 1 : 0) + (lastFx?.needsAttention ? 1 : 0); setRoomStatus("room-security-status", attention ? `${attention}` : "", attention ? "warn" : ""); }
   setRoomStatus("room-export-status", "MD · TXT · JSON");
   // 3. room visibility mirrors its content section (mode-specific blocks)
   const econInner = $("blank-economics-result");
@@ -956,6 +970,20 @@ function fillBlankIntake() {
   $("in-margin-status").value = d.marginStatus;
   $("in-margin-bps").value = d.marginBps;
   $("in-margin-thr").value = d.marginThresholdBps;
+  $("in-sec-advance").value = d.secAdvancePct;
+  $("in-lc-status").value = d.lcStatus;
+  $("in-lc-confirmed").value = d.lcConfirmed;
+  $("in-lc-coverage").value = d.lcCoveragePct;
+  $("in-ins-status").value = d.insStatus;
+  $("in-ins-coverage").value = d.insCoveragePct;
+  $("in-sec-accept").checked = d.secAccept === true;
+  $("in-fx-currency").value = d.fxCostCurrency;
+  $("in-fx-share").value = d.fxCostSharePct;
+  $("in-fx-hedge").value = d.fxHedge;
+  $("in-fx-hedged").value = d.fxHedgedPct;
+  $("in-fx-rate").value = d.fxRate;
+  $("in-fx-asof").value = d.fxAsOf;
+  $("in-fx-source").value = d.fxSource;
   $("in-quotes-comp").value = d.quotesComparable;
   $("in-why").value = "";
   $("in-whynot").value = "";
@@ -1009,6 +1037,20 @@ function collectBlankInput() {
     marginStatus: $("in-margin-status").value,
     marginBps: $("in-margin-bps").value,
     marginThresholdBps: $("in-margin-thr").value,
+    secAdvancePct: $("in-sec-advance").value,
+    lcStatus: $("in-lc-status").value,
+    lcConfirmed: $("in-lc-confirmed").value,
+    lcCoveragePct: $("in-lc-coverage").value,
+    insStatus: $("in-ins-status").value,
+    insCoveragePct: $("in-ins-coverage").value,
+    secAccept: $("in-sec-accept").checked,
+    fxCostCurrency: $("in-fx-currency").value,
+    fxCostSharePct: $("in-fx-share").value,
+    fxHedge: $("in-fx-hedge").value,
+    fxHedgedPct: $("in-fx-hedged").value,
+    fxRate: $("in-fx-rate").value,
+    fxAsOf: $("in-fx-asof").value,
+    fxSource: $("in-fx-source").value,
     quotesComparable: $("in-quotes-comp").value,
     contradictions: window.__contradictions || [],
     unknowns: window.__unknowns || [],
@@ -1148,6 +1190,9 @@ $("btn-run").addEventListener("click", () => {
   current.trade = { deliveryTerm: input.deliveryTerm };
   current.commercialContext = input.commercialContext;
   current.economics = input.economics;
+  current = withDerivedUnknowns(current); // registers payment-security / FX unknowns the engine reads
+  fxReference = null;
+  fxFetchMessage = "";
   window.__lastInput = input;
   runAssessment();
   scrollToResult();
@@ -1309,6 +1354,8 @@ function renderResult() {
     if (firstChange) selectedPathId = firstChange.id;
   }
   renderDecisionPath();
+  renderFlipMap();
+  renderSecurityFx();
   $("export-status").textContent = tx("export.ready") + " " + current.name;
   syncEvidenceRooms({ economics, commercialView, tradeView, momentum, coverage, nextBestAction, recommended: g.recommended, currency, g });
 
@@ -1325,6 +1372,220 @@ function renderResult() {
   $("human-note").value = humanNote;
   renderHumanDecision();
 }
+
+// Flip map: which confirmations move the recommendation, in the engine's own
+// gate order, and which findings would move it the other way. Every state is a
+// hypothetical run of evaluateDecision(); see flip-map.js.
+const TRADE_PROFIT_NAVIGATOR = "https://apchen1978.github.io/trade-profit-navigator-demo/?case=gulf-001";
+let lastFlipMap = null;
+
+function flipStateChip(state) {
+  return `<span class="rec-tag ${tagClass(state)}">${stateLabel(state)}</span>`;
+}
+
+function flipStepTitle(step) {
+  const label = esc(localizeEvidenceText(step.label || "", language));
+  return pathText(`flip.step.${step.kind}`, { label });
+}
+
+function renderFlipMap() {
+  const area = $("flip-map-area");
+  if (!area) return;
+  if (!current) { lastFlipMap = null; area.innerHTML = ""; return; }
+  const map = buildFlipMap(current);
+  lastFlipMap = map;
+
+  const steps = map.route.steps.map((step, index) => {
+    const effect = !step.simulable
+      ? `<span class="flip-effect data">${tx("flip.needsRealData")}</span>`
+      : step.flips
+        ? `<span class="flip-effect">${pathText("flip.stepFlips", { state: flipStateChip(step.after) })}</span>`
+        : `<span class="flip-effect quiet">${pathText("flip.stepHolds", { state: stateLabel(step.after) })}</span>`;
+    const doc = step.resolveWith ? `<span class="flip-doc">${esc(localizeEvidenceText(step.resolveWith, language))}</span>` : "";
+    const clearedName = (id) => {
+      const known = (current.unknowns || []).find((u) => u.id === id);
+      return known ? `${id} ${localizeEvidenceText(known.label, language)}` : id;
+    };
+    const also = step.clears && step.clears.length > 1
+      ? `<span class="flip-doc">${pathText("flip.alsoClears", { ids: esc(step.clears.slice(1).map(clearedName).join(", ")) })}</span>` : "";
+    return `<li class="flip-step ${step.flips ? "flips" : ""}"><span class="flip-no">${index + 1}</span><div><strong class="flip-step-title">${flipStepTitle(step)}</strong>${doc}${also}${effect}</div></li>`;
+  }).join("");
+
+  let routeEnd = "";
+  if (map.terminal.length) {
+    routeEnd = `<ul class="flip-terminal">${map.terminal.map((t) => `<li>${tx(`flip.terminal.${t.id}`)}</li>`).join("")}</ul><p class="flip-note">${tx("flip.stoppedTerminal")}</p>`;
+  } else if (map.route.reachedPursueNow && map.route.steps.length) {
+    routeEnd = `<p class="flip-note">${tx("flip.reached")}</p>`;
+  } else if (map.route.stoppedBecause === "payment-events") {
+    routeEnd = `<p class="flip-note">${tx("flip.stoppedData")}</p>`;
+  } else if (!map.route.steps.length) {
+    routeEnd = `<p class="flip-note">${tx("flip.noSteps")}</p>`;
+  } else if (!map.route.reachedPursueNow) {
+    routeEnd = `<p class="flip-note">${tx("flip.stoppedOther")}</p>`;
+  }
+
+  const flipping = map.singles.filter((s) => s.flips);
+  const masked = map.singles.some((s) => !s.flips);
+  const flipLabel = (s) => {
+    const step = map.route.steps.find((x) => x.id === s.id);
+    return step ? flipStepTitle(step) : s.id;
+  };
+  const mask = map.singles.length && masked
+    ? `<div class="flip-block"><h4>${tx("flip.maskTitle")}</h4><p>${flipping.length ? pathText("flip.maskOne", { flipping: flipping.map(flipLabel).join(" / ") }) : tx("flip.maskNone")}</p></div>`
+    : "";
+
+  const adverse = map.adverse.map((a) => `<li class="${a.changes ? "" : "masked"}"><span>${tx(`flip.down.${a.id}`)}</span>${a.changes ? `<span class="flip-to">${flipStateChip(a.state)}</span>` : `<span class="flip-effect quiet">${tx("flip.downMasked")}</span>`}</li>`).join("");
+
+  let economics = "";
+  if (map.economics) {
+    const e = map.economics;
+    const money = (v) => economicsValue(v, e.currency || "CNY");
+    const pct = (v) => (v == null ? "?" : (Math.round(v * 10) / 10).toString());
+    economics = `<div class="flip-block"><h4>${tx("flip.econTitle")}</h4><p>${pathText("flip.econBody", { net: money(e.net), min: money(e.minimum), gap: money(e.gap), pctRev: pct(e.gapPctOfRevenue), pctNet: pct(e.gapPctOfNet) })}</p>${e.gateActive ? `<p>${tx("flip.econGate")}</p>` : ""}${current.id === "OPP-2026-008" ? `<p>${tx("flip.econNext")} <a href="${TRADE_PROFIT_NAVIGATOR}" target="_blank" rel="noopener noreferrer">${tx("flip.econLink")}</a></p>` : ""}</div>`;
+  }
+
+  area.innerHTML = `
+    <h2>${tx("flip.heading")}</h2>
+    <p class="path-warning">${tx("flip.warning")}</p>
+    <div class="flip-block">
+      <h4>${tx("flip.upsideTitle")}</h4>
+      <p class="flip-start"><span class="muted">${tx("flip.start")}</span> ${flipStateChip(map.current)}</p>
+      ${steps ? `<ol class="flip-steps">${steps}</ol>` : ""}
+      ${routeEnd}
+    </div>
+    ${mask}
+    <div class="flip-block"><h4>${tx("flip.downTitle")}</h4><ul class="flip-adverse">${adverse}</ul></div>
+    ${economics}
+    <p class="flip-human">${tx("path.humanBoundary")}</p>
+  `;
+}
+
+// Payment security (L/C, credit insurance) and currency exposure. Both are
+// assessed from the opportunity's own fields; neither changes the decision
+// engine. They reach it only as registered UNKNOWNs (see derived-unknowns.js).
+// The reference exchange rate is fetched only when the user presses the button.
+
+const todayIso = () => new Date().toISOString().slice(0, 10);
+const round1 = (v) => (Math.round(v * 10) / 10).toString();
+
+function renderSecurityFx() {
+  const area = $("security-fx-area");
+  if (!area) return;
+  if (!current) { lastSecurity = null; lastFx = null; area.innerHTML = ""; return; }
+  const currency = current.economics?.currency || "CNY";
+  const money = (v) => economicsValue(v, currency);
+  const sec = assessPaymentSecurity(current);
+  const fx = assessFx(current, { today: todayIso(), reference: fxReference });
+  lastSecurity = current.paymentSecurity ? sec : null;
+  lastFx = fx;
+
+  // ---- payment security
+  let secHtml;
+  if (!current.paymentSecurity) {
+    secHtml = `<p class="muted">${tx("sec.notAssessed")}</p>`;
+  } else {
+    const statusText = (s) => tx(`sec.status.${s}`);
+    const lcLine = `${statusText(sec.lc.status)}${sec.lc.status === "IN_PLACE" ? ` · ${tx(`sec.confirmed.${sec.lc.confirmed}`)}${sec.lc.coveragePct === null ? "" : ` · ${pathText("sec.coverage", { pct: sec.lc.coveragePct })}`}` : ""}`;
+    const insLine = `${statusText(sec.insurance.status)}${sec.insurance.status === "IN_PLACE" && sec.insurance.coveragePct !== null ? ` · ${pathText("sec.coverage", { pct: sec.insurance.coveragePct })}` : ""}`;
+    const costs = sec.costs.length
+      ? sec.costs.map((c) => `${tx(c.id === "lc" ? "sec.lc" : "sec.insurance")}: ${c.amount === null ? tx("sec.costUnknown") : money(c.amount)}`).join(" · ")
+      : "";
+    const registered = current.unknowns?.find((u) => u.id === "UNK-SEC");
+    secHtml = `
+      <div class="sec-state ${sec.needsAttention ? "warn" : "ok"}">${tx(`sec.state.${sec.state}`)}</div>
+      <dl class="sec-grid">
+        <div><dt>${tx("sec.exposure")}</dt><dd>${sec.exposure === null ? tx("economics.notCalculated") : money(sec.exposure)}<small>${tx(sec.exposureKnown ? "sec.exposureKnown" : "sec.exposureUnknown")}</small></dd></div>
+        <div><dt>${tx("sec.lc")}</dt><dd>${esc(lcLine)}</dd></div>
+        <div><dt>${tx("sec.insurance")}</dt><dd>${esc(insLine)}</dd></div>
+        <div><dt>${tx("sec.covered")}</dt><dd>${sec.secured === null ? "?" : money(sec.secured)}</dd></div>
+        <div><dt>${tx("sec.residual")}</dt><dd>${sec.residual === null ? "?" : money(sec.residual)}</dd></div>
+        ${costs ? `<div><dt>${tx("sec.cost")}</dt><dd>${esc(costs)}</dd></div>` : ""}
+      </dl>
+      <p class="sec-note">${tx("sec.note")}</p>
+      ${registered ? `<p class="flip-note">${tx("sec.registered")} ${pathText("sec.howToClear", { how: esc(localizeEvidenceText(registered.resolveWith, language)) })}</p>` : ""}`;
+  }
+
+  // ---- currency
+  let fxHtml;
+  if (fx.state === "NOT_ASSESSED") fxHtml = `<p class="muted">${tx("fx.notAssessed")}</p>`;
+  else if (fx.state === "NO_EXPOSURE") fxHtml = `<p>${tx("fx.noExposure")}</p>`;
+  else if (fx.state === "UNKNOWN") fxHtml = `<p>${tx("fx.unknown")}</p>`;
+  else {
+    const info = fx.rateInfo;
+    const rateLine = info.rate === null
+      ? tx("fx.rateUnknown")
+      : pathText("fx.rateLine", { rate: info.rate, cost: esc(fx.costCurrency), quote: esc(fx.quote ?? ""), asOf: info.asOf ? esc(info.asOf) : tx("fx.dateUnknown"), source: esc(info.source ? localizeEvidenceText(info.source, language) : tx("fx.sourceUnknown")) });
+    const stale = info.stale ? ` <strong class="fx-stale">${pathText("fx.stale", { days: info.ageDays })}</strong>` : "";
+    const moves = fx.moves.map((m) => `<li>${pathText("fx.moveRow", { pct: m.pct, impact: money(m.impact), used: m.headroomUsedPct === null ? "?" : Math.round(m.headroomUsedPct) })}</li>`).join("");
+    const shift = fx.referenceShift;
+    const shiftHtml = shift ? `
+      <div class="fx-ref">
+        <p>${pathText("fx.refResult", { rate: shift.referenceRate, asOf: esc(shift.asOf || ""), source: esc(shift.source || "") })}${fxReference?.attribution ? ` <a href="${esc(fxReference.attribution)}" target="_blank" rel="noopener noreferrer">${tx("fx.fetchAttrib")}</a>` : ""}</p>
+        <p>${shift.changePct >= 0
+          ? pathText("fx.refShift", { pct: round1(Math.abs(shift.changePct)), cost: esc(fx.costCurrency), quote: esc(fx.quote ?? ""), impact: money(Math.round(Math.abs(shift.impact))), used: shift.headroomUsedPct === null ? "?" : Math.round(shift.headroomUsedPct) })
+          : pathText("fx.refShiftBelow", { pct: round1(Math.abs(shift.changePct)), cost: esc(fx.costCurrency), quote: esc(fx.quote ?? ""), impact: money(Math.round(Math.abs(shift.impact))) })}
+          ${shift.exceedsHeadroom ? `<strong>${tx("fx.refExceeds")}</strong>` : ""} ${current.synthetic ? tx("fx.refSynthetic") : ""}</p>
+        ${current.synthetic ? "" : `<button type="button" class="secondary" id="fx-use-rate">${tx("fx.useRate")}</button>`}
+      </div>` : "";
+    fxHtml = `
+      <div class="sec-state ${fx.needsAttention ? "warn" : "ok"}">${tx(`fx.state.${fx.state}`)}${fx.hedgeUnknown ? ` · ${tx("fx.hedge.UNKNOWN")}` : ` · ${tx(`fx.hedge.${fx.hedge}`)}${fx.hedgedPct ? ` ${pathText("fx.hedgedPct", { pct: fx.hedgedPct })}` : ""}`}</div>
+      <dl class="sec-grid">
+        <div><dt>${pathText("fx.exposure", { cost: esc(fx.costCurrency) })}</dt><dd>${money(fx.exposed)}<small>${fx.costSharePct}%</small></dd></div>
+        <div><dt>${tx("fx.unhedged")}</dt><dd>${money(fx.unhedged)}</dd></div>
+        <div><dt>${tx("fx.rate")}</dt><dd>${rateLine}${stale}</dd></div>
+        ${fx.breakEvenMovePct === null ? "" : `<div><dt>${tx("fx.headroom")}</dt><dd>${fx.headroom === null ? "?" : money(fx.headroom)}</dd></div>`}
+      </dl>
+      ${fx.breakEvenMovePct === null ? "" : `<p class="flip-note">${pathText("fx.breakEven", { pct: round1(fx.breakEvenMovePct), cost: esc(fx.costCurrency) })}</p>`}
+      <h4>${tx("fx.movesTitle")}</h4>
+      <ul class="fx-moves">${moves}</ul>
+      ${shiftHtml}
+      <div class="fx-fetch">
+        <button type="button" class="secondary" id="fx-fetch-btn" ${fxFetching ? "disabled" : ""}>${tx(fxFetching ? "fx.fetching" : "fx.fetch")}</button>
+        ${fxFetchMessage ? `<span class="fx-msg" role="status">${esc(fxFetchMessage)}</span>` : ""}
+      </div>
+      <p class="sec-note">${tx("fx.fetchNote")}</p>
+      ${current.unknowns?.some((u) => u.id === "UNK-FX") ? `<p class="sec-note">${tx("fx.unknownRegistered")}</p>` : ""}`;
+  }
+
+  area.innerHTML = `
+    <h2>${tx("sec.heading")}</h2>
+    <p class="path-warning">${tx("sec.boundary")}</p>
+    <div class="flip-block"><h4>${tx("sec.title")}</h4>${secHtml}</div>
+    <div class="flip-block"><h4>${tx("fx.title")}</h4>${fxHtml}</div>
+  `;
+}
+
+async function fetchFxReference() {
+  const fx = current?.fx;
+  if (!fx || fxFetching) return;
+  fxFetching = true;
+  fxFetchMessage = "";
+  renderSecurityFx();
+  const result = await fetchReferenceRateGuarded({ quote: fx.quoteCurrency, cost: fx.costCurrency });
+  fxFetching = false;
+  if (result.ok) {
+    fxReference = { rate: result.rate, asOf: result.asOf, source: result.source, attribution: result.attribution };
+    fxFetchMessage = "";
+  } else if (result.reason === "COOLDOWN") {
+    fxFetchMessage = pathText("fx.cooldown", { sec: Math.ceil(result.retryInMs / 1000) });
+  } else {
+    fxFetchMessage = pathText("fx.fetchFailed", { reason: result.reason === "ALL_PROVIDERS_FAILED" ? tx("fx.reason.unavailable") : result.reason });
+  }
+  renderSecurityFx();
+}
+
+// One delegated listener: the button is re-created on every render.
+$("security-fx-area")?.addEventListener("click", (event) => {
+  if (event.target.closest("#fx-fetch-btn")) fetchFxReference();
+  if (event.target.closest("#fx-use-rate") && fxReference && current?.fx) {
+    current.fx = { ...current.fx, rate: fxReference.rate, asOf: fxReference.asOf, source: fxReference.source };
+    $("in-fx-rate").value = fxReference.rate;
+    $("in-fx-asof").value = fxReference.asOf;
+    $("in-fx-source").value = fxReference.source;
+    fxReference = null;
+    renderSecurityFx();
+  }
+});
 
 const pathTitleKey = { "CP-1": "path.cp1", "CP-2": "path.cp2", "CP-3R": "path.cp3", "CP-4": "path.cp4" };
 const pathSourceKey = { "CP-1": "path.cp1Source", "CP-2": "path.cp2Source", "CP-3R": "path.cp3Source", "CP-4": "path.cp4Source" };

@@ -283,3 +283,14 @@ S15 future flip. S16–S18 are tagged `SYNTHETIC` + `KYC-GATE` (sanctions veto /
 KYC-incomplete HOLD / clear pass-through). See "Documented boundaries".
 Current matrix: **21 scenarios — 19 PASS, 2 BASELINE_FIX_CONFIRMED, 0 FAIL,
 deterministic** (see `scenario-test/outputs/run-log.txt`).
+
+## Flip map (what would change the recommendation)
+
+`flip-map.js` is an overview room, "What would flip the decision", that sits beside the Decision Path. It is **not a second decision engine**: every state it shows is produced by `evaluateDecision()` run on a hypothetical copy of the opportunity. It never mutates the opportunity, persists anything, or counts as evidence, and the human decision stays separate and final.
+
+- **Route forward.** Confirmations are cleared one at a time in the engine's own gate order (KYC, contradictions, evidence floor, terms, payment events, blocking unknowns, then strong buyer fit and evidence) and the engine is re-run after each. A step shows the state it produces, or that the state does not move yet. Where a contradiction's `resolveWith` names another item (for example `CTR-1 / UNK-2`), that item is cleared with it. A missing fact that cannot be simulated (complete payment events) stops the route and asks for real data.
+- **Masking.** Each confirmation is also tested alone. In the sample, only resolving CTR-1 changes the state on its own; every other confirmation stays masked behind that higher-priority gate.
+- **The other direction.** Adverse findings (sanctions hit, unverified beneficial owner, weak category fit, low evidence, a declared margin threshold that is missed) are run through the real engine. One that changes nothing is reported as masked by a higher-priority gate.
+- **Vetoes and reassessments** (sanctions, declared margin threshold, weak category fit) are terminal: more documents cannot change them, so no route is offered.
+- **Economic headroom is presentation-only**, like `economics-bridge.js`. It shows how far net contribution sits above the owner's reference minimum and never gates the engine, unless the owner declares `margin.thresholdBps`.
+- Works for the synthetic sample and for a user-entered opportunity. Test: `node flip-map.test.mjs`.

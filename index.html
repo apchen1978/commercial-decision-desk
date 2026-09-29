@@ -1133,6 +1133,31 @@
          ================================================================ */
       #result-area > h2 { margin: 0 0 2px; }
       .result-heading-sub { margin: 0 0 12px; color: var(--muted-2); font-size: 12px; line-height: 1.5; max-width: 80ch; }
+      /* Flip map (what would change the recommendation) */
+      .flip-map h2 { margin: 6px 0 4px; font-size: 18px; }
+      #result-area .flip-map span.rec-tag { font-size: 14px; line-height: 1.3; letter-spacing: 0; }
+      .flip-block { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--hairline); }
+      .flip-block h4 { margin: 0 0 8px; font-size: 14px; }
+      .flip-block p { margin: 6px 0; line-height: 1.6; }
+      .flip-start { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+      .flip-steps { list-style: none; margin: 10px 0 0; padding: 0; }
+      .flip-step { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 4px 12px; padding: 12px 0; border-top: 1px solid var(--hairline); }
+      .flip-step > div { display: grid; gap: 4px; min-width: 0; }
+      .flip-no { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800; border: 1px solid var(--hairline); color: var(--muted-2); background: var(--surface-2); }
+      .flip-step.flips .flip-no { background: var(--forest); border-color: var(--forest); color: #fff; }
+      .flip-step-title { font-size: 14px; }
+      .flip-doc { font-size: 13px; color: var(--muted-2); line-height: 1.5; }
+      .flip-effect { font-size: 13px; display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+      .flip-effect.quiet { color: var(--muted-2); }
+      .flip-effect.data { color: #7c6b1e; font-weight: 700; }
+      .flip-note { font-size: 13px; color: var(--muted-2); border-left: 3px solid var(--amber); padding-left: 10px; }
+      .flip-terminal { margin: 8px 0; padding-left: 18px; font-weight: 700; }
+      .flip-adverse { list-style: none; margin: 8px 0 0; padding: 0; }
+      .flip-adverse li { display: flex; justify-content: space-between; gap: 14px; align-items: center; padding: 9px 0; border-top: 1px solid var(--hairline); font-size: 14px; }
+      .flip-adverse li.masked span:first-child { color: var(--muted-2); }
+      .flip-to { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+      .flip-human { margin-top: 16px; font-size: 13px; color: var(--muted-2); }
+      @media (max-width: 640px) { .flip-adverse li { flex-direction: column; align-items: flex-start; gap: 6px; } }
       .evidence-room { margin-top: 18px; }
       .evidence-room-head {
         display: flex; align-items: baseline; justify-content: space-between;
@@ -1685,6 +1710,16 @@
               </div>
             </details>
 
+            <details class="room" id="room-flip">
+              <summary>
+                <span class="room-title" data-i18n="room.flipTitle">什麼條件會翻轉判斷（翻轉地圖）</span>
+                <span class="room-status" id="room-flip-status"></span>
+                <span class="room-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="room-body">
+                <section class="flip-map" id="flip-map-area" aria-live="polite"></section>
+              </div>
+            </details>
             <details class="room" id="room-path">
               <summary>
                 <span class="room-title" data-i18n="room.pathTitle">哪個證據會改變判斷（Decision Path）</span>

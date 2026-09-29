@@ -7,6 +7,7 @@ import { DECISION_STATES, dedupePreserveOrder, evaluateDecision, buildBrief, pay
 import { blankAssessmentDefaults, buildOpportunityFromInput, summarizeInput } from "./workbench-adapter.js";
 import { localizeEvidenceText, presentReason as localizeReason, stateLabels, t } from "./i18n.js";
 import { createDecisionPathExperiment } from "./decision-path.js";
+import { buildFlipMap } from "./flip-map.js";
 import { buildCommercialViewModel } from "./commercial-action-layer.js";
 import { buildTradeDealViewModel } from "./trade-deal-structure.js";
 import { buildEconomicsBridge, economicsEvidenceTrace, economicsReading } from "./economics-bridge.js";
@@ -458,6 +459,7 @@ function syncEvidenceRooms({ economics, commercialView, tradeView, momentum, cov
   setRoomStatus("room-trade-status", tradeView.structure.payment?.termsStatus === "COMPLETE" ? tx("trade.confirmed") : tx("trade.notConfirmed"), tradeView.structure.payment?.termsStatus === "COMPLETE" ? "ok" : "warn");
   const pathArea = $("decision-path-area");
   setRoomStatus("room-path-status", pathArea && !pathArea.hidden && decisionPathExperiment ? `${decisionPathExperiment.paths.length}` : "");
+  setRoomStatus("room-flip-status", lastFlipMap ? (lastFlipMap.terminal.length ? "!" : lastFlipMap.route.steps.length ? `${lastFlipMap.route.steps.length}` : "") : "", lastFlipMap && lastFlipMap.terminal.length ? "warn" : "");
   setRoomStatus("room-export-status", "MD · TXT · JSON");
   // 3. room visibility mirrors its content section (mode-specific blocks)
   const econInner = $("blank-economics-result");
@@ -1309,6 +1311,7 @@ function renderResult() {
     if (firstChange) selectedPathId = firstChange.id;
   }
   renderDecisionPath();
+  renderFlipMap();
   $("export-status").textContent = tx("export.ready") + " " + current.name;
   syncEvidenceRooms({ economics, commercialView, tradeView, momentum, coverage, nextBestAction, recommended: g.recommended, currency, g });
 
@@ -1324,6 +1327,93 @@ function renderResult() {
   });
   $("human-note").value = humanNote;
   renderHumanDecision();
+}
+
+// Flip map: which confirmations move the recommendation, in the engine's own
+// gate order, and which findings would move it the other way. Every state is a
+// hypothetical run of evaluateDecision(); see flip-map.js.
+const TRADE_PROFIT_NAVIGATOR = "https://apchen1978.github.io/trade-profit-navigator-demo/?case=gulf-001";
+let lastFlipMap = null;
+
+function flipStateChip(state) {
+  return `<span class="rec-tag ${tagClass(state)}">${stateLabel(state)}</span>`;
+}
+
+function flipStepTitle(step) {
+  const label = esc(localizeEvidenceText(step.label || "", language));
+  return pathText(`flip.step.${step.kind}`, { label });
+}
+
+function renderFlipMap() {
+  const area = $("flip-map-area");
+  if (!area) return;
+  if (!current) { lastFlipMap = null; area.innerHTML = ""; return; }
+  const map = buildFlipMap(current);
+  lastFlipMap = map;
+
+  const steps = map.route.steps.map((step, index) => {
+    const effect = !step.simulable
+      ? `<span class="flip-effect data">${tx("flip.needsRealData")}</span>`
+      : step.flips
+        ? `<span class="flip-effect">${pathText("flip.stepFlips", { state: flipStateChip(step.after) })}</span>`
+        : `<span class="flip-effect quiet">${pathText("flip.stepHolds", { state: stateLabel(step.after) })}</span>`;
+    const doc = step.resolveWith ? `<span class="flip-doc">${esc(localizeEvidenceText(step.resolveWith, language))}</span>` : "";
+    const clearedName = (id) => {
+      const known = (current.unknowns || []).find((u) => u.id === id);
+      return known ? `${id} ${localizeEvidenceText(known.label, language)}` : id;
+    };
+    const also = step.clears && step.clears.length > 1
+      ? `<span class="flip-doc">${pathText("flip.alsoClears", { ids: esc(step.clears.slice(1).map(clearedName).join(", ")) })}</span>` : "";
+    return `<li class="flip-step ${step.flips ? "flips" : ""}"><span class="flip-no">${index + 1}</span><div><strong class="flip-step-title">${flipStepTitle(step)}</strong>${doc}${also}${effect}</div></li>`;
+  }).join("");
+
+  let routeEnd = "";
+  if (map.terminal.length) {
+    routeEnd = `<ul class="flip-terminal">${map.terminal.map((t) => `<li>${tx(`flip.terminal.${t.id}`)}</li>`).join("")}</ul><p class="flip-note">${tx("flip.stoppedTerminal")}</p>`;
+  } else if (map.route.reachedPursueNow && map.route.steps.length) {
+    routeEnd = `<p class="flip-note">${tx("flip.reached")}</p>`;
+  } else if (map.route.stoppedBecause === "payment-events") {
+    routeEnd = `<p class="flip-note">${tx("flip.stoppedData")}</p>`;
+  } else if (!map.route.steps.length) {
+    routeEnd = `<p class="flip-note">${tx("flip.noSteps")}</p>`;
+  } else if (!map.route.reachedPursueNow) {
+    routeEnd = `<p class="flip-note">${tx("flip.stoppedOther")}</p>`;
+  }
+
+  const flipping = map.singles.filter((s) => s.flips);
+  const masked = map.singles.some((s) => !s.flips);
+  const flipLabel = (s) => {
+    const step = map.route.steps.find((x) => x.id === s.id);
+    return step ? flipStepTitle(step) : s.id;
+  };
+  const mask = map.singles.length && masked
+    ? `<div class="flip-block"><h4>${tx("flip.maskTitle")}</h4><p>${flipping.length ? pathText("flip.maskOne", { flipping: flipping.map(flipLabel).join(" / ") }) : tx("flip.maskNone")}</p></div>`
+    : "";
+
+  const adverse = map.adverse.map((a) => `<li class="${a.changes ? "" : "masked"}"><span>${tx(`flip.down.${a.id}`)}</span>${a.changes ? `<span class="flip-to">${flipStateChip(a.state)}</span>` : `<span class="flip-effect quiet">${tx("flip.downMasked")}</span>`}</li>`).join("");
+
+  let economics = "";
+  if (map.economics) {
+    const e = map.economics;
+    const money = (v) => economicsValue(v, e.currency || "CNY");
+    const pct = (v) => (v == null ? "?" : (Math.round(v * 10) / 10).toString());
+    economics = `<div class="flip-block"><h4>${tx("flip.econTitle")}</h4><p>${pathText("flip.econBody", { net: money(e.net), min: money(e.minimum), gap: money(e.gap), pctRev: pct(e.gapPctOfRevenue), pctNet: pct(e.gapPctOfNet) })}</p>${e.gateActive ? `<p>${tx("flip.econGate")}</p>` : ""}${current.id === "OPP-2026-008" ? `<p>${tx("flip.econNext")} <a href="${TRADE_PROFIT_NAVIGATOR}" target="_blank" rel="noopener noreferrer">${tx("flip.econLink")}</a></p>` : ""}</div>`;
+  }
+
+  area.innerHTML = `
+    <h2>${tx("flip.heading")}</h2>
+    <p class="path-warning">${tx("flip.warning")}</p>
+    <div class="flip-block">
+      <h4>${tx("flip.upsideTitle")}</h4>
+      <p class="flip-start"><span class="muted">${tx("flip.start")}</span> ${flipStateChip(map.current)}</p>
+      ${steps ? `<ol class="flip-steps">${steps}</ol>` : ""}
+      ${routeEnd}
+    </div>
+    ${mask}
+    <div class="flip-block"><h4>${tx("flip.downTitle")}</h4><ul class="flip-adverse">${adverse}</ul></div>
+    ${economics}
+    <p class="flip-human">${tx("path.humanBoundary")}</p>
+  `;
 }
 
 const pathTitleKey = { "CP-1": "path.cp1", "CP-2": "path.cp2", "CP-3R": "path.cp3", "CP-4": "path.cp4" };

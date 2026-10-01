@@ -792,6 +792,7 @@ function applyLanguage() {
   $("nav-prev").href = "https://apchen1978.github.io/overseas-lead-discovery-demo/" + (language === "en" ? "?lang=en" : "");
   // The portfolio homepage now reads ?lang=, so "back to portfolio" keeps the language too.
   $("nav-back").href = "https://paulstradecraft.com/" + (language === "en" ? "?lang=en" : "") + "#three-questions";
+  $("nav-next").href = tradeProfitNavigatorUrl();
   $("lang-zh").classList.toggle("active", language === "zh-TW");
   $("lang-en").classList.toggle("active", language === "en");
   $("lang-zh").setAttribute("aria-pressed", String(language === "zh-TW"));
@@ -1380,7 +1381,9 @@ function renderResult() {
 // Flip map: which confirmations move the recommendation, in the engine's own
 // gate order, and which findings would move it the other way. Every state is a
 // hypothetical run of evaluateDecision(); see flip-map.js.
-const TRADE_PROFIT_NAVIGATOR = "https://apchen1978.github.io/trade-profit-navigator-demo/?case=gulf-001";
+const TRADE_PROFIT_NAVIGATOR_BASE = "https://apchen1978.github.io/trade-profit-navigator-demo/?case=gulf-001";
+// The profit navigator is bilingual too and defaults to Chinese, so English links carry ?lang=en.
+const tradeProfitNavigatorUrl = () => TRADE_PROFIT_NAVIGATOR_BASE + (language === "en" ? "&lang=en" : "");
 let lastFlipMap = null;
 
 function flipStateChip(state) {
@@ -1445,7 +1448,7 @@ function renderFlipMap() {
     const e = map.economics;
     const money = (v) => economicsValue(v, e.currency || "CNY");
     const pct = (v) => (v == null ? "?" : (Math.round(v * 10) / 10).toString());
-    economics = `<div class="flip-block"><h4>${tx("flip.econTitle")}</h4><p>${pathText("flip.econBody", { net: money(e.net), min: money(e.minimum), gap: money(e.gap), pctRev: pct(e.gapPctOfRevenue), pctNet: pct(e.gapPctOfNet) })}</p>${e.gateActive ? `<p>${tx("flip.econGate")}</p>` : ""}${current.id === "OPP-2026-008" ? `<p>${tx("flip.econNext")} <a href="${TRADE_PROFIT_NAVIGATOR}" target="_blank" rel="noopener noreferrer">${tx("flip.econLink")}</a></p>` : ""}</div>`;
+    economics = `<div class="flip-block"><h4>${tx("flip.econTitle")}</h4><p>${pathText("flip.econBody", { net: money(e.net), min: money(e.minimum), gap: money(e.gap), pctRev: pct(e.gapPctOfRevenue), pctNet: pct(e.gapPctOfNet) })}</p>${e.gateActive ? `<p>${tx("flip.econGate")}</p>` : ""}${current.id === "OPP-2026-008" ? `<p>${tx("flip.econNext")} <a href="${tradeProfitNavigatorUrl()}" target="_blank" rel="noopener noreferrer">${tx("flip.econLink")}</a></p>` : ""}</div>`;
   }
 
   area.innerHTML = `

@@ -10,6 +10,7 @@ export const SYNTHETIC_LABEL =
 // applies to PRODUCT COST (economics.directCost), never to the sale price: a
 // factory is paid for the goods it makes, and the gap between price and cost is
 // the deal's margin. Hypothetical FX, for demonstration only.
+// SYNTHETIC ASSUMPTION: USD 22 per metre of finished window width. Not a supplier quote.
 export const GOODS_COST_USD = 264000;
 export const PLANNING_FX_CNY_PER_USD = 7.5;
 
@@ -41,20 +42,20 @@ const baseOpportunity = {
   // Decision Core, Momentum, Coverage, or a manual assessment.
   sampleGuide: {
     zh: {
-      quantityPricing: "12,000 metres 為 RFP 規劃基準；目標單價 USD 40／metre，買方要求 5% 折讓。此數量尚非已承諾採購量。",
+      quantityPricing: "12,000 metres 為 RFP 規劃基準（本案例的「公尺」指一公尺成品窗寬，即遮光簾、紗簾與窗簾頭的成品，不含現場安裝）；目標單價 USD 40／metre，買方要求 5% 折讓。此數量尚非已承諾採購量。",
       payment: "RFP 提到交付後 90 天付款；轉介紀錄僅提到 30% 預付款。其餘 70% 的觸發條件與日期仍為 UNKNOWN。",
       specification: "遮光布、紗簾與裝飾簾頭；樣品／mockup 僅作規劃基準。飯店防焰與認證仍需以正式核准文件確認。",
       authority: "Daniel Al-Mansoori 為合成採購聯絡人；採購與技術路徑已知，但最終商務核准人仍為 UNKNOWN。",
       delivery: "合成基準報價為 CIF Khalifa Port；現場安裝、進口清關、關稅、保固與場地責任未被納入供貨範圍。",
-      economics: "已填入收入、產品成本、貿易／物流、專案成本與風險準備金；預期淨貢獻 USD 120,000，仍不是接受訂單的授權。",
+      economics: "已填入收入、產品成本、貿易／物流、專案成本與風險準備金；預期淨貢獻 USD 120,000，仍不是接受訂單的授權。每公尺 USD 22 的商品成本為合成假設，不代表任何供應商報價。",
     },
     en: {
-      quantityPricing: "12,000 metres is the RFP planning basis; target price is USD 40/metre with a requested 5% discount. It is not a committed purchase quantity.",
+      quantityPricing: "12,000 metres is the RFP planning basis (in this case, 'metre' means one metre of finished window width: blackout drapery, sheers and valances as finished goods, excluding on-site installation); target price is USD 40/metre with a requested 5% discount. It is not a committed purchase quantity.",
       payment: "The RFP says payment 90 days after delivery; a referral note only mentions 30% advance. The trigger and date for the remaining 70% are still UNKNOWN.",
       specification: "Blackout drapery, sheers and valances; the sample/mockup is planning-level only. Hospitality fire-rating and certification still need formal approval evidence.",
       authority: "Daniel Al-Mansoori is the synthetic procurement contact. Purchasing and technical paths are known; final commercial authority remains UNKNOWN.",
       delivery: "The synthetic baseline quote is CIF Khalifa Port. Site installation, import clearance, duty, warranty and site liability are outside the supply scope until confirmed.",
-      economics: "Revenue, product cost, trade/logistics, deal-specific cost and contingency are recorded; expected net contribution is USD 120,000, not authority to accept the deal.",
+      economics: "Revenue, product cost, trade/logistics, deal-specific cost and contingency are recorded; expected net contribution is USD 120,000, not authority to accept the deal. The USD 22 per metre goods cost is a synthetic assumption, not a supplier quote.",
     },
   },
   economics: {
@@ -137,7 +138,7 @@ const baseOpportunity = {
   commercialTerms: {
     status: "INCOMPLETE",
     detail:
-      "SYNTHETIC / HYPOTHETICAL planning basis: 12,000 metres at a target USD 40/metre = USD 480,000 expected revenue; CIF Khalifa Port; 60-day quote validity; MOQ baseline 12,000 metres; sample/mockup-approved planning scope. The buyer's RFP states 90 days after delivery while a referral note suggests 30% advance; the trigger and treatment of the remaining 70% balance are UNKNOWN, so binding payment terms are INCOMPLETE. A requested 5% discount and two competing supplier offers require scope-normalized comparison. The synthetic contact is a procurement path, not verified final authority.",
+      "SYNTHETIC / HYPOTHETICAL planning basis: 12,000 metres (one metre = one metre of finished window width, excluding on-site installation) at a target USD 40/metre = USD 480,000 expected revenue; CIF Khalifa Port; 60-day quote validity; MOQ baseline 12,000 metres; sample/mockup-approved planning scope. The buyer's RFP states 90 days after delivery while a referral note suggests 30% advance; the trigger and treatment of the remaining 70% balance are UNKNOWN, so binding payment terms are INCOMPLETE. A requested 5% discount and two competing supplier offers require scope-normalized comparison. The synthetic contact is a procurement path, not verified final authority.",
     resolveWith: "Binding commercial terms in writing (payment schedule, CIF named place and excluded installation/import scope)",
     paymentEvidence: [
       { id: "PEV-1", label: "Buyer RFP: 90 days after delivery", state: "PROPOSED", source: "Synthetic buyer RFP", fragment: "Payment at 90 days after delivery", asOf: "2026-06-18 (synthetic)", humanStatus: "PENDING_REVIEW" },

@@ -16,7 +16,7 @@ function rowTemplate(idx) {
       <div><label class="field">供應商／報價單號</label><input type="text" class="q-label" placeholder="如：A 供應商 RFQ-01" /></div>
       <div><label class="field">交貨條件</label><select class="q-incoterm">${incotermOpts}</select></div>
       <div><label class="field">幣別</label><select class="q-currency">${currencyOpts}</select></div>
-      <div><label class="field">金額</label><input type="number" class="q-amount" placeholder="如 480000" /></div>
+      <div><label class="field">金額</label><input type="number" class="q-amount" placeholder="如 144000" /></div>
       <div><label class="field">有效期限</label><input type="date" class="q-valid" /></div>
       <div><label class="field">備註</label><input type="text" class="q-note" placeholder="如：含檢驗費" /><button type="button" class="del" title="移除這張報價">✕</button></div>
     </div>`;

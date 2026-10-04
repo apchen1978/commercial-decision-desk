@@ -96,8 +96,8 @@ import { bossCollect, bossFinish, bossInvest, buildBossThree } from "./boss-thre
   assert.equal(view.rows[1].chipKey, "boss.q2.chip.declared");
   assert.equal(view.rows[2].chipKey, "boss.q3.chip.esc");
   assert.ok(view.economicsLine, "sample economics is CALCULATED");
-  assert.equal(view.economicsLine.net, 120000);
-  assert.equal(view.economicsLine.min, 96000);
+  assert.equal(view.economicsLine.net, 36000);
+  assert.equal(view.economicsLine.min, 28800);
   assert.equal(view.economicsLine.currency, "USD");
   console.log("PASS buildBossThree sample: 3 rows + real economics line");
 }

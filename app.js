@@ -221,8 +221,10 @@ function contextDisplay(value) {
 function contextQuantityDisplay(qty, unit) {
   const hasQty = qty !== "" && qty !== undefined && qty !== null;
   const hasUnit = unit !== "" && unit !== undefined && unit !== null;
-  if (hasQty && hasUnit) return qty + " " + unit;
-  if (hasQty) return qty + " (" + tx("context.unitUnknown") + ")";
+  const quantity = hasQty && Number.isFinite(Number(qty)) ? Number(qty).toLocaleString("en-US") : qty;
+  const displayUnit = language === "zh-TW" && /^metres?$/i.test(String(unit)) ? "米" : unit;
+  if (hasQty && hasUnit) return quantity + " " + displayUnit;
+  if (hasQty) return quantity + " (" + tx("context.unitUnknown") + ")";
   return tx("context.unknown");
 }
 

@@ -55,7 +55,7 @@ check(adverse["margin-below-threshold"].state === "DO_NOT_PURSUE", "a declared m
 
 // Economics is presentation-only headroom, never a gate.
 const e = map.economics;
-check(e.net === 120000 && e.minimum === 96000 && e.gap === 24000, "headroom equals net minus the owner reference minimum");
+check(e.net === 36000 && e.minimum === 28800 && e.gap === 7200, "headroom equals net minus the owner reference minimum");
 check(e.gapPctOfRevenue === 5 && e.gapPctOfNet === 20, "headroom percentages are relative to revenue and to net");
 check(e.gateActive === false, "without a declared threshold the economics does not gate");
 const declared = clone(opportunity);

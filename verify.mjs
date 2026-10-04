@@ -58,7 +58,7 @@ check("R4 quote bases not comparable", opportunity.quoteBasesComparable === fals
 // Hard rule 5 — payment exposure only from complete events; incomplete → UNKNOWN.
 {
   const e1 = paymentExposure(opportunity.paymentEvents);
-  check("R5 exposure computed from complete events", e1.computed === true && e1.totalCommittedCny === 594000 + 1386000);
+  check("R5 exposure computed from complete events", e1.computed === true && e1.totalCommittedCny === 178200 + 415800);
   const mixed = paymentExposure([...opportunity.paymentEvents, { label: "Unconfirmed bond", status: "INCOMPLETE" }]);
   check("R5 incomplete events reported as UNKNOWN", mixed.incompleteCount === 1 && mixed.incompleteLabels.includes("Unconfirmed bond"));
   const onlyIncomplete = paymentExposure([{ status: "INCOMPLETE" }]);
@@ -211,7 +211,7 @@ function cleanScenario() {
 }
 {
   const e = paymentExposure(opportunity.paymentEvents);
-  check("audit payment semantics unchanged", e.computed && e.totalCommittedCny === 1980000 && e.peakWindowCny === 1386000);
+  check("audit payment semantics unchanged", e.computed && e.totalCommittedCny === 594000 && e.peakWindowCny === 415800);
 }
 {
   const engineSrc = readFileSync(new URL("./decision-engine.js", import.meta.url), "utf8");

@@ -10,14 +10,17 @@ export const SYNTHETIC_LABEL =
 // applies to PRODUCT COST (economics.directCost), never to the sale price: a
 // factory is paid for the goods it makes, and the gap between price and cost is
 // the deal's margin. Hypothetical FX, for demonstration only.
-// SYNTHETIC ASSUMPTION: USD 22 per metre of finished window width. Not a supplier quote.
-export const GOODS_COST_USD = 264000;
-export const PLANNING_FX_CNY_PER_USD = 7.5;
+// Owner-approved synthetic teaching inputs; not a supplier quote.
+import { GULF_BASELINE as baseline } from "./cases/gulf-hospitality-baseline.js";
+const total = (unitCost) => Math.round(baseline.quantity * unitCost * 100) / 100;
+export const GOODS_COST_USD = total(baseline.costsPerUnitUsd.goods);
+export const PLANNING_FX_CNY_PER_USD = baseline.supplierPaymentFx.cnyPerUsd;
 
 import { withDerivedUnknowns } from "./derived-unknowns.js";
 
 const baseOpportunity = {
   id: "OPP-2026-008",
+  caseBaseline: { id: baseline.id, version: baseline.version },
   synthetic: true,
   name: "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
   summary:
@@ -42,30 +45,30 @@ const baseOpportunity = {
   // Decision Core, Momentum, Coverage, or a manual assessment.
   sampleGuide: {
     zh: {
-      quantityPricing: "12,000 metres 為 RFP 規劃基準（本案例的「公尺」指一公尺成品窗寬，即遮光簾、紗簾與窗簾頭的成品，不含現場安裝）；目標單價 USD 40／metre，買方要求 5% 折讓。此數量尚非已承諾採購量。",
+      quantityPricing: "12,000 metres 為 RFP 規劃基準（本案例的「公尺」指一公尺成品窗寬，即遮光簾、紗簾與窗簾頭的成品，不含現場安裝）；目標單價 USD 12／metre（CIF），買方要求 5% 折讓。此數量尚非已承諾採購量。",
       payment: "RFP 提到交付後 90 天付款；轉介紀錄僅提到 30% 預付款。其餘 70% 的觸發條件與日期仍為 UNKNOWN。",
       specification: "遮光布、紗簾與裝飾簾頭；樣品／mockup 僅作規劃基準。飯店防焰與認證仍需以正式核准文件確認。",
       authority: "Daniel Al-Mansoori 為合成採購聯絡人；採購與技術路徑已知，但最終商務核准人仍為 UNKNOWN。",
       delivery: "合成基準報價為 CIF Khalifa Port；現場安裝、進口清關、關稅、保固與場地責任未被納入供貨範圍。",
-      economics: "已填入收入、產品成本、貿易／物流、專案成本與風險準備金；預期淨貢獻 USD 120,000，仍不是接受訂單的授權。每公尺 USD 22 的商品成本為合成假設，不代表任何供應商報價。",
+      economics: "已填入收入、產品成本、貿易／物流、專案成本與風險準備金；資金成本前預期淨貢獻 USD 36,000，仍不是接受訂單的授權。每公尺 USD 6.60 的商品成本為合成假設，不代表任何供應商報價。",
     },
     en: {
-      quantityPricing: "12,000 metres is the RFP planning basis (in this case, 'metre' means one metre of finished window width: blackout drapery, sheers and valances as finished goods, excluding on-site installation); target price is USD 40/metre with a requested 5% discount. It is not a committed purchase quantity.",
+      quantityPricing: "12,000 metres is the RFP planning basis (in this case, 'metre' means one metre of finished window width: blackout drapery, sheers and valances as finished goods, excluding on-site installation); target price is USD 12/metre (CIF) with a requested 5% discount. It is not a committed purchase quantity.",
       payment: "The RFP says payment 90 days after delivery; a referral note only mentions 30% advance. The trigger and date for the remaining 70% are still UNKNOWN.",
       specification: "Blackout drapery, sheers and valances; the sample/mockup is planning-level only. Hospitality fire-rating and certification still need formal approval evidence.",
       authority: "Daniel Al-Mansoori is the synthetic procurement contact. Purchasing and technical paths are known; final commercial authority remains UNKNOWN.",
       delivery: "The synthetic baseline quote is CIF Khalifa Port. Site installation, import clearance, duty, warranty and site liability are outside the supply scope until confirmed.",
-      economics: "Revenue, product cost, trade/logistics, deal-specific cost and contingency are recorded; expected net contribution is USD 120,000, not authority to accept the deal. The USD 22 per metre goods cost is a synthetic assumption, not a supplier quote.",
+      economics: "Revenue, product cost, trade/logistics, deal-specific cost and contingency are recorded; expected net contribution before funding is USD 36,000, not authority to accept the deal. The USD 6.60 per metre goods cost is a synthetic assumption, not a supplier quote.",
     },
   },
   economics: {
     currency: "USD",
-    revenue: 480000,
+    revenue: total(baseline.pricePerUnitUsd),
     directCost: GOODS_COST_USD,
-    tradeCost: 42000,
-    dealSpecificCost: 36000,
-    contingency: 18000,
-    minimumNetContribution: 96000,
+    tradeCost: total(baseline.costsPerUnitUsd.tradeLogistics),
+    dealSpecificCost: total(baseline.costsPerUnitUsd.dealSpecific),
+    contingency: total(baseline.costsPerUnitUsd.contingency),
+    minimumNetContribution: baseline.minimumNetContributionUsd,
   },
   trade: {
     deliveryTerm: "CIF",
@@ -82,7 +85,7 @@ const baseOpportunity = {
     categoryFit: {
       value: "HIGH",
       evidence: [
-        { tier: "PRIMARY", note: "Product spec (curtains + window hardware) matches the core soft-furnishing category (synthetic spec doc)." },
+        { tier: "PRIMARY", note: "Product spec (blackout drapery + sheers + valances) matches the core soft-furnishing category (synthetic spec doc)." },
       ],
     },
     evidenceQuality: {
@@ -133,12 +136,12 @@ const baseOpportunity = {
     "Strong Buyer Fit: the synthetic procurement desk has a defined category, indicative volume baseline and meeting path through Daniel Al-Mansoori (synthetic contact).",
     "Strong Category Fit: blackout drapery, sheers and valances match the core window-treatment category.",
     "Clear import openness: the synthetic RFP explicitly invites international suppliers for delivery to Abu Dhabi.",
-    "The USD 120,000 expected net contribution is above the synthetic owner reference of USD 96,000, before unresolved terms, scope and authority are accepted.",
+    "The USD 36,000 expected net contribution is above the synthetic owner reference of USD 28,800, before unresolved terms, scope and authority are accepted.",
   ],
   commercialTerms: {
     status: "INCOMPLETE",
     detail:
-      "SYNTHETIC / HYPOTHETICAL planning basis: 12,000 metres (one metre = one metre of finished window width, excluding on-site installation) at a target USD 40/metre = USD 480,000 expected revenue; CIF Khalifa Port; 60-day quote validity; MOQ baseline 12,000 metres; sample/mockup-approved planning scope. The buyer's RFP states 90 days after delivery while a referral note suggests 30% advance; the trigger and treatment of the remaining 70% balance are UNKNOWN, so binding payment terms are INCOMPLETE. A requested 5% discount and two competing supplier offers require scope-normalized comparison. The synthetic contact is a procurement path, not verified final authority.",
+      "SYNTHETIC / HYPOTHETICAL planning basis: 12,000 metres (one metre = one metre of finished window width, excluding on-site installation) at a target USD 12/metre (CIF) = USD 144,000 expected revenue; CIF Khalifa Port; 60-day quote validity; MOQ baseline 12,000 metres; sample/mockup-approved planning scope. The buyer's RFP states 90 days after delivery while a referral note suggests 30% advance; the trigger and treatment of the remaining 70% balance are UNKNOWN, so binding payment terms are INCOMPLETE. A requested 5% discount and two competing supplier offers require scope-normalized comparison. The synthetic contact is a procurement path, not verified final authority.",
     resolveWith: "Binding commercial terms in writing (payment schedule, CIF named place and excluded installation/import scope)",
     paymentEvidence: [
       { id: "PEV-1", label: "Buyer RFP: 90 days after delivery", state: "PROPOSED", source: "Synthetic buyer RFP", fragment: "Payment at 90 days after delivery", asOf: "2026-06-18 (synthetic)", humanStatus: "PENDING_REVIEW" },
@@ -164,8 +167,8 @@ const baseOpportunity = {
   ],
   quoteBasesComparable: false, // rule 4: non-comparable bases → never ranked
   paymentEvents: [
-    { id: "PE-1", label: "Internal factory deposit — 30% of USD 264,000 product cost at synthetic planning FX 7.50 CNY/USD", amountCny: Math.round(GOODS_COST_USD * 0.3 * PLANNING_FX_CNY_PER_USD), daysFromSign: 0, status: "COMPLETE" },
-    { id: "PE-2", label: "Internal factory balance — 70% of USD 264,000 product cost at synthetic planning FX 7.50 CNY/USD", amountCny: Math.round(GOODS_COST_USD * 0.7 * PLANNING_FX_CNY_PER_USD), daysFromSign: 45, status: "COMPLETE" },
+    { id: "PE-1", label: "Internal factory deposit — 30% of USD 79,200 product cost at synthetic planning FX 7.50 CNY/USD", amountCny: Math.round(GOODS_COST_USD * 0.3 * PLANNING_FX_CNY_PER_USD), daysFromSign: 0, status: "COMPLETE" },
+    { id: "PE-2", label: "Internal factory balance — 70% of USD 79,200 product cost at synthetic planning FX 7.50 CNY/USD", amountCny: Math.round(GOODS_COST_USD * 0.7 * PLANNING_FX_CNY_PER_USD), daysFromSign: 45, status: "COMPLETE" },
   ],
   // Payment security for the open receivable (letter of credit / credit insurance).
   // Nothing has been discussed yet, so every instrument is UNKNOWN and the RFP's

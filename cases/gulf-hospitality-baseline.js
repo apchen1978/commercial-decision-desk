@@ -1,0 +1,129 @@
+// Generated mirror of gulf-hospitality-baseline.json for static browser modules.
+// Canonical input lives in commercial-decision-desk/cases; parity is checked before release.
+export const GULF_BASELINE = {
+  "id": "gulf-hospitality-baseline",
+  "version": "2026-10-05.1",
+  "schemaVersion": 1,
+  "status": "SYNTHETIC_OWNER_APPROVED_INPUTS_AND_RESULTS",
+  "approvedInputDate": "2026-10-05",
+  "currency": "USD",
+  "unit": {
+    "id": "metre-of-finished-window-width",
+    "zh": "一米成品窗寬",
+    "en": "one metre of finished window width",
+    "includedProducts": [
+      "blackout drapery",
+      "sheer curtains",
+      "decorative valances"
+    ],
+    "excludedScope": [
+      "on-site installation"
+    ]
+  },
+  "quantity": 12000,
+  "quantityStatus": "PLANNING_NOT_COMMITTED",
+  "pricePerUnitUsd": 12,
+  "incoterm": "CIF",
+  "namedPlace": "Khalifa Port, Abu Dhabi (synthetic)",
+  "costsPerUnitUsd": {
+    "goods": 6.6,
+    "tradeLogistics": 1.05,
+    "dealSpecific": 0.9,
+    "contingency": 0.45
+  },
+  "minimumNetContributionUsd": 28800,
+  "minimumBasis": "Owner-set fixed minimum: 20% of the undiscounted planning revenue. Do not lower it automatically when testing concessions.",
+  "funding": {
+    "dutyRate": 0.05,
+    "dutyBearer": "BUYER",
+    "costOfCapital": 0.08,
+    "fxShare": 1,
+    "timeline": {
+      "depositShare": 0.3,
+      "depositDay": 0,
+      "balanceDay": 45,
+      "otherCostDay": 60,
+      "deliveryDay": 75
+    },
+    "terms": {
+      "A": {
+        "label": "RFP: payment 90 days after delivery",
+        "receipts": [
+          {
+            "share": 1,
+            "base": "delivery",
+            "offset": 90,
+            "late": true
+          }
+        ]
+      },
+      "B": {
+        "label": "Referral note: 30% advance; timing of the 70% is UNKNOWN (assumed before shipment)",
+        "receipts": [
+          {
+            "share": 0.3,
+            "day": 0
+          },
+          {
+            "share": 0.7,
+            "day": 60,
+            "late": true
+          }
+        ]
+      },
+      "C": {
+        "label": "Staged: 30% at order, 40% before shipment, 30% 30 days after delivery",
+        "receipts": [
+          {
+            "share": 0.3,
+            "day": 0
+          },
+          {
+            "share": 0.4,
+            "day": 60
+          },
+          {
+            "share": 0.3,
+            "base": "delivery",
+            "offset": 30,
+            "late": true
+          }
+        ]
+      },
+      "D": {
+        "label": "Letter of credit at sight: paid when shipping documents are accepted",
+        "lc": true,
+        "receipts": [
+          {
+            "share": 1,
+            "day": 62,
+            "late": true
+          }
+        ]
+      },
+      "E": {
+        "label": "Full prepayment before production",
+        "receipts": [
+          {
+            "share": 1,
+            "day": 0
+          }
+        ]
+      }
+    },
+    "activeTerms": "A"
+  },
+  "supplierPaymentFx": {
+    "costCurrency": "CNY",
+    "cnyPerUsd": 7.5,
+    "status": "EXISTING_SYNTHETIC_PLANNING_ASSUMPTION_NOT_MARKET_RATE"
+  },
+  "provenance": {
+    "numericalInputs": "Paul Owner decision, 2026-10-05. Synthetic teaching inputs, not supplier quotes or market prices.",
+    "cddSourceRevision": "bc15767317744aa2256cfa08a850cd9589a3a389",
+    "tpnSourceRevision": "c64391cae7e8ebe42da6d108569602c9eba3d59d",
+    "fundingAssumptions": "Copied unchanged from CASE_GULF_001.landed, excluding its superseded cost and minimum fields.",
+    "sensitivityPackId": "tpn-default-assumptions",
+    "sensitivityPackVersion": "0.1.0"
+  }
+};

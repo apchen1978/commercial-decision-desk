@@ -7,7 +7,7 @@ const check = (name, condition, detail = "") => { results.push(Boolean(condition
 
 const sample = buildTradeDealViewModel(opportunity, evaluateDecision(opportunity));
 check("payment structure reuses existing payment events", sample.structure.payment.totalCount === 2 && sample.structure.payment.completeCount === 2);
-check("payment exposure uses engine semantics", sample.structure.payment.exposure === 1980000 && sample.structure.payment.exposureStatus === "COMPUTED_FROM_COMPLETE_EVENTS");
+check("payment exposure uses engine semantics", sample.structure.payment.exposure === 594000 && sample.structure.payment.exposureStatus === "COMPUTED_FROM_COMPLETE_EVENTS");
 check("sample declares its Incoterm", sample.structure.delivery.declaredTerm === "CIF" && sample.structure.delivery.confirmed);
 const undeclared = structuredClone(opportunity);
 delete undeclared.trade;

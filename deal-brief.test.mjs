@@ -66,8 +66,8 @@ pass("plain text is readable without markdown syntax", () => {
 });
 
 pass("filename is sanitized and has a missing-name fallback", () => {
-  assert.equal(sanitizeDealBriefFilename("Dubai: Hotel / Group?", "md"), "CDD-Deal-Brief-Dubai-Hotel-Group.md");
-  assert.equal(sanitizeDealBriefFilename("", "txt"), "CDD-Deal-Brief-untitled-opportunity.txt");
+  assert.equal(sanitizeDealBriefFilename("Dubai: Hotel / Group?", "md"), "Deal-Brief-Dubai-Hotel-Group.md");
+  assert.equal(sanitizeDealBriefFilename("", "txt"), "Deal-Brief-untitled-opportunity.txt");
 });
 
 pass("sample keeps synthetic marker and Decision Path", () => {

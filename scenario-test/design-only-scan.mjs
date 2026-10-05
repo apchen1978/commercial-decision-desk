@@ -1,7 +1,7 @@
 // design-only-scan.mjs — synthetic boundary scan for Decision Pack 001.
 // DESIGN-ONLY: no engine/contract changes. Reads decision-engine.js, builds
 // in-memory fixtures for the KYC and urgent-order cases, records ACTUAL behavior.
-// Output is used only inside SYNTHETIC_BOUNDARY_MATRIX_001.md (design evidence).
+// Output is used only inside BOUNDARY_MATRIX_001.md (design evidence).
 import { evaluateDecision, paymentExposure } from "../decision-engine.js";
 
 // base opportunity template (mirrors fixture shape, synthetic)

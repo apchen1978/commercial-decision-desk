@@ -1,6 +1,6 @@
 // channel-price-experiment.mjs — CHANNEL PRICE DISCIPLINE GATE boundary experiment.
 // -----------------------------------------------------------------------------
-// OWNER-AUTHORIZED (charter confirmed 2026-08-23, commit 96fa1d6): synthetic
+// APPROVED (charter confirmed 2026-08-23, commit 96fa1d6): synthetic
 // experiment ONLY. Production decision-engine.js is NOT modified. No deployment,
 // no production data.
 //

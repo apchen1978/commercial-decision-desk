@@ -390,12 +390,12 @@
       .dl-grid .glance-col h4 { color: var(--forest); font-size: 11.5px; }
       .dl-next .glance-col { border-left-color: var(--amber); }
       .dl-note { margin-top: 14px; }
-      /* 詳細證據明細：預設收合，展開才顯示重複細節（Astra P1-1） */
+      /* 詳細證據明細：預設收合，展開才顯示重複細節 */
       .dl-detail { margin-top: 14px; border: 1px solid var(--line); border-radius: 10px; background: #fafbf7; padding: 4px 14px 12px; }
       .dl-detail > summary { cursor: pointer; color: var(--forest); font-size: 13px; font-weight: 700; padding: 10px 0; }
       .dl-detail-grid { border-top: 1px dashed var(--hairline); padding-top: 12px; }
       .dl-detail .dl-grid { margin-top: 0; }
-      /* 帶走什麼：四問 Deal Brief 預覽（Astra P1-1） */
+      /* 帶走什麼：四問 Deal Brief 預覽 */
       .brief-four { display: grid; }
       .brief-preview-intro { max-width: 72ch; margin: 0 0 4px; color: var(--muted); font-size: 13px; line-height: 1.6; }
       .brief-row { display: grid; grid-template-columns: 150px minmax(0,1fr); gap: 14px; padding: 13px 2px; border-bottom: 1px solid var(--hairline); align-items: baseline; }
@@ -1060,7 +1060,7 @@
       .boss-chip.unk { background: color-mix(in srgb, var(--muted) 12%, transparent); color: var(--muted-2); }
       .boss-row-answer { margin: 0; color: #4c5049; font-size: 12.5px; line-height: 1.6; }
       .boss-row-trace { margin-top: auto; padding-top: 8px; border-top: 1px dashed var(--hairline); color: var(--muted-2); font-size: 10.5px; letter-spacing: .04em; }
-      /* L1 executive strip — the 30-second reading (Codex two-layer slice) */
+      /* L1 executive strip — the 30-second reading (two-layer reading) */
       .boss-executive { margin: 0 0 14px; padding: 0 0 13px; border-bottom: 1px solid var(--hairline); }
       .boss-exec-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
       .boss-exec-label { color: var(--brass); font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
@@ -1131,7 +1131,7 @@
        @media (max-width: 420px) { .boss-three.sample-mode .boss-exec-fields { grid-template-columns: 1fr; } .boss-three.sample-mode .boss-exec-field { padding: 10px 0; border-left: 0; border-top: 1px solid var(--hairline); } .boss-three.sample-mode .boss-exec-field:first-child { padding-top: 0; border-top: 0; } .boss-three.sample-mode .boss-exec-next { margin-top: 0; padding-top: 10px; } .boss-three.sample-mode .boss-aux { grid-template-columns: 1fr; gap: 10px; } }
       @media (max-width: 860px) { .boss-three-grid { grid-template-columns: 1fr; } .boss-row-trace { margin-top: 0; } }
       /* ================================================================
-         TWO-LAYER EXECUTIVE READING (Codex slice v0.1) — presentation only.
+         TWO-LAYER EXECUTIVE READING (v0.1) — presentation only.
          Layer 1: boss-three card is the executive reading (value, position,
          what controls, cash/delivery risk, next action, human boundary).
          Layer 2: Evidence Room — each deep block is a <details> with a
@@ -1363,9 +1363,9 @@
           <p class="capability-body" data-i18n="capability.body">核心評估不需要登入、API 金鑰或後端即可完成。系統以可追溯的商業規則、證據與人工判斷為基礎；之後也能接上外部資料，協助整理資訊、補充證據、分析情境，支援更深入的決策。</p>
           <p class="capability-line" data-i18n="capability.line">今日手動使用 → 需要時再接上外部資料</p>
           <div class="badges-row" aria-label="驗證徽章">
-            <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.verify">自動檢查</span> <span class="mono-num" data-i18n="badge.verifyNum">50/50</span></a>
+            <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.verify">自動檢查</span> <span class="mono-num" data-i18n="badge.verifyNum">65/65</span></a>
             <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk/tree/main/scenario-test" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.scenarios">情境回歸</span> <span class="mono-num">21</span></a>
-            <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk/tree/main/docs/interviews" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.gates">KYC + Margin 關卡已實作</span></a>
+            <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.gates">KYC + Margin 關卡已實作</span></a>
             <a class="badge" href="#"><span class="dot"></span><span data-i18n="badge.manual">無 API key · 手動優先</span></a>
           </div>
           <p class="trust-note" data-i18n="trust.note">這些不是裝飾數字：自動檢查驗證既有規則可重跑，情境回歸驗證既有修正未倒退。它們不代表商業採用或 ROI 已獲證明。</p>

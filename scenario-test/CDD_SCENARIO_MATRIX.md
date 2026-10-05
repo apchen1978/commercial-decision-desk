@@ -5,17 +5,16 @@
 **Experiment artifacts:** `6141606` (scenario experiment, Level 2, verdict B)
 **Post-fix commits:** `7ecbe5c` (S10/S11 fixes + S08/S12 documentation + S10R/S11R regressions) → `fbe8548` (inbound lead scan S13–S15 + protocol examples + interview 001) → `9c1ae4a` (KYC boundary experiment) → KYC gate implementation + S16–S18 (see Git section)
 **Harness:** `scenario-test/run-scenarios.mjs` (isolated, reads `fixtures.js` + `decision-engine.js`, never modifies them)
-**Raw output:** `scenario-test/outputs/scenario-results.raw.json` (full mutated fixtures + actual states, verbatim)
-**Run log:** `scenario-test/outputs/run-log.txt`
-**Date:** 2026-08-23 · **Owner approval:** CDD Evidence Depth Experiment (AUTHORIZED — scenario stress test only; no product development; no CDD V2)
+**Raw output:** generated locally by `node scenario-test/run-scenarios.mjs` (not committed)
+**Date:** 2026-08-23 · **Approval:** CDD Evidence Depth Experiment (AUTHORIZED — scenario stress test only; no product development; no CDD V2)
 
-> Method per owner amendment: expected behavior declared **before** execution; existing
+> Method per amendment: expected behavior declared **before** execution; existing
 > decision contract run deterministically; actual recorded; expected vs actual compared;
 > every mismatch preserved and classified. No engine modification. No claim inflation.
 
-## POST-FIX RUN (owner-review closing)
+## POST-FIX RUN (review closing)
 
-After owner review (EXPERIMENT ACCEPTED, VERDICT B ACCEPTED), the following were
+After review (EXPERIMENT ACCEPTED, VERDICT B ACCEPTED), the following were
 authorized and executed:
 
 1. Experiment artifacts committed as `6141606`.
@@ -41,13 +40,13 @@ authorized and executed:
 10. Document Parity Closing Rule evaluated — no public copy changes required
     (Level 2 evidence does not materially change any existing external claim).
 
-## INBOUND LEAD SCAN + KYC GATE + MARGIN GATE (owner tasks, commits `fbe8548` + `e1a8924` + margin-gate build)
+## INBOUND LEAD SCAN + KYC GATE + MARGIN GATE (tasks, commits `fbe8548` + `e1a8924` + margin-gate build)
 
 Three real-shaped inbound-lead emails (L1/L2/L3, anonymized synthetic) were run
-through the contract and archived as **S13/S14/S15** (tags `SYNTHETIC` +
-`PRE-MARGIN-GATE`); the owner-authorized KYC gate added **S16/S17/S18** (tags
-`SYNTHETIC` + `KYC-GATE`); the building-phase Margin gate added **S19** (tag
-`SYNTHETIC` + `MARGIN-GATE`). Full matrix now: **21 scenarios — 19 PASS, 2
+through the contract and archived as **S13/S14/S15** (tags `DEMO` +
+`PRE-MARGIN-GATE`); the approved KYC gate added **S16/S17/S18** (tags
+`DEMO` + `KYC-GATE`); the building-phase Margin gate added **S19** (tag
+`DEMO` + `MARGIN-GATE`). Full matrix now: **21 scenarios — 19 PASS, 2
 BASELINE_FIX_CONFIRMED, 0 FAIL, deterministic**.
 
 | ID | Lead / case | Engine state | Finding |
@@ -67,7 +66,7 @@ margin / cost-burden into an independent, explainable go/no-go gate. The engine
 fires on the *registered* material contradiction (no decision authority at the
 contact point → `ESCALATE`), not on the commercial killer. Gross Margin Threshold
 and Compliance Cost Payer are candidates for a future Margin gate, pending
-Domain Review interview 001 (`docs/interviews/001_MARGIN_AND_COST_GATE.md`).
+a domain review of the margin and cost gate.
 **FUTURE FLIP (pre-declared, not current result):** after a Margin gate lands,
 S15's expected state must become `DO_NOT_PURSUE` — that flip is the measured
 evidence of decision evolution. **Margin gate is UNKNOWN until interview 001.**
@@ -182,7 +181,7 @@ boundary the contract does not define** — see §4.
 - **Actual:** PURSUE_NOW, availableNow true (identical to fresh evidence). **PASS** (behavior matches pre-declared reading)
 - **Invariant:** expired evidence must not be treated as current — **not enforced by engine**.
 - **UNKNOWN preserved:** n/a. **Limitation discovered: YES.** Expiry is invisible to the engine: a 14-month-old verification note is commercially indistinguishable from a current one. The fixture tier vocabulary (PRIMARY/SUPPORTING/VERIFICATION_REQUIRED) has no EXPIRED tier, and the contract never states that tiers do not affect decisions.
-- **Follow-up:** owner decision — either document "tiers are annotation-only; humans screen expiry" or introduce an expiry gate. **See §4.1.**
+- **Follow-up:** decision-maker decision — either document "tiers are annotation-only; humans screen expiry" or introduce an expiry gate. **See §4.1.**
 
 ### S09 — INCOMPARABLE quote bases (adversarial)
 - **Claim:** Non-comparable quote bases must not be force-ranked; Rule 4 is a disclosure gate, not a pursuit gate.
@@ -199,7 +198,7 @@ boundary the contract does not define** — see §4.
 - **Invariant:** malformed input must not fabricate a level — **partially violated in spirit**: the engine neither fabricates a *strong* level nor rejects the input; it silently downgrades to conditional pursuit without telling the human the input was unparsable.
 - **UNKNOWN preserved:** no — the malformed value is consumed as if it were a valid MEDIUM-ish level; the unparsability itself is never recorded as UNKNOWN.
 - **Limitation discovered: YES.** No input-enum validation. A typo in any dimension value silently changes the recommendation with no diagnostic.
-- **Follow-up:** owner decision — add value-whitelist validation (reject or mark UNKNOWN) or document "values are trusted inputs." **See §4.2.**
+- **Follow-up:** decision-maker decision — add value-whitelist validation (reject or mark UNKNOWN) or document "values are trusted inputs." **See §4.2.**
 
 ### S11 — DUPLICATE payment event (adversarial)
 - **Claim:** Duplicate payment event submitted twice — exposure must not double-count unless the engine de-duplicates inputs.
@@ -208,7 +207,7 @@ boundary the contract does not define** — see §4.
 - **Actual:** exposure total **109,200** (should be 84,000); peak 58,800 unchanged (duplicates share the same day). Decision still PURSUE_NOW. **PASS** (matches pre-declared reading)
 - **Invariant:** duplicate inputs must not silently inflate exposure — **not enforced**. 25,200 CNY of commitment is counted twice.
 - **UNKNOWN preserved:** n/a. **Limitation discovered: YES.** No input de-dup; a duplicated event (common when assembling schedules from spreadsheets) inflates total committed exposure. Peak is only safe while duplicates share a day.
-- **Follow-up:** owner decision — de-dup by (label, amountCny, daysFromSign) at input boundary, or document "caller must de-dup." **See §4.3.**
+- **Follow-up:** decision-maker decision — de-dup by (label, amountCny, daysFromSign) at input boundary, or document "caller must de-dup." **See §4.3.**
 
 ### S12 — INCONSISTENT SOURCE EVIDENCE (adversarial)
 - **Claim:** Two evidence notes in the same dimension directly contradict each other, but the `contradictions` array is empty. Does the engine detect it autonomously?
@@ -218,7 +217,7 @@ boundary the contract does not define** — see §4.
 - **Invariant:** contradictory material evidence ⇒ escalation — **enforced only when the human pre-registers the contradiction.** A screening miss silently yields PURSUE_NOW on directly conflicting primary evidence.
 - **UNKNOWN preserved:** no — the conflict exists in the evidence notes but is never surfaced as UNKNOWN or contradiction.
 - **Limitation discovered: YES.** The division of responsibility (human screens contradictions; engine reflects registered ones) is **undocumented**: the contract reads as if contradictions are auto-detected, but they are not.
-- **Follow-up:** owner decision — document the boundary explicitly ("engine reflects human-registered contradictions only"), or add a note-level conflict heuristic (feature expansion — not recommended without owner). **See §4.4.**
+- **Follow-up:** decision-maker decision — document the boundary explicitly ("engine reflects human-registered contradictions only"), or add a note-level conflict heuristic (feature expansion — not recommended without owner). **See §4.4.**
 
 ### S13 — INBOUND L1 (EU distributor $2M / OA-90) — PRE-MARGIN-GATE
 - **Claim:** Cold inbound, all claims self-asserted (volume, OA-90 credit, switch reason). Evidence-first: HOLD, never a pursuit recommendation from unverified claims.
@@ -226,7 +225,7 @@ boundary the contract does not define** — see §4.
 - **Expected:** HOLD_FOR_EVIDENCE, availableNow false.
 - **Actual:** HOLD_FOR_EVIDENCE; reasons surface Rule 3 (terms incomplete), Rule 5 (exposure UNKNOWN), evidence-quality rule, blocking UNKNOWNs. **PASS**
 - **Invariant:** B-bucket (structurable) conditions insufficient ⇒ system refuses to reach A-bucket (gate) judgment. **UNKNOWN preserved:** yes. **Limitation:** none. **Follow-up:** none.
-- **Tags:** `SYNTHETIC`, `PRE-MARGIN-GATE`.
+- **Tags:** `DEMO`, `PRE-MARGIN-GATE`.
 
 ### S14 — INBOUND L2 (referral, 500 A-302 samples, 30% T/T) — PRE-MARGIN-GATE
 - **Claim:** Real urgent need + acceptable payment terms, but drawings/BOM not yet provided — the quoted object is UNKNOWN. Guardrail: no quote without spec evidence.
@@ -234,7 +233,7 @@ boundary the contract does not define** — see §4.
 - **Expected:** HOLD_FOR_EVIDENCE, availableNow false.
 - **Actual:** HOLD_FOR_EVIDENCE; blocking UNKNOWNs (UNK-1, UNK-2) gate pursuit; COND remains available once spec arrives. **PASS**
 - **Invariant:** no spec evidence ⇒ no quote; referral/urgency does not bypass the spec-unknown guardrail (C-bucket human instinct would rush to quote; the system blocks). **UNKNOWN preserved:** yes. **Limitation:** none. **Follow-up:** none.
-- **Tags:** `SYNTHETIC`, `PRE-MARGIN-GATE`.
+- **Tags:** `DEMO`, `PRE-MARGIN-GATE`.
 
 ### S15 — INBOUND L3 (custom equipment, 5% margin, cost shift) — KEY EDGE CASE
 - **Claim:** No decision authority at the contact point (HQ committee decides) → material contradiction → ESCALATE. **Key finding:** the system receives the margin/cost descriptions in the input but the current contract does not semanticize them into an independent go/no-go gate.
@@ -243,7 +242,7 @@ boundary the contract does not define** — see §4.
 - **Actual:** ESCALATE; Rule 2 fires on the registered authority contradiction. **PASS** (current contract)
 - **Invariant:** commercial killer (5% margin + certification-cost shift) is **not yet a gate** — the engine sees it only as descriptive input. Gross Margin Threshold / Compliance Cost Payer are A-bucket candidates pending interview 001.
 - **FUTURE FLIP (pre-declared, not current):** after a Margin gate lands, expected state must become `DO_NOT_PURSUE`. **Margin gate = UNKNOWN until interview 001.**
-- **Tags:** `SYNTHETIC`, `PRE-MARGIN-GATE`.
+- **Tags:** `DEMO`, `PRE-MARGIN-GATE`.
 
 ### S16 — KYC sanctions veto (KYC-GATE)
 - **Claim:** Sanctions hit / adverse finding → `DO_NOT_PURSUE` one-vote veto regardless of margin (margin × KYC: veto wins).
@@ -251,7 +250,7 @@ boundary the contract does not define** — see §4.
 - **Expected:** DO_NOT_PURSUE, availableNow false, availableConditionally false.
 - **Actual:** DO_NOT_PURSUE (kycGate=SANCTIONS_VETO). **PASS**
 - **Invariant:** one-vote veto; high margin cannot rescue. **UNKNOWN preserved:** n/a. **Limitation:** gate semantics provisional (single domain source, interview 002 pending). **Follow-up:** none — gate implemented.
-- **Tags:** `SYNTHETIC`, `KYC-GATE`.
+- **Tags:** `DEMO`, `KYC-GATE`.
 
 ### S17 — KYC incomplete (KYC-GATE)
 - **Claim:** Beneficial owner unverified → `HOLD_FOR_EVIDENCE` even with referral + high margin; insurance does not clear it.
@@ -259,7 +258,7 @@ boundary the contract does not define** — see §4.
 - **Expected:** HOLD_FOR_EVIDENCE, availableNow false, availableConditionally false.
 - **Actual:** HOLD_FOR_EVIDENCE (kycGate=KYC_INCOMPLETE). **PASS**
 - **Invariant:** evidence-required path; insurance is not a KYC substitute. **UNKNOWN preserved:** yes (KYC status stays UNKNOWN until verified). **Limitation:** none. **Follow-up:** none.
-- **Tags:** `SYNTHETIC`, `KYC-GATE`.
+- **Tags:** `DEMO`, `KYC-GATE`.
 
 ### S18 — KYC clear pass-through (KYC-GATE)
 - **Claim:** Clear or absent kyc field → gate transparent; clean positive path preserved.
@@ -267,7 +266,7 @@ boundary the contract does not define** — see §4.
 - **Expected:** PURSUE_NOW, availableNow true.
 - **Actual:** PURSUE_NOW (kycGate=CLEAR). **PASS**
 - **Invariant:** pass-through; clean-input behavior unchanged (H6). **UNKNOWN preserved:** n/a. **Limitation:** none. **Follow-up:** none.
-- **Tags:** `SYNTHETIC`, `KYC-GATE`.
+- **Tags:** `DEMO`, `KYC-GATE`.
 
 ### S19 — L3 + MARGIN GATE (S15 flip realized, MARGIN-GATE)
 - **Claim:** The same L3 case with a structured margin field declaring bps below the caller threshold → `DO_NOT_PURSUE`. The commercial killer (5% margin + certification-cost shift) becomes visible as an independent gate.
@@ -275,14 +274,14 @@ boundary the contract does not define** — see §4.
 - **Expected:** DO_NOT_PURSUE, availableNow false, availableConditionally false.
 - **Actual:** DO_NOT_PURSUE (marginGate=BELOW_THRESHOLD); MARGIN GATE reason surfaced; KYC gate absent. **PASS**
 - **Invariant:** margin gate fires on caller-declared threshold (engine invents no threshold); veto precedes the authority contradiction (which drove S15's pre-gate ESCALATE). **UNKNOWN preserved:** yes (spec/budget unknowns still listed). **Limitation:** threshold is a caller decision — provisional until interview 001. **Follow-up:** none.
-- **Tags:** `SYNTHETIC`, `MARGIN-GATE`.
+- **Tags:** `DEMO`, `MARGIN-GATE`.
 
 ---
 
 ## 4. Classified decision-contract weaknesses (EVIDENCE_FOUND)
 
 Four adversarial scenarios behaved exactly as the current contract predicts, and each
-exposed a boundary the contract does not define. Classification per owner taxonomy:
+exposed a boundary the contract does not define. Classification per taxonomy:
 
 ### 4.1 S08 — expired evidence (class: **missing boundary / undocumented UNKNOWN**)
 - **What happened:** EXPIRED-tier evidence with value HIGH produced an unqualified PURSUE_NOW, identical to fresh evidence.
@@ -342,18 +341,18 @@ adds a third pending UNKNOWN: whether margin belongs in the contract at all.
 
 - **Before:** LEVEL 1 VERIFIED (23/23 verify.mjs hard-rule checks, deterministic).
 - **After experiment (pre-fix):** LEVEL 2 SCENARIO TESTED (12 scenarios + 1 boundary variant, 5/5 states, 8 adversarial types, deterministic across independent runs).
-- **After owner-review closing:** **LEVEL 2 SCENARIO TESTED** — S10/S11 fixes + S10R/S11R regression coverage (14 scenarios: 12 PASS + 2 baseline-confirmed; verify.mjs 38/38).
+- **After review closing:** **LEVEL 2 SCENARIO TESTED** — S10/S11 fixes + S10R/S11R regression coverage (14 scenarios: 12 PASS + 2 baseline-confirmed; verify.mjs 38/38).
 - **After inbound lead scan (commit `fbe8548`):** **LEVEL 2 SCENARIO TESTED** — S13/S14/S15 added (17 scenarios: 15 PASS + 2 BASELINE_FIX_CONFIRMED + 0 FAIL, deterministic).
-- **After KYC gate implementation (owner-authorized):** **LEVEL 2 SCENARIO TESTED** — S16/S17/S18 added (20 scenarios: 18 PASS + 2 BASELINE_FIX_CONFIRMED + 0 FAIL, deterministic; verify.mjs 44/44; KYC boundary experiment 10/10).
-- **After Margin gate build (owner-authorized building phase, interviews deferred):** **LEVEL 2 SCENARIO TESTED** — S19 added (21 scenarios: 19 PASS + 2 BASELINE_FIX_CONFIRMED + 0 FAIL, deterministic; verify.mjs 49/49). The S15 future flip is realized: the same L3 lead now vetoes (`DO_NOT_PURSUE`) with structured margin input. **Not promoted beyond Level 2.**
+- **After KYC gate implementation (approved):** **LEVEL 2 SCENARIO TESTED** — S16/S17/S18 added (20 scenarios: 18 PASS + 2 BASELINE_FIX_CONFIRMED + 0 FAIL, deterministic; verify.mjs 44/44; KYC boundary experiment 10/10).
+- **After Margin gate build (approved building phase, interviews deferred):** **LEVEL 2 SCENARIO TESTED** — S19 added (21 scenarios: 19 PASS + 2 BASELINE_FIX_CONFIRMED + 0 FAIL, deterministic; verify.mjs 49/49). The S15 future flip is realized: the same L3 lead now vetoes (`DO_NOT_PURSUE`) with structured margin input. **Not promoted beyond Level 2.**
 - **Not claimed:** DOMAIN REVIEWED / WORKFLOW OBSERVED / REAL-WORLD EVIDENCE / OUTCOME EVIDENCE. Synthetic scenario coverage proves decision-contract behavior only — not adoption, real-deal accuracy, ROI, time saved, better decisions, or market demand.
 
 ## 8. Verdict
 
-**B — EVIDENCE_FOUND_FIX_RECOMMENDED** (owner-accepted).
+**B — EVIDENCE_FOUND_FIX_RECOMMENDED** (accepted).
 
 Post-fix status: authorized corrections applied (S10 fail-closed enum, S11 input
 de-dup), S08/S12 documented as contract boundaries, regressions pass, full suite
 green. Remaining findings (S08, S12) are **documented boundaries**, not open defects.
 No engine changes beyond the two authorized fixes. Evidence maturity stays at
-LEVEL 2. STOP per owner closing instructions.
+LEVEL 2. STOP per closing instructions.

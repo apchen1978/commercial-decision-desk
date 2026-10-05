@@ -1,4 +1,4 @@
-// run-scenarios.mjs — CDD EVIDENCE-DEPTH STRESS TEST (OWNER-AUTHORIZED EXPERIMENT)
+// run-scenarios.mjs — CDD EVIDENCE-DEPTH STRESS TEST (APPROVED EXPERIMENT)
 // -----------------------------------------------------------------------------
 // PURPOSE: evidence-discovery, NOT test beautification. Expected behavior is
 // defined BEFORE execution. Every mismatch is preserved and classified.
@@ -221,9 +221,9 @@ const SCENARIOS = [
   },
 
   // =========================================================================
-  // S13–S15 — INBOUND LEAD SCAN (owner task 2026-08-23)
+  // S13–S15 — INBOUND LEAD SCAN (task 2026-08-23)
   // Source: cdd-lead-scan.mjs — three real-shaped inbound-lead emails transcribed
-  // as anonymized synthetic fixtures. Tags: SYNTHETIC + PRE-MARGIN-GATE.
+  // as anonymized synthetic fixtures. Tags: DEMO + PRE-MARGIN-GATE.
   // Purpose: L3 (S15) is the key edge case — the system RECEIVES the margin/cost
   // descriptions but the current contract does not semanticize them into an
   // independent go/no-go gate; it fires on the registered authority contradiction
@@ -253,7 +253,7 @@ const SCENARIOS = [
       return c;
     },
     expected: { recommended: "HOLD_FOR_EVIDENCE", availableNow: false, invariant: "unverified volume + OA-90 credit + unknown switch reason -> HOLD, not pursuit" },
-    tags: ["SYNTHETIC", "PRE-MARGIN-GATE"],
+    tags: ["DEMO", "PRE-MARGIN-GATE"],
   },
   {
     id: "S14",
@@ -277,7 +277,7 @@ const SCENARIOS = [
       return c;
     },
     expected: { recommended: "HOLD_FOR_EVIDENCE", availableNow: false, invariant: "no spec evidence -> no quote; referral/urgency does not bypass the spec-unknown guardrail" },
-    tags: ["SYNTHETIC", "PRE-MARGIN-GATE"],
+    tags: ["DEMO", "PRE-MARGIN-GATE"],
   },
   {
     id: "S15",
@@ -303,8 +303,8 @@ const SCENARIOS = [
       return c;
     },
     expected: { recommended: "ESCALATE", availableNow: false, invariant: "authority contradiction -> ESCALATE under current contract; margin/cost information is received but not semanticized into an independent, explainable go/no-go gate (PRE-MARGIN-GATE)" },
-    tags: ["SYNTHETIC", "PRE-MARGIN-GATE"],
-    futureFlipNote: "REALIZED: after the Margin gate landed (owner-authorized building phase), S19 proves the same L3 case flips ESCALATE -> DO_NOT_PURSUE when the structured margin field declares bps below threshold. This flip is the measured evidence of decision evolution.",
+    tags: ["DEMO", "PRE-MARGIN-GATE"],
+    futureFlipNote: "REALIZED: after the Margin gate landed (approved building phase), S19 proves the same L3 case flips ESCALATE -> DO_NOT_PURSUE when the structured margin field declares bps below threshold. This flip is the measured evidence of decision evolution.",
   },
   {
     id: "S19",
@@ -331,11 +331,11 @@ const SCENARIOS = [
       return c;
     },
     expected: { recommended: "DO_NOT_PURSUE", availableNow: false, availableConditionally: false, invariant: "margin gate: bps below declared threshold -> commercial-viability veto (S15 flip realized); cost-shift is additional signal" },
-    tags: ["SYNTHETIC", "MARGIN-GATE"],
+    tags: ["DEMO", "MARGIN-GATE"],
   },
 
   // =========================================================================
-  // S16–S18 — KYC GATE regression (owner-authorized implementation, 2026-08-23;
+  // S16–S18 — KYC GATE regression (approved implementation, 2026-08-23;
   // verified by kyc-boundary-experiment.mjs). Production engine now reads the
   // structured kyc field: sanctions/adverse -> DO_NOT_PURSUE one-vote veto;
   // KYC incomplete -> HOLD_FOR_EVIDENCE; clear/absent -> pass-through.
@@ -350,7 +350,7 @@ const SCENARIOS = [
       return c;
     },
     expected: { recommended: "DO_NOT_PURSUE", availableNow: false, availableConditionally: false, invariant: "one-vote veto; margin x KYC interaction -> veto wins" },
-    tags: ["SYNTHETIC", "KYC-GATE"],
+    tags: ["DEMO", "KYC-GATE"],
   },
   {
     id: "S17",
@@ -362,7 +362,7 @@ const SCENARIOS = [
       return c;
     },
     expected: { recommended: "HOLD_FOR_EVIDENCE", availableNow: false, availableConditionally: false, invariant: "evidence-required path; insurance is not a KYC substitute" },
-    tags: ["SYNTHETIC", "KYC-GATE"],
+    tags: ["DEMO", "KYC-GATE"],
   },
   {
     id: "S18",
@@ -373,7 +373,7 @@ const SCENARIOS = [
       return c;
     },
     expected: { recommended: "PURSUE_NOW", availableNow: true, invariant: "gate pass-through; clean-input behavior unchanged" },
-    tags: ["SYNTHETIC", "KYC-GATE"],
+    tags: ["DEMO", "KYC-GATE"],
   },
 ];
 

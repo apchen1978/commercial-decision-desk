@@ -9,7 +9,7 @@
 // passes in.
 //
 // It never gates the engine. The exposure is visible and can register a
-// non-blocking UNKNOWN; whether a given move is tolerable is the owner's call.
+// non-blocking UNKNOWN; whether a given move is tolerable is the decision-maker's call.
 
 import { buildEconomicsBridge } from "./economics-bridge.js";
 
@@ -57,7 +57,7 @@ export function assessFx(opp, { today = null, maxRateAgeDays = DEFAULT_MAX_RATE_
   const exposed = (directCost * share) / 100;
   const hedgeKnown = hedgedPct !== null && hedge !== "UNKNOWN";
   const unhedged = hedgeKnown ? exposed * (1 - hedgedPct / 100) : exposed;
-  const headroom = bridge.gap; // net contribution minus the owner's reference minimum; null unless both are known
+  const headroom = bridge.gap; // net contribution minus the decision-maker's reference minimum; null unless both are known
   const moves = FX_MOVES_PCT.map((p) => {
     const impact = (unhedged * p) / 100;
     return { pct: p, impact, headroomUsedPct: headroom !== null && headroom > 0 ? (impact / headroom) * 100 : null };
@@ -100,15 +100,15 @@ export function assessFx(opp, { today = null, maxRateAgeDays = DEFAULT_MAX_RATE_
   };
 }
 
-// Non-blocking: currency risk is a margin risk the owner should see, not a veto.
+// Non-blocking: currency risk is a margin risk the decision-maker should see, not a veto.
 export function fxUnknown(opp, options) {
   const a = assessFx(opp, options);
   if (!a.needsAttention) return null;
   return {
     id: FX_UNKNOWN_ID,
     label: "Currency exposure on cost",
-    detail: `${Math.round(a.unhedged).toLocaleString("en-US")} ${a.quote ?? ""} of cost is paid in ${a.costCurrency ?? "another currency"} with no confirmed hedge. ${a.breakEvenMovePct === null ? "" : `A ${a.breakEvenMovePct.toFixed(1)}% move would use up the headroom above the owner's minimum.`}`.trim(),
+    detail: `${Math.round(a.unhedged).toLocaleString("en-US")} ${a.quote ?? ""} of cost is paid in ${a.costCurrency ?? "another currency"} with no confirmed hedge. ${a.breakEvenMovePct === null ? "" : `A ${a.breakEvenMovePct.toFixed(1)}% move would use up the headroom above the decision-maker's minimum.`}`.trim(),
     blocksPursue: false,
-    resolveWith: "A dated rate with its source, the share of cost in that currency, and a hedge (forward or natural) or the owner's acceptance of the open position",
+    resolveWith: "A dated rate with its source, the share of cost in that currency, and a hedge (forward or natural) or the decision-maker's acceptance of the open position",
   };
 }

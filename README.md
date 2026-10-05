@@ -71,7 +71,7 @@ Tests: `node margin-calculator.test.mjs` · `node workbench-ledger.test.mjs` ·
 ## Synthetic scenario (OPP-2026-008)
 
 A Gulf-region hospitality procurement desk invites international suppliers to
-quote window treatments (curtains + hardware) for a multi-property rollout.
+quote interior products for a multi-property rollout.
 Strong Buyer Fit and Category Fit; a **material payment-terms contradiction**
 (90-day vs 30% advance) is unresolved; indicative volumes are
 VERIFICATION_REQUIRED; installation/customs liability is outside the standard

@@ -73,15 +73,15 @@ export function assessPaymentSecurity(opp) {
 }
 
 // The UNKNOWN the engine reads. It blocks PURSUE_NOW until the receivable is
-// covered, the exposure disappears, or the owner explicitly accepts the risk.
+// covered, the exposure disappears, or the decision-maker explicitly accepts the risk.
 export function paymentSecurityUnknown(opp) {
   const a = assessPaymentSecurity(opp);
   if (!a.needsAttention || !opp.paymentSecurity) return null;
   return {
     id: SECURITY_UNKNOWN_ID,
     label: "Payment security for the open receivable",
-    detail: `An open receivable of up to ${a.exposure === null ? "an unknown amount" : `${a.currency ?? ""} ${Math.round(a.exposure).toLocaleString("en-US")}`.trim()} is not yet covered by a letter of credit, credit insurance, an advance, or the owner's acceptance of the residual risk.`,
+    detail: `An open receivable of up to ${a.exposure === null ? "an unknown amount" : `${a.currency ?? ""} ${Math.round(a.exposure).toLocaleString("en-US")}`.trim()} is not yet covered by a letter of credit, credit insurance, an advance, or the decision-maker's acceptance of the residual risk.`,
     blocksPursue: true,
-    resolveWith: "Confirmed L/C or credit-insurance limit in place for this buyer, an advance that covers the exposure, or the owner's written acceptance of the residual risk",
+    resolveWith: "Confirmed L/C or credit-insurance limit in place for this buyer, an advance that covers the exposure, or the decision-maker's written acceptance of the residual risk",
   };
 }

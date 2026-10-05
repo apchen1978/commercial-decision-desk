@@ -54,7 +54,7 @@ export const DECISION_PATH_PROPOSITIONS = [
   }),
   proposition("CP-3R", {
     proposition: "Common quote comparison basis formally confirmed.",
-    sourceRequirement: "Buyer-provided comparison basis or owner-confirmed scope normalization covering the submitted quotes.",
+    sourceRequirement: "Buyer-provided comparison basis or decision-maker-confirmed scope normalization covering the submitted quotes.",
     fieldsAffected: ["quoteBasesComparable", "quoteComparabilityAssessed"],
     unknownsResolved: [],
     unknownsPreserved: ["UNK-1", "UNK-2", "UNK-3"],
@@ -162,7 +162,7 @@ export function createDecisionPathExperiment(opportunity) {
       comparison: compareResults(current, hypothetical),
       stillBlocks: stillBlocks(hypothetical),
       actualUnchanged,
-      humanBoundary: "The owner decides whether to obtain the evidence, act on it, or stop. The hypothetical result is not an approval or rejection.",
+      humanBoundary: "The decision-maker decides whether to obtain the evidence, act on it, or stop. The hypothetical result is not an approval or rejection.",
     };
   });
   return { opportunity: actualBefore, current, paths, actualEvidenceUnchanged: sameJson(actualBefore, opportunity) };

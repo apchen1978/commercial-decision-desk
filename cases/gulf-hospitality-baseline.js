@@ -4,18 +4,14 @@ export const GULF_BASELINE = {
   "id": "gulf-hospitality-baseline",
   "version": "2026-10-05.1",
   "schemaVersion": 1,
-  "status": "SYNTHETIC_OWNER_APPROVED_INPUTS_AND_RESULTS",
+  "status": "DEMO_APPROVED_INPUTS_AND_RESULTS",
   "approvedInputDate": "2026-10-05",
   "currency": "USD",
   "unit": {
-    "id": "metre-of-finished-window-width",
-    "zh": "一米成品窗寬",
-    "en": "one metre of finished window width",
-    "includedProducts": [
-      "blackout drapery",
-      "sheer curtains",
-      "decorative valances"
-    ],
+    "id": "metre-of-finished-width",
+    "zh": "一米成品寬度",
+    "en": "one metre of finished width",
+    "includedProducts": ["hospitality interior products"],
     "excludedScope": [
       "on-site installation"
     ]
@@ -24,7 +20,7 @@ export const GULF_BASELINE = {
   "quantityStatus": "PLANNING_NOT_COMMITTED",
   "pricePerUnitUsd": 12,
   "incoterm": "CIF",
-  "namedPlace": "Khalifa Port, Abu Dhabi (synthetic)",
+  "namedPlace": "Khalifa Port, Abu Dhabi (demo)",
   "costsPerUnitUsd": {
     "goods": 6.6,
     "tradeLogistics": 1.05,
@@ -32,7 +28,7 @@ export const GULF_BASELINE = {
     "contingency": 0.45
   },
   "minimumNetContributionUsd": 28800,
-  "minimumBasis": "Owner-set fixed minimum: 20% of the undiscounted planning revenue. Do not lower it automatically when testing concessions.",
+  "minimumBasis": "Fixed minimum set by the decision-maker: 20% of the undiscounted planning revenue. Do not lower it automatically when testing concessions.",
   "funding": {
     "dutyRate": 0.05,
     "dutyBearer": "BUYER",
@@ -116,10 +112,10 @@ export const GULF_BASELINE = {
   "supplierPaymentFx": {
     "costCurrency": "CNY",
     "cnyPerUsd": 7.5,
-    "status": "EXISTING_SYNTHETIC_PLANNING_ASSUMPTION_NOT_MARKET_RATE"
+    "status": "EXISTING_DEMO_PLANNING_ASSUMPTION_NOT_MARKET_RATE"
   },
   "provenance": {
-    "numericalInputs": "Paul Owner decision, 2026-10-05. Synthetic teaching inputs, not supplier quotes or market prices.",
+    "numericalInputs": "Demo teaching inputs set on 2026-10-05; not supplier quotes or market prices.",
     "cddSourceRevision": "bc15767317744aa2256cfa08a850cd9589a3a389",
     "tpnSourceRevision": "c64391cae7e8ebe42da6d108569602c9eba3d59d",
     "fundingAssumptions": "Copied unchanged from CASE_GULF_001.landed, excluding its superseded cost and minimum fields.",

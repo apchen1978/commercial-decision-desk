@@ -1,4 +1,4 @@
-// Calculation-only Owner gate. Does not write files, update golden data, or publish.
+// Calculation-only gate. Does not write files, update golden data, or publish.
 // node scripts/check-gulf-baseline.mjs <TPN checkout>
 // Add --check-runtime AFTER the approved baseline has been synced to both cases.
 import assert from "node:assert/strict";
@@ -30,15 +30,15 @@ const money = (value) => Math.round(value * 100) / 100;
 
 equal([baseline.id, baseline.schemaVersion, baseline.version], ["gulf-hospitality-baseline", 1, "2026-10-05.1"], "approved case identity and version");
 equal(baseline.currency, "USD", "quote currency");
-equal(baseline.unit.id, "metre-of-finished-window-width", "finished window width, not fabric length");
-equal(baseline.unit.includedProducts, ["blackout drapery", "sheer curtains", "decorative valances"], "three-piece scope");
+equal(baseline.unit.id, "metre-of-finished-width", "finished width, not fabric length");
+equal(baseline.unit.includedProducts, ["hospitality interior products"], "product scope");
 equal(baseline.unit.excludedScope, ["on-site installation"], "installation remains excluded");
 equal([baseline.quantity, baseline.pricePerUnitUsd, baseline.incoterm], [12000, 12, "CIF"], "approved quantity, price and basis");
 equal(baseline.costsPerUnitUsd, { goods: 6.6, tradeLogistics: 1.05, dealSpecific: 0.9, contingency: 0.45 }, "approved unit costs");
 equal(baseline.minimumNetContributionUsd, 28800, "fixed owner minimum, not a moving percentage during sensitivity");
 check(Object.values(baseline.costsPerUnitUsd).every((v) => typeof v === "number" && Number.isFinite(v) && v >= 0), "blank costs cannot become zero or an old default");
 equal([DEFAULT_PACK.id, DEFAULT_PACK.version], [baseline.provenance.sensitivityPackId, baseline.provenance.sensitivityPackVersion], "unchanged sensitivity pack identity");
-equal(baseline.supplierPaymentFx.cnyPerUsd, PLANNING_FX_CNY_PER_USD, "unchanged synthetic CDD FX");
+equal(baseline.supplierPaymentFx.cnyPerUsd, PLANNING_FX_CNY_PER_USD, "unchanged demo CDD FX");
 
 const fundingKeys = ["dutyRate", "dutyBearer", "costOfCapital", "fxShare", "timeline", "terms", "activeTerms"];
 for (const key of fundingKeys) equal(baseline.funding[key], CASE_GULF_001.landed[key], `existing TPN funding assumption unchanged: ${key}`);
@@ -60,8 +60,8 @@ const draftCdd = structuredClone(opportunity);
 draftCdd.caseBaseline = reference;
 draftCdd.economics = economics;
 draftCdd.paymentEvents = [
-  { id: "PE-1", label: "Synthetic supplier deposit", amountCny: Math.round(economics.directCost * baseline.funding.timeline.depositShare * baseline.supplierPaymentFx.cnyPerUsd), daysFromSign: baseline.funding.timeline.depositDay, status: "COMPLETE" },
-  { id: "PE-2", label: "Synthetic supplier balance", amountCny: Math.round(economics.directCost * (1 - baseline.funding.timeline.depositShare) * baseline.supplierPaymentFx.cnyPerUsd), daysFromSign: baseline.funding.timeline.balanceDay, status: "COMPLETE" },
+  { id: "PE-1", label: "Demo supplier deposit", amountCny: Math.round(economics.directCost * baseline.funding.timeline.depositShare * baseline.supplierPaymentFx.cnyPerUsd), daysFromSign: baseline.funding.timeline.depositDay, status: "COMPLETE" },
+  { id: "PE-2", label: "Demo supplier balance", amountCny: Math.round(economics.directCost * (1 - baseline.funding.timeline.depositShare) * baseline.supplierPaymentFx.cnyPerUsd), daysFromSign: baseline.funding.timeline.balanceDay, status: "COMPLETE" },
 ];
 const draftTpn = {
   ...structuredClone(CASE_GULF_001),

@@ -51,7 +51,7 @@ export function ledgerFilename(brief, extension = "json") {
   const oppId = String(brief?.opportunityId || "opp").replace(/[^\p{L}\p{N}_-]+/gu, "").slice(0, 20) || "opp";
   const date = String(brief?.generatedAt || "").slice(0, 10) || "undated";
   const time = String(brief?.generatedAt || "").slice(11, 19).replace(/:/g, "") || "000000";
-  return `CDD-Decision-Ledger-${date}-${time}-${oppId}-${rawName}.${extension}`;
+  return `Decision-Ledger-${date}-${time}-${oppId}-${rawName}.${extension}`;
 }
 
 // --- download hook (mirrors downloadDealBrief) -------------------------------

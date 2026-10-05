@@ -208,6 +208,11 @@ function renderEconomicsBridge(bridge, currency) {
     : tx("economics.complete");
 }
 
+// The demo product name is fixture data in English; only its Chinese display is localized here.
+function localizeProduct(value) {
+  return language === "zh-TW" && value === "Hospitality interior products (demo)" ? "飯店室內產品（示範）" : value;
+}
+
 function contextDisplay(value) {
   return value === "" || value === undefined || value === null || value === "unknown" ? tx("context.unknown") : value;
 }
@@ -266,7 +271,7 @@ function renderExecutiveSnapshot({ economics, tradeView, control, momentum, cove
   const fields = [
     ["snapshot.buyer", buyer],
     ["snapshot.market", context.market || tx("context.unknown")],
-    ["snapshot.product", context.product || tx("context.unknown")],
+    ["snapshot.product", localizeProduct(context.product) || tx("context.unknown")],
     ["snapshot.quantity", contextQuantityDisplay(context.quantity, context.quantityUnit)],
     ["snapshot.dealValue", revenue],
     ["snapshot.delivery", delivery],
@@ -490,7 +495,7 @@ function renderCommercialContext(context = {}) {
   if (mode !== "blank") return;
   $("blank-commercial-context").innerHTML = [
     '<div class="context-grid">',
-    '<div><span>' + tx("context.product") + '</span><strong>' + contextDisplay(context.product) + '</strong></div>',
+    '<div><span>' + tx("context.product") + '</span><strong>' + contextDisplay(localizeProduct(context.product)) + '</strong></div>',
     '<div><span>' + tx("context.buyerCompany") + '</span><strong>' + contextDisplay(context.buyerCompany) + '</strong></div>',
     '<div><span>' + tx("context.market") + '</span><strong>' + contextDisplay(context.market) + '</strong></div>',
     '<div><span>' + tx("context.quantity") + '</span><strong>' + contextQuantityDisplay(context.quantity, context.quantityUnit) + '</strong></div>',

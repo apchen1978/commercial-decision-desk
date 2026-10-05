@@ -15,7 +15,7 @@ const cases = [
   ["explicit rejection", "REJECTION_EVIDENCE: buyer rejection notice dated 2026-08-25", "buyer rejection evidenced"],
   ["corrective action pending", "CORRECTIVE_ACTION_PENDING: replacement batch due 2026-09-01", "corrective action / replacement pending"],
   ["remedy evidence pending", "REMEDY_EVIDENCE_PENDING: written remedy agreement not yet received", "remedy evidence pending"],
-  ["remedy deadline", "REMEDY_DEADLINE: 2026-09-15 written deadline", "remedy deadline requires Owner attention"],
+  ["remedy deadline", "REMEDY_DEADLINE: 2026-09-15 written deadline", "remedy deadline requires the decision-maker's attention"],
   ["explicit termination", "TERMINATION_EVIDENCE: signed cancellation received", "explicit termination evidence"],
 ];
 

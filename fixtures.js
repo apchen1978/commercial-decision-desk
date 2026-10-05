@@ -22,12 +22,12 @@ const baseOpportunity = {
   id: "OPP-2026-008",
   caseBaseline: { id: baseline.id, version: baseline.version },
   synthetic: true,
-  name: "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
+  name: "Gulf Coast Hospitality — Interior Products Supply Inquiry",
   summary:
-    "DEMO / HYPOTHETICAL: a Gulf-region hospitality procurement desk invites international suppliers to quote on a multi-property hotel window-treatment rollout. The current commercial case is attractive, but the released volume and binding payment terms remain unresolved.",
+    "DEMO / HYPOTHETICAL: a Gulf-region hospitality procurement desk invites international suppliers to quote on a multi-property hotel interior-products rollout. The current commercial case is attractive, but the released volume and binding payment terms remain unresolved.",
   source: "Demo procurement notice + referral call note (both fabricated)",
   commercialContext: {
-    product: "Blackout drapery, sheer curtains and decorative valances (demo)",
+    product: "Hospitality interior products (demo)",
     buyerCompany: "Gulf Coast Hospitality Procurement (demo)",
     market: "UAE — Abu Dhabi hospitality projects (demo sample)",
     quantity: "12000",
@@ -45,17 +45,17 @@ const baseOpportunity = {
   // Decision Core, Momentum, Coverage, or a manual assessment.
   sampleGuide: {
     zh: {
-      quantityPricing: "12,000 metres 為 RFP 規劃基準（本案例的「公尺」指一公尺成品窗寬，即遮光簾、紗簾與窗簾頭的成品，不含現場安裝）；目標單價 USD 12／metre（CIF），買方要求 5% 折讓。此數量尚非已承諾採購量。",
+      quantityPricing: "12,000 metres 為 RFP 規劃基準（本案例的「公尺」指一公尺成品寬度，為成品供貨，不含現場安裝）；目標單價 USD 12／metre（CIF），買方要求 5% 折讓。此數量尚非已承諾採購量。",
       payment: "RFP 提到交付後 90 天付款；轉介紀錄僅提到 30% 預付款。其餘 70% 的觸發條件與日期仍為 UNKNOWN。",
-      specification: "遮光布、紗簾與裝飾簾頭；樣品／mockup 僅作規劃基準。飯店防焰與認證仍需以正式核准文件確認。",
+      specification: "飯店室內產品；樣品／mockup 僅作規劃基準。飯店防焰與認證仍需以正式核准文件確認。",
       authority: "Daniel Al-Mansoori 為示範採購聯絡人；採購與技術路徑已知，但最終商務核准人仍為 UNKNOWN。",
       delivery: "示範基準報價為 CIF Khalifa Port；現場安裝、進口清關、關稅、保固與場地責任未被納入供貨範圍。",
       economics: "已填入收入、產品成本、貿易／物流、專案成本與風險準備金；資金成本前預期淨貢獻 USD 36,000，仍不是接受訂單的授權。每公尺 USD 6.60 的商品成本為示範假設，不代表任何供應商報價。",
     },
     en: {
-      quantityPricing: "12,000 metres is the RFP planning basis (in this case, 'metre' means one metre of finished window width: blackout drapery, sheers and valances as finished goods, excluding on-site installation); target price is USD 12/metre (CIF) with a requested 5% discount. It is not a committed purchase quantity.",
+      quantityPricing: "12,000 metres is the RFP planning basis (in this case, 'metre' means one metre of finished width, supplied as finished goods and excluding on-site installation); target price is USD 12/metre (CIF) with a requested 5% discount. It is not a committed purchase quantity.",
       payment: "The RFP says payment 90 days after delivery; a referral note only mentions 30% advance. The trigger and date for the remaining 70% are still UNKNOWN.",
-      specification: "Blackout drapery, sheers and valances; the sample/mockup is planning-level only. Hospitality fire-rating and certification still need formal approval evidence.",
+      specification: "Hospitality interior products; the sample/mockup is planning-level only. Hospitality fire-rating and certification still need formal approval evidence.",
       authority: "Daniel Al-Mansoori is the demo procurement contact. Purchasing and technical paths are known; final commercial authority remains UNKNOWN.",
       delivery: "The demo baseline quote is CIF Khalifa Port. Site installation, import clearance, duty, warranty and site liability are outside the supply scope until confirmed.",
       economics: "Revenue, product cost, trade/logistics, deal-specific cost and contingency are recorded; expected net contribution before funding is USD 36,000, not authority to accept the deal. The USD 6.60 per metre goods cost is a demo assumption, not a supplier quote.",
@@ -85,13 +85,13 @@ const baseOpportunity = {
     categoryFit: {
       value: "HIGH",
       evidence: [
-        { tier: "PRIMARY", note: "Product spec (blackout drapery + sheers + valances) matches the core soft-furnishing category (demo spec doc)." },
+        { tier: "PRIMARY", note: "Product spec matches the core product category (demo spec doc)." },
       ],
     },
     evidenceQuality: {
       value: "MEDIUM",
       evidence: [
-        { tier: "PRIMARY", note: "Demo product specification reviewed: blackout, sheer and valance scope; sample/mockup approval recorded for the planning basis." },
+        { tier: "PRIMARY", note: "Demo product specification reviewed: agreed product scope; sample/mockup approval recorded for the planning basis." },
         { tier: "SUPPORTING", note: "Demo specification pack records drawing references, hospitality fire-rating requirements and certification review as part of the buyer's approval path; final acceptance evidence is not yet a released order condition." },
         { tier: "SUPPORTING", note: "Procurement notice + referral note (demo)." },
         { tier: "VERIFICATION_REQUIRED", note: "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (demo)." },
@@ -134,14 +134,14 @@ const baseOpportunity = {
   ],
   why: [
     "Strong Buyer Fit: the demo procurement desk has a defined category, indicative volume baseline and meeting path through Daniel Al-Mansoori (demo contact).",
-    "Strong Category Fit: blackout drapery, sheers and valances match the core window-treatment category.",
+    "Strong Category Fit: the product scope matches the core category.",
     "Clear import openness: the demo RFP explicitly invites international suppliers for delivery to Abu Dhabi.",
     "The USD 36,000 expected net contribution is above the demo minimum reference of USD 28,800, before unresolved terms, scope and authority are accepted.",
   ],
   commercialTerms: {
     status: "INCOMPLETE",
     detail:
-      "DEMO / HYPOTHETICAL planning basis: 12,000 metres (one metre = one metre of finished window width, excluding on-site installation) at a target USD 12/metre (CIF) = USD 144,000 expected revenue; CIF Khalifa Port; 60-day quote validity; MOQ baseline 12,000 metres; sample/mockup-approved planning scope. The buyer's RFP states 90 days after delivery while a referral note suggests 30% advance; the trigger and treatment of the remaining 70% balance are UNKNOWN, so binding payment terms are INCOMPLETE. A requested 5% discount and two competing supplier offers require scope-normalized comparison. The demo contact is a procurement path, not verified final authority.",
+      "DEMO / HYPOTHETICAL planning basis: 12,000 metres (one metre = one metre of finished width, excluding on-site installation) at a target USD 12/metre (CIF) = USD 144,000 expected revenue; CIF Khalifa Port; 60-day quote validity; MOQ baseline 12,000 metres; sample/mockup-approved planning scope. The buyer's RFP states 90 days after delivery while a referral note suggests 30% advance; the trigger and treatment of the remaining 70% balance are UNKNOWN, so binding payment terms are INCOMPLETE. A requested 5% discount and two competing supplier offers require scope-normalized comparison. The demo contact is a procurement path, not verified final authority.",
     resolveWith: "Binding commercial terms in writing (payment schedule, CIF named place and excluded installation/import scope)",
     paymentEvidence: [
       { id: "PEV-1", label: "Buyer RFP: 90 days after delivery", state: "PROPOSED", source: "Demo buyer RFP", fragment: "Payment at 90 days after delivery", asOf: "2026-06-18 (demo)", humanStatus: "PENDING_REVIEW" },

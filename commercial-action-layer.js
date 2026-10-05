@@ -80,7 +80,7 @@ export function derivePriorityActions(opportunity, engine, decisionPathExperimen
       2,
       "BLOCKING_UNKNOWN",
       unknowns.map((item) => trace("unknown", item.id, item.label)),
-      "Rerun after the blocking UNKNOWN evidence is confirmed or explicitly accepted by the owner.",
+      "Rerun after the blocking UNKNOWN evidence is confirmed or explicitly accepted by the decision-maker.",
     ));
   }
   if (engine.kycGate === "KYC_INCOMPLETE") {
@@ -117,7 +117,7 @@ export function derivePriorityActions(opportunity, engine, decisionPathExperimen
       3,
       "DECISION_PATH",
       [trace("decision_path", changed.join(","), "Decision Path identifies evidence changes that can alter the recommendation")],
-      "Rerun after the owner obtains the selected Decision Path evidence proposition.",
+      "Rerun after the decision-maker obtains the selected Decision Path evidence proposition.",
     ));
   }
 

@@ -4,7 +4,7 @@
 // any value as real commercial data.
 
 export const SYNTHETIC_LABEL =
-  "SYNTHETIC FIXTURE — every record is fabricated for demonstration. No real prospect, company, or financial figure.";
+  "DEMO FIXTURE — every record is fabricated for demonstration. No real prospect, company, or financial figure.";
 
 // Synthetic planning basis for supplier payments. The 30% deposit / 70% balance
 // applies to PRODUCT COST (economics.directCost), never to the sale price: a
@@ -24,18 +24,18 @@ const baseOpportunity = {
   synthetic: true,
   name: "Gulf Coast Hospitality — Window-Treatment Supply Inquiry",
   summary:
-    "SYNTHETIC / HYPOTHETICAL: a Gulf-region hospitality procurement desk invites international suppliers to quote on a multi-property hotel window-treatment rollout. The current commercial case is attractive, but the released volume and binding payment terms remain unresolved.",
-  source: "Synthetic procurement notice + referral call note (both fabricated)",
+    "DEMO / HYPOTHETICAL: a Gulf-region hospitality procurement desk invites international suppliers to quote on a multi-property hotel window-treatment rollout. The current commercial case is attractive, but the released volume and binding payment terms remain unresolved.",
+  source: "Demo procurement notice + referral call note (both fabricated)",
   commercialContext: {
-    product: "Blackout drapery, sheer curtains and decorative valances (synthetic)",
-    buyerCompany: "Gulf Coast Hospitality Procurement (synthetic)",
-    market: "UAE — Abu Dhabi hospitality projects (synthetic sample)",
+    product: "Blackout drapery, sheer curtains and decorative valances (demo)",
+    buyerCompany: "Gulf Coast Hospitality Procurement (demo)",
+    market: "UAE — Abu Dhabi hospitality projects (demo sample)",
     quantity: "12000",
     quantityUnit: "metres",
-    timing: "First shipment target: 15 Sep 2026; installation window: Oct–Nov 2026 (synthetic)",
+    timing: "First shipment target: 15 Sep 2026; installation window: Oct–Nov 2026 (demo)",
     relationship: "new",
-    source: "Synthetic RFP + synthetic referral call note",
-    contactRole: "Daniel Al-Mansoori — Regional Procurement Manager (synthetic contact)",
+    source: "Demo RFP + demo referral call note",
+    contactRole: "Daniel Al-Mansoori — Regional Procurement Manager (demo contact)",
     purchasingAuthority: "yes",
     technicalAuthority: "yes",
     finalApprover: "unknown",
@@ -48,17 +48,17 @@ const baseOpportunity = {
       quantityPricing: "12,000 metres 為 RFP 規劃基準（本案例的「公尺」指一公尺成品窗寬，即遮光簾、紗簾與窗簾頭的成品，不含現場安裝）；目標單價 USD 12／metre（CIF），買方要求 5% 折讓。此數量尚非已承諾採購量。",
       payment: "RFP 提到交付後 90 天付款；轉介紀錄僅提到 30% 預付款。其餘 70% 的觸發條件與日期仍為 UNKNOWN。",
       specification: "遮光布、紗簾與裝飾簾頭；樣品／mockup 僅作規劃基準。飯店防焰與認證仍需以正式核准文件確認。",
-      authority: "Daniel Al-Mansoori 為合成採購聯絡人；採購與技術路徑已知，但最終商務核准人仍為 UNKNOWN。",
-      delivery: "合成基準報價為 CIF Khalifa Port；現場安裝、進口清關、關稅、保固與場地責任未被納入供貨範圍。",
-      economics: "已填入收入、產品成本、貿易／物流、專案成本與風險準備金；資金成本前預期淨貢獻 USD 36,000，仍不是接受訂單的授權。每公尺 USD 6.60 的商品成本為合成假設，不代表任何供應商報價。",
+      authority: "Daniel Al-Mansoori 為示範採購聯絡人；採購與技術路徑已知，但最終商務核准人仍為 UNKNOWN。",
+      delivery: "示範基準報價為 CIF Khalifa Port；現場安裝、進口清關、關稅、保固與場地責任未被納入供貨範圍。",
+      economics: "已填入收入、產品成本、貿易／物流、專案成本與風險準備金；資金成本前預期淨貢獻 USD 36,000，仍不是接受訂單的授權。每公尺 USD 6.60 的商品成本為示範假設，不代表任何供應商報價。",
     },
     en: {
       quantityPricing: "12,000 metres is the RFP planning basis (in this case, 'metre' means one metre of finished window width: blackout drapery, sheers and valances as finished goods, excluding on-site installation); target price is USD 12/metre (CIF) with a requested 5% discount. It is not a committed purchase quantity.",
       payment: "The RFP says payment 90 days after delivery; a referral note only mentions 30% advance. The trigger and date for the remaining 70% are still UNKNOWN.",
       specification: "Blackout drapery, sheers and valances; the sample/mockup is planning-level only. Hospitality fire-rating and certification still need formal approval evidence.",
-      authority: "Daniel Al-Mansoori is the synthetic procurement contact. Purchasing and technical paths are known; final commercial authority remains UNKNOWN.",
-      delivery: "The synthetic baseline quote is CIF Khalifa Port. Site installation, import clearance, duty, warranty and site liability are outside the supply scope until confirmed.",
-      economics: "Revenue, product cost, trade/logistics, deal-specific cost and contingency are recorded; expected net contribution before funding is USD 36,000, not authority to accept the deal. The USD 6.60 per metre goods cost is a synthetic assumption, not a supplier quote.",
+      authority: "Daniel Al-Mansoori is the demo procurement contact. Purchasing and technical paths are known; final commercial authority remains UNKNOWN.",
+      delivery: "The demo baseline quote is CIF Khalifa Port. Site installation, import clearance, duty, warranty and site liability are outside the supply scope until confirmed.",
+      economics: "Revenue, product cost, trade/logistics, deal-specific cost and contingency are recorded; expected net contribution before funding is USD 36,000, not authority to accept the deal. The USD 6.60 per metre goods cost is a demo assumption, not a supplier quote.",
     },
   },
   economics: {
@@ -72,42 +72,42 @@ const baseOpportunity = {
   },
   trade: {
     deliveryTerm: "CIF",
-    namedPlace: "Khalifa Port, Abu Dhabi (synthetic)",
+    namedPlace: "Khalifa Port, Abu Dhabi (demo)",
   },
   dimensions: {
     buyerFit: {
       value: "HIGH",
       evidence: [
-        { tier: "SUPPORTING", note: "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (synthetic)." },
-        { tier: "SUPPORTING", note: "Referral call note records a scheduled follow-up with the procurement desk (synthetic)." },
+        { tier: "SUPPORTING", note: "Procurement notice names a dedicated buyer persona and states overseas sourcing is standard practice (demo)." },
+        { tier: "SUPPORTING", note: "Referral call note records a scheduled follow-up with the procurement desk (demo)." },
       ],
     },
     categoryFit: {
       value: "HIGH",
       evidence: [
-        { tier: "PRIMARY", note: "Product spec (blackout drapery + sheers + valances) matches the core soft-furnishing category (synthetic spec doc)." },
+        { tier: "PRIMARY", note: "Product spec (blackout drapery + sheers + valances) matches the core soft-furnishing category (demo spec doc)." },
       ],
     },
     evidenceQuality: {
       value: "MEDIUM",
       evidence: [
-        { tier: "PRIMARY", note: "Synthetic product specification reviewed: blackout, sheer and valance scope; sample/mockup approval recorded for the planning basis." },
-        { tier: "SUPPORTING", note: "Synthetic specification pack records drawing references, hospitality fire-rating requirements and certification review as part of the buyer's approval path; final acceptance evidence is not yet a released order condition." },
-        { tier: "SUPPORTING", note: "Procurement notice + referral note (synthetic)." },
-        { tier: "VERIFICATION_REQUIRED", note: "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (synthetic)." },
+        { tier: "PRIMARY", note: "Demo product specification reviewed: blackout, sheer and valance scope; sample/mockup approval recorded for the planning basis." },
+        { tier: "SUPPORTING", note: "Demo specification pack records drawing references, hospitality fire-rating requirements and certification review as part of the buyer's approval path; final acceptance evidence is not yet a released order condition." },
+        { tier: "SUPPORTING", note: "Procurement notice + referral note (demo)." },
+        { tier: "VERIFICATION_REQUIRED", note: "Indicative volume figures copied from a trade-aggregator summary; not yet confirmed against the buyer (demo)." },
       ],
     },
     importOpenness: {
       value: "HIGH",
       evidence: [
-        { tier: "PRIMARY", note: "RFP text explicitly invites international suppliers and references an overseas delivery point (synthetic)." },
+        { tier: "PRIMARY", note: "RFP text explicitly invites international suppliers and references an overseas delivery point (demo)." },
       ],
     },
     commercialFeasibility: {
       value: "CONDITIONAL",
       evidence: [
-        { tier: "SUPPORTING", note: "The 12,000-metre MOQ baseline and Sep 2026 shipment window are feasible at current capacity (synthetic estimate)." },
-        { tier: "SUPPORTING", note: "The baseline quote is CIF Khalifa Port; local delivery, installation, import clearance and duty remain outside the baseline supply scope unless separately confirmed (synthetic)." },
+        { tier: "SUPPORTING", note: "The 12,000-metre MOQ baseline and Sep 2026 shipment window are feasible at current capacity (demo estimate)." },
+        { tier: "SUPPORTING", note: "The baseline quote is CIF Khalifa Port; local delivery, installation, import clearance and duty remain outside the baseline supply scope unless separately confirmed (demo)." },
       ],
     },
   },
@@ -123,7 +123,7 @@ const baseOpportunity = {
     },
   ],
   unknowns: [
-    { id: "UNK-1", label: "Released order volume", detail: "The 12,000-metre quantity is an indicative RFP planning baseline and the synthetic quote uses it as MOQ. The released purchase-order quantity, phased schedule and buyer commitment remain UNKNOWN until confirmed.", blocksPursue: true, resolveWith: "Buyer-issued purchase order or released quantity schedule confirming MOQ and phases" },
+    { id: "UNK-1", label: "Released order volume", detail: "The 12,000-metre quantity is an indicative RFP planning baseline and the demo quote uses it as MOQ. The released purchase-order quantity, phased schedule and buyer commitment remain UNKNOWN until confirmed.", blocksPursue: true, resolveWith: "Buyer-issued purchase order or released quantity schedule confirming MOQ and phases" },
     { id: "UNK-2", label: "Final payment terms", detail: "Contradictory sources (CTR-1): 90 days after delivery versus a verbal 30% advance. The trigger, timing and binding treatment of the remaining 70% balance are UNKNOWN until confirmed in writing.", blocksPursue: true, resolveWith: "Written confirmation of the buyer payment schedule, including the 30% / 70% triggers" },
     { id: "UNK-3", label: "Installation and importer liability", detail: "Local installation, import clearance, duty, warranty/site liability and the final commercial approver remain UNKNOWN. Hospitality specification acceptance is evidenced only at planning level, not as a released commitment.", blocksPursue: false, resolveWith: "Written responsibility matrix, certification/approval checklist and named final approver" },
   ],
@@ -133,42 +133,42 @@ const baseOpportunity = {
     "Indicative volume figures are unverified (VERIFICATION_REQUIRED tier).",
   ],
   why: [
-    "Strong Buyer Fit: the synthetic procurement desk has a defined category, indicative volume baseline and meeting path through Daniel Al-Mansoori (synthetic contact).",
+    "Strong Buyer Fit: the demo procurement desk has a defined category, indicative volume baseline and meeting path through Daniel Al-Mansoori (demo contact).",
     "Strong Category Fit: blackout drapery, sheers and valances match the core window-treatment category.",
-    "Clear import openness: the synthetic RFP explicitly invites international suppliers for delivery to Abu Dhabi.",
-    "The USD 36,000 expected net contribution is above the synthetic owner reference of USD 28,800, before unresolved terms, scope and authority are accepted.",
+    "Clear import openness: the demo RFP explicitly invites international suppliers for delivery to Abu Dhabi.",
+    "The USD 36,000 expected net contribution is above the demo minimum reference of USD 28,800, before unresolved terms, scope and authority are accepted.",
   ],
   commercialTerms: {
     status: "INCOMPLETE",
     detail:
-      "SYNTHETIC / HYPOTHETICAL planning basis: 12,000 metres (one metre = one metre of finished window width, excluding on-site installation) at a target USD 12/metre (CIF) = USD 144,000 expected revenue; CIF Khalifa Port; 60-day quote validity; MOQ baseline 12,000 metres; sample/mockup-approved planning scope. The buyer's RFP states 90 days after delivery while a referral note suggests 30% advance; the trigger and treatment of the remaining 70% balance are UNKNOWN, so binding payment terms are INCOMPLETE. A requested 5% discount and two competing supplier offers require scope-normalized comparison. The synthetic contact is a procurement path, not verified final authority.",
+      "DEMO / HYPOTHETICAL planning basis: 12,000 metres (one metre = one metre of finished window width, excluding on-site installation) at a target USD 12/metre (CIF) = USD 144,000 expected revenue; CIF Khalifa Port; 60-day quote validity; MOQ baseline 12,000 metres; sample/mockup-approved planning scope. The buyer's RFP states 90 days after delivery while a referral note suggests 30% advance; the trigger and treatment of the remaining 70% balance are UNKNOWN, so binding payment terms are INCOMPLETE. A requested 5% discount and two competing supplier offers require scope-normalized comparison. The demo contact is a procurement path, not verified final authority.",
     resolveWith: "Binding commercial terms in writing (payment schedule, CIF named place and excluded installation/import scope)",
     paymentEvidence: [
-      { id: "PEV-1", label: "Buyer RFP: 90 days after delivery", state: "PROPOSED", source: "Synthetic buyer RFP", fragment: "Payment at 90 days after delivery", asOf: "2026-06-18 (synthetic)", humanStatus: "PENDING_REVIEW" },
-      { id: "PEV-2", label: "Referral note: 30% advance", state: "MENTIONED", source: "Synthetic referral call note", fragment: "Verbal indication of a 30% advance", asOf: "2026-06-20 (synthetic)", humanStatus: "PENDING_REVIEW" },
+      { id: "PEV-1", label: "Buyer RFP: 90 days after delivery", state: "PROPOSED", source: "Demo buyer RFP", fragment: "Payment at 90 days after delivery", asOf: "2026-06-18 (demo)", humanStatus: "PENDING_REVIEW" },
+      { id: "PEV-2", label: "Referral note: 30% advance", state: "MENTIONED", source: "Demo referral call note", fragment: "Verbal indication of a 30% advance", asOf: "2026-06-20 (demo)", humanStatus: "PENDING_REVIEW" },
     ],
   },
   quotes: [
     {
       id: "Q-1",
-      basis: "FOB Ningbo — goods, export clearance and on-board delivery only (synthetic competing quote)",
+      basis: "FOB Ningbo — goods, export clearance and on-board delivery only (demo competing quote)",
       status: "COMPLETE",
     },
     {
       id: "Q-2",
-      basis: "CIF Khalifa Port — goods, ocean freight and cargo insurance; no installation or import duty (synthetic baseline quote)",
+      basis: "CIF Khalifa Port — goods, ocean freight and cargo insurance; no installation or import duty (demo baseline quote)",
       status: "COMPLETE",
     },
     {
       id: "Q-3",
-      basis: "DAP project warehouse — local delivery included; installation and duty assumptions require confirmation (synthetic alternative)",
+      basis: "DAP project warehouse — local delivery included; installation and duty assumptions require confirmation (demo alternative)",
       status: "COMPLETE",
     },
   ],
   quoteBasesComparable: false, // rule 4: non-comparable bases → never ranked
   paymentEvents: [
-    { id: "PE-1", label: "Internal factory deposit — 30% of USD 79,200 product cost at synthetic planning FX 7.50 CNY/USD", amountCny: Math.round(GOODS_COST_USD * 0.3 * PLANNING_FX_CNY_PER_USD), daysFromSign: 0, status: "COMPLETE" },
-    { id: "PE-2", label: "Internal factory balance — 70% of USD 79,200 product cost at synthetic planning FX 7.50 CNY/USD", amountCny: Math.round(GOODS_COST_USD * 0.7 * PLANNING_FX_CNY_PER_USD), daysFromSign: 45, status: "COMPLETE" },
+    { id: "PE-1", label: "Internal factory deposit — 30% of USD 79,200 product cost at demo planning FX 7.50 CNY/USD", amountCny: Math.round(GOODS_COST_USD * 0.3 * PLANNING_FX_CNY_PER_USD), daysFromSign: 0, status: "COMPLETE" },
+    { id: "PE-2", label: "Internal factory balance — 70% of USD 79,200 product cost at demo planning FX 7.50 CNY/USD", amountCny: Math.round(GOODS_COST_USD * 0.7 * PLANNING_FX_CNY_PER_USD), daysFromSign: 45, status: "COMPLETE" },
   ],
   // Payment security for the open receivable (letter of credit / credit insurance).
   // Nothing has been discussed yet, so every instrument is UNKNOWN and the RFP's
@@ -187,18 +187,18 @@ const baseOpportunity = {
     costSharePct: 100,
     rate: PLANNING_FX_CNY_PER_USD,
     asOf: null,
-    source: "SYNTHETIC planning rate (hypothetical, not a market quote)",
+    source: "Demo planning rate (hypothetical, not a market quote)",
     hedge: "UNKNOWN",
     hedgedPct: null,
   },
   kyc: {
     status: "CLEAR",
     beneficialOwnerVerified: true,
-    evidence: "Synthetic screening record: no adverse finding represented in this demo fixture.",
+    evidence: "Demo screening record: no adverse finding represented in this demo fixture.",
   },
-  buyers: [{ id: "BUYER-1", label: "Gulf Coast Hospitality Procurement (synthetic)" }],
+  buyers: [{ id: "BUYER-1", label: "Gulf Coast Hospitality Procurement (demo)" }],
   paymentDisclosure:
-    "SYNTHETIC planning note: payment exposure is calculated from complete internal supplier-commitment events only, using the stated hypothetical planning FX. It is NOT cash balance, liquidity, affordability, cash shortfall, credit capacity, or binding buyer payment terms.",
+    "DEMO planning note: payment exposure is calculated from complete internal supplier-commitment events only, using the stated hypothetical planning FX. It is NOT cash balance, liquidity, affordability, cash shortfall, credit capacity, or binding buyer payment terms.",
 };
 
 export const opportunity = withDerivedUnknowns(baseOpportunity);

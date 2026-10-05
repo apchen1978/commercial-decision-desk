@@ -29,7 +29,7 @@ function renderSnapshot(data) {
   $("ledger-content").hidden = false;
   $("error-box").hidden = true;
 
-  $("l-synthetic").textContent = s.synthetic === true ? "SYNTHETIC" : "MANUAL";
+  $("l-synthetic").textContent = s.synthetic === true ? "DEMO" : "MANUAL";
   $("l-name").textContent = s.opportunityName || "UNKNOWN";
   $("l-id").textContent = s.opportunityId || "";
 

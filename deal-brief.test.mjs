@@ -36,7 +36,7 @@ function pass(name, fn) {
 
 pass("brief is stand-alone and executive-readable", () => {
   const md = serializeDealBriefMarkdown(brief, "en");
-  assert.match(md, /CDD DEAL BRIEF/);
+  assert.match(md, /COMMERCIAL DECISION DESK · DEAL BRIEF/);
   assert.match(md, /Executive Snapshot/);
   assert.match(md, /Current recommendation/);
   assert.match(md, /Meeting Agenda/);
@@ -60,7 +60,7 @@ pass("recommendation and human decision remain separate", () => {
 
 pass("plain text is readable without markdown syntax", () => {
   const text = serializeDealBriefText(brief, "en");
-  assert.match(text, /CDD DEAL BRIEF/);
+  assert.match(text, /COMMERCIAL DECISION DESK · DEAL BRIEF/);
   assert.doesNotMatch(text, /^#{1,3} /m);
   assert.doesNotMatch(text, /^- /m);
 });

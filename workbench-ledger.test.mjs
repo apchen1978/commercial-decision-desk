@@ -102,7 +102,7 @@ const brief = buildDealBriefViewModel({
   const f1 = ledgerFilename(brief);
   const f2 = ledgerFilename(brief);
   check("filename deterministic for same brief", f1 === f2);
-  check("filename is .json + date+time+oppid", /^CDD-Decision-Ledger-\d{4}-\d{2}-\d{2}-\d{6}-OPP-2026-008-.+\.json$/.test(f1), f1);
+  check("filename is .json + date+time+oppid", /^Decision-Ledger-\d{4}-\d{2}-\d{2}-\d{6}-OPP-2026-008-.+\.json$/.test(f1), f1);
   // collision test: same opportunity, same day, DIFFERENT generatedAt time -> distinct
   const fA = ledgerFilename({ snapshot: { name: brief.snapshot.name }, opportunityId: "OPP-2026-008", generatedAt: "2026-08-24T10:00:00.000Z" });
   const fB = ledgerFilename({ snapshot: { name: brief.snapshot.name }, opportunityId: "OPP-2026-008", generatedAt: "2026-08-24T10:05:00.000Z" });

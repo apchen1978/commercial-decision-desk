@@ -1,6 +1,6 @@
-// kyc-boundary-experiment.mjs — KYC boundary experiment (owner-authorized).
+// kyc-boundary-experiment.mjs — KYC boundary experiment (approved).
 // -----------------------------------------------------------------------------
-// PHASE 2 (post-fix): the production engine now HAS the KYC gate (owner-authorized
+// PHASE 2 (post-fix): the production engine now HAS the KYC gate (approved
 // implementation, commit after 9c1ae4a). This harness re-runs the same 10 cases
 // against the PRODUCTION engine to confirm the implemented gate matches the
 // experiment's verified semantics. Phase 1 (pre-fix, additive-variant comparison)
@@ -64,7 +64,7 @@ function baseOpp(id, name) {
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// Cases — 6 KYC + 4 margin×KYC interaction (all SYNTHETIC / DESIGN-ONLY).
+// Cases — 6 KYC + 4 margin×KYC interaction (all DEMO / DESIGN-ONLY).
 // EXPECTED declared here, before running.
 // ---------------------------------------------------------------------------
 const CASES = [

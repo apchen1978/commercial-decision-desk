@@ -344,7 +344,7 @@ export function sanitizeDealBriefFilename(name, extension = "md") {
     .replace(/-+/g, "-")
     .replace(/^[-.]+|[-.]+$/g, "")
     .slice(0, 80) || "untitled-opportunity";
-  return `CDD-Deal-Brief-${safe}.${extension}`;
+  return `Deal-Brief-${safe}.${extension}`;
 }
 
 export function downloadDealBrief(brief, format, language = "zh-TW") {

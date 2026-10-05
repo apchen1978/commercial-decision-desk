@@ -1,7 +1,7 @@
 # Commercial Decision Desk
 
-**NORTH STAR (owner, 2026-08-23):** Build the smallest credible **Commercial
-Decision Workbench** that a business owner can use **without an API key** to
+**NORTH STAR:** Build the smallest credible **Commercial
+Decision Workbench** that a business decision-maker can use **without an API key** to
 assess one opportunity from **input → evidence → recommendation → human decision**.
 
 Decision-support for one question: **"Should we pursue this overseas commercial
@@ -14,12 +14,12 @@ user-initiated **reference exchange rate** (see *Payment security and currency*)
 a GET that carries only a currency pair.
 
 > Every feature/gate decision is measured against the north star: does it make the
-> workbench *smaller* or *more credible* for a single-opportunity, owner-driven
+> workbench *smaller* or *more credible* for a single-opportunity, decision-maker-driven
 > assessment? **FEATURE DEPTH ≠ EVIDENCE DEPTH.**
 
 ## Core principle
 
-> Human defines the decision boundary. AI operates inside it.
+> The human defines the decision boundary. The tool works inside it.
 
 The desk assembles evidence, applies deterministic rules, and recommends a
 **decision-support state**. It never contacts, negotiates, quotes, commits,
@@ -63,12 +63,11 @@ Tests: `node margin-calculator.test.mjs` · `node workbench-ledger.test.mjs` ·
 - `index.html` — one-screen flow: Opportunity → Evidence → Commercial →
   Payment Exposure → WHY/WHY NOT/UNKNOWN → Decision Brief → Human Decision
 - `app.js` — client-side rendering (no framework)
-- `fixtures.js` — the synthetic opportunity (clearly labeled)
+- `fixtures.js` — the demo opportunity (clearly labeled)
 - `decision-engine.js` — pure, deterministic rules + payment math
 - `verify.mjs` — automated hard-rule + determinism checks
-- `docs/AI_INTAKE_VISION.md` — future AI-assisted intake architecture (design only, not implemented)
 
-## Synthetic scenario (OPP-2026-008)
+## Demo scenario (OPP-2026-008)
 
 A Gulf-region hospitality procurement desk invites international suppliers to
 quote interior products for a multi-property rollout.
@@ -112,7 +111,7 @@ still required in every case.
   function of the fixture — identical output on every run.
 - Recommendation: pure rule evaluation (`decision-engine.js`).
 
-## Commercial Momentum v0.1 (owner-governed heuristic, not calibrated)
+## Commercial Momentum v0.1 (decision-maker-governed heuristic, not calibrated)
 
 The result snapshot presents three deliberately separate signals:
 
@@ -165,7 +164,7 @@ Freshness / expiry screening is currently a **human responsibility** at intake.
 There is deliberately **no universal expiry threshold** — a 90-day-old price
 confirmation may be useless while a 2-year-old buyer relationship record may
 still matter; only domain judgment can decide. If you want an engine-level
-expiry gate, that is a separate, owner-approved design decision — not something
+expiry gate, that is a separate, approved design decision — not something
 this engine invents on its own.
 
 ### Contradiction records are expected to be normalized UPSTREAM (S12 finding)
@@ -181,7 +180,7 @@ This is a documented responsibility boundary: the engine reflects registered
 contradictions; it does not discover them. There is no automatic NLP/agent-based
 contradiction detection, and none is planned under the current scope.
 
-### Urgent-order caller discipline: unknown supplier-switch reason (proposal 2, owner-accepted 2026-08-23)
+### Urgent-order caller discipline: unknown supplier-switch reason (proposal 2, accepted 2026-08-23)
 
 > When an urgent opportunity has an unknown supplier-switch reason, the caller must
 > register it as a blocking UNKNOWN. The engine will return `HOLD_FOR_EVIDENCE`; it
@@ -213,7 +212,7 @@ evidence-required path — the recommendation becomes `HOLD_FOR_EVIDENCE` and
 inputs no longer silently inflate committed exposure. `dedupedCount` reports how
 many duplicate complete events were dropped (0 for clean inputs).
 
-### KYC / sanctions gate (owner-authorized implementation, 2026-08-23)
+### KYC / sanctions gate (2026-08-23)
 
 `evaluateDecision()` reads an optional structured `kyc` field:
 
@@ -235,7 +234,7 @@ The `kycGate` result field reports `SANCTIONS_VETO` / `KYC_INCOMPLETE` /
 KYC gate semantics remain **provisional** (single domain source so far —
 interview 002 pending) but the engine behavior is deterministic and tested.
 
-### Margin gate (owner-authorized building phase, 2026-08-23)
+### Margin gate (2026-08-23)
 
 `evaluateDecision()` reads an optional structured `margin` field:
 
@@ -268,24 +267,24 @@ the threshold is a caller decision, never engine-invented.
 
 ## Scenario evidence
 
-`scenario-test/` holds the owner-approved evidence-depth experiment: a **21-scenario
+`scenario-test/` holds the evidence-depth experiment: a **21-scenario
 matrix** (5/5 decision states, 8 adversarial types, 3 inbound-lead scans S13–S15,
 3 KYC-gate regressions S16–S18, 1 margin-gate flip S19) with pre-declared
-expectations, raw deterministic output, and a limitation/classification record.
+expectations, and a classification record.
 Run it with:
 
 ```bash
 node scenario-test/run-scenarios.mjs
 ```
 
-S13–S15 are tagged `SYNTHETIC` + `PRE-MARGIN-GATE`: S15 (a 5%-margin custom-equipment
+S13–S15 are tagged `DEMO` + `PRE-MARGIN-GATE`: S15 (a 5%-margin custom-equipment
 lead with certification costs shifted to the supplier) is the key edge case; S19
 (`MARGIN-GATE` tag) proves the same case now vetoes (`DO_NOT_PURSUE`) once the
 structured margin field declares bps below the caller threshold — the realized
-S15 future flip. S16–S18 are tagged `SYNTHETIC` + `KYC-GATE` (sanctions veto /
+S15 future flip. S16–S18 are tagged `DEMO` + `KYC-GATE` (sanctions veto /
 KYC-incomplete HOLD / clear pass-through). See "Documented boundaries".
 Current matrix: **21 scenarios — 19 PASS, 2 BASELINE_FIX_CONFIRMED, 0 FAIL,
-deterministic** (see `scenario-test/outputs/run-log.txt`).
+deterministic** (re-run the command above to reproduce).
 
 ## Flip map (what would change the recommendation)
 
@@ -295,16 +294,16 @@ deterministic** (see `scenario-test/outputs/run-log.txt`).
 - **Masking.** Each confirmation is also tested alone. In the sample, only resolving CTR-1 changes the state on its own; every other confirmation stays masked behind that higher-priority gate.
 - **The other direction.** Adverse findings (sanctions hit, unverified beneficial owner, weak category fit, low evidence, a declared margin threshold that is missed) are run through the real engine. One that changes nothing is reported as masked by a higher-priority gate.
 - **Vetoes and reassessments** (sanctions, declared margin threshold, weak category fit) are terminal: more documents cannot change them, so no route is offered.
-- **Economic headroom is presentation-only**, like `economics-bridge.js`. It shows how far net contribution sits above the owner's reference minimum and never gates the engine, unless the owner declares `margin.thresholdBps`.
-- Works for the synthetic sample and for a user-entered opportunity. Test: `node flip-map.test.mjs`.
+- **Economic headroom is presentation-only**, like `economics-bridge.js`. It shows how far net contribution sits above the decision-maker's reference minimum and never gates the engine, unless the decision-maker declares `margin.thresholdBps`.
+- Works for the demo sample and for a user-entered opportunity. Test: `node flip-map.test.mjs`.
 
 ## Payment security and currency (L/C, credit insurance, FX)
 
 Three dimensions that decide whether a deal's money actually arrives and what is left after conversion. The decision engine is **unchanged**: they reach it only as registered UNKNOWNs (`derived-unknowns.js`), the documented caller discipline.
 
 - **Letter of credit and credit insurance** (`payment-security.js`). The open receivable is revenue less any confirmed advance (an unconfirmed advance leaves the whole revenue as an upper bound). An L/C counts only when it is in place **and confirmed by a bank**; insurance counts by its coverage. When both cover the same receivable the larger coverage is used, not the sum. A receivable with no cover registers a **blocking** UNKNOWN (`UNK-SEC`); it clears with cover, a sufficient advance, or the owner's written acceptance of the residual risk. An opportunity with no security information registers nothing and never reads as covered.
-- **Currency exposure** (`fx-exposure.js`). Cost paid in a currency other than the quote currency, less any hedge, is sized against the headroom above the owner's reference minimum: the break-even move, and the impact of 3 / 5 / 10% moves. It registers a **non-blocking** UNKNOWN (`UNK-FX`): a reminder, never a veto. The declared rate carries a date and a source; an unknown date is reported as unknown, not as stale.
+- **Currency exposure** (`fx-exposure.js`). Cost paid in a currency other than the quote currency, less any hedge, is sized against the headroom above the decision-maker's reference minimum: the break-even move, and the impact of 3 / 5 / 10% moves. It registers a **non-blocking** UNKNOWN (`UNK-FX`): a reminder, never a veto. The declared rate carries a date and a source; an unknown date is reported as unknown, not as stale.
 - **Reference exchange rate** (`fx-rate-source.js`, optional). A button reads one public rate (European Central Bank reference via Frankfurter, falling back to open.er-api.com for currencies the ECB does not publish, such as TWD). It is a plain GET carrying only the currency pair, needs no API key, is cached in memory and rate-limited on the client, and fails closed. The result is shown next to the declared rate and never rewrites it, so a recorded assessment stays reproducible from its declared inputs.
-- **Network policy.** Owner-revised from "no network calls": the engine and all assessments stay network-free, and `verify.mjs` enforces that only `fx-rate-source.js` makes a request, that it is a body-less GET, that it carries no opportunity data, and that only the UI layer imports it.
+- **Network policy.** Revised from "no network calls": the engine and all assessments stay network-free, and `verify.mjs` enforces that only `fx-rate-source.js` makes a request, that it is a body-less GET, that it carries no opportunity data, and that only the UI layer imports it.
 
 Tests: `node payment-security.test.mjs`, `node fx-exposure.test.mjs`, `node fx-rate-source.test.mjs` (the network is faked; nothing touches the internet).

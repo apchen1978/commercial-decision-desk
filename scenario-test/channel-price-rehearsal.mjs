@@ -1,9 +1,9 @@
-// channel-price-rehearsal.mjs — SYNTHETIC IMPLEMENTATION REHEARSAL (design-only).
+// channel-price-rehearsal.mjs — DEMO IMPLEMENTATION REHEARSAL (design-only).
 // -----------------------------------------------------------------------------
-// Owner instruction (2026-08-23): rehearse the production implementation WITHOUT
+// Decision-maker instruction (2026-08-23): rehearse the production implementation WITHOUT
 // modifying canonical production engine. This file defines the EXACT gate logic
 // that WOULD be added to decision-engine.js (test-only overlay / isolated patch),
-// plus 12 clearly-marked SYNTHETIC / DESIGN-ONLY cases covering:
+// plus 12 clearly-marked DEMO / DESIGN-ONLY cases covering:
 //   - dumping-risk trigger semantics
 //   - exceptions: new market, clearance/one-off sale, end-customer self-use
 //   - conflicts with sanctions, margin, KYC-incomplete
@@ -12,8 +12,8 @@
 // decision-engine.js, NO production data, NO Level 3 claim.
 //
 // The overlay below is the rehearsal of the PROPOSED production gate. It is
-// isolated here; if owner later authorizes implementation, this logic is the
-// minimal diff to apply (see REHEARSAL_PLAN in docs/interviews/).
+// isolated here; if implementation is later approved, this logic is the
+// minimal diff to apply .
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -113,7 +113,7 @@ function baseOpp(id, name) {
 }
 
 // ---------------------------------------------------------------------------
-// 12 SYNTHETIC / DESIGN-ONLY cases. EXPECTED declared here, before running.
+// 12 DEMO / DESIGN-ONLY cases. EXPECTED declared here, before running.
 // ---------------------------------------------------------------------------
 const CASES = [
   { id: "R-01", label: "dumping risk → veto fires (trigger semantics)", expected: "DO_NOT_PURSUE",

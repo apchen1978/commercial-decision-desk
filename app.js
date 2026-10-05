@@ -549,7 +549,7 @@ function renderTradeDeal(view) {
 }
 
 // 帶走什麼：以既有 Deal Brief view model 渲染第一層四問的可讀摘要
-// （Astra P1-1：前移簡報預覽，讓客戶先看到能帶走的成果；不新增任何資料）。
+// （前移簡報預覽，讓客戶先看到能帶走的成果；不新增任何資料）。
 function renderDealBriefPreview({ engine: g, economics, tradeView, nextBestAction }) {
   const area = $("brief-preview-area");
   const body = $("brief-preview-body");
@@ -751,7 +751,7 @@ function renderPreviewBand() {
     },
     {
       k: "5", title: tx("preview.cardGates"), body: tx("preview.cardGatesBody"),
-      // Astra P0: ABSENT (not yet assessed) is never summarized as "all clear".
+      // ABSENT (not yet assessed) is never summarized as "all clear".
       // Only when every gate is CLEAR may the card say 關卡全清.
       big: gateOpen(eng.kycGate) || gateOpen(eng.marginGate)
         ? (gateOpen(eng.kycGate) ? tx("structure.kyc") : "") + (gateOpen(eng.kycGate) && gateOpen(eng.marginGate) ? " + " : "") + (gateOpen(eng.marginGate) ? tx("structure.margin") : "")
@@ -1307,7 +1307,7 @@ function renderResult() {
   const momentum = buildCommercialMomentum(current, economics);
   const coverage = buildEvidenceCoverage(current, economics);
   // Snapshot 控制原因：以實際矛盾／卡點標籤取代泛化句（僅由既有資料組裝，
-  // 不新增任何判斷或數字；Astra P0-3「把卡點講具體」）。
+  // 不新增任何判斷或數字；「把卡點講具體」）。
   // 聚焦真正的控制因素（矛盾與阻塞未知）；terms/evidence 屬衍生狀態，
   // 已在其專屬區塊呈現，不在此重複堆疊。
   const ownerControlFacts = [
@@ -1779,7 +1779,7 @@ $("btn-home").addEventListener("click", () => {
 applyLanguage();
 showModeScreen();
 
-// Deep-link support (Astra P0): #mode-sample / #mode-blank auto-open the chosen
+// Deep-link support: #mode-sample / #mode-blank auto-open the chosen
 // mode, so portfolio CTAs can take a first-time visitor straight into the
 // completed example instead of asking them to start working immediately.
 function bootFromHash() {

@@ -1,6 +1,6 @@
 // lead-scan-source.mjs — scan three inbound-lead emails through the CDD contract.
 // Evidence-first: no opinion before the engine speaks. In-memory fixtures only;
-// nothing is written to the repo. SYNTHETIC ANALYSIS — emails treated as
+// nothing is written to the repo. DEMO ANALYSIS — emails treated as
 // anonymized test material, no real identifiers, no real commercial data.
 //
 // RUNNABLE archived source (canonical copy of cdd-lead-scan.mjs, commit fbe8548):
@@ -130,4 +130,4 @@ for (const [id, opp, exp] of [
   console.log(`reasons:`);
   e.reasons.forEach((r) => console.log(`   - ${r}`));
 }
-console.log("\nDONE — SYNTHETIC analysis only. No repo changes, no real identifiers.");
+console.log("\nDONE — DEMO analysis only. No repo changes, no real identifiers.");

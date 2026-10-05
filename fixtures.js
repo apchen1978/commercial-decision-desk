@@ -1,4 +1,4 @@
-// fixtures.js — SYNTHETIC fixture for the Commercial Decision Desk prototype.
+// fixtures.js — DEMO fixture for the Commercial Decision Desk prototype.
 // EVERY record below is fabricated for demonstration. No real prospect,
 // company, person, financial figure, or contact appears here. Do not treat
 // any value as real commercial data.
@@ -6,7 +6,7 @@
 export const SYNTHETIC_LABEL =
   "DEMO FIXTURE — every record is fabricated for demonstration. No real prospect, company, or financial figure.";
 
-// Synthetic planning basis for supplier payments. The 30% deposit / 70% balance
+// Demo planning basis for supplier payments. The 30% deposit / 70% balance
 // applies to PRODUCT COST (economics.directCost), never to the sale price: a
 // factory is paid for the goods it makes, and the gap between price and cost is
 // the deal's margin. Hypothetical FX, for demonstration only.

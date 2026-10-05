@@ -1,6 +1,6 @@
 // urgent-signal-experiment.mjs — URGENT-ORDER DUAL-SIGNAL boundary experiment.
 // -----------------------------------------------------------------------------
-// OWNER-AUTHORIZED: design-only boundary experiment (no production change).
+// APPROVED: design-only boundary experiment (no production change).
 // MODE: additive variant composed on top of the current contract — production
 // decision-engine.js is NOT modified.
 //
@@ -136,7 +136,7 @@ export function evaluateWithUrgencyDirection(opp) {
 }
 
 // ---------------------------------------------------------------------------
-// Cases — 10 dual-signal cases (all SYNTHETIC / DESIGN-ONLY). EXPECTED declared
+// Cases — 10 dual-signal cases (all DEMO / DESIGN-ONLY). EXPECTED declared
 // here, before running. base = production engine; gated = variant.
 // ---------------------------------------------------------------------------
 const CASES = [

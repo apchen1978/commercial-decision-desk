@@ -140,6 +140,7 @@
       .ok-tag { font-weight: 700; color: var(--forest); }
       .human-note-area { margin-top: 12px; }
       .foot { margin-top: 30px; border-top: 1px solid var(--line); padding-top: 14px; font-size: 12px; color: var(--muted); }
+      .foot .foot-line { display: block; margin-top: 4px; }
       .rec-box { background: var(--forest); color: var(--bone); border-radius: 10px; padding: 14px 16px; margin-top: 12px; font-size: 14px; }
       .rec-box b { color: var(--gold); }
       .language-switch { display:flex; justify-content:flex-end; align-items:center; gap:6px; margin-bottom:10px; }
@@ -1227,7 +1228,7 @@
       #mode-screen .mode-card { position: relative; min-height: 202px; padding: 28px 24px 20px; overflow: hidden; }
       #mode-screen .mode-card::after { content: ""; position: absolute; right: 22px; bottom: 18px; width: 34px; height: 1px; background: var(--gold); opacity: .7; }
       #mode-screen .mode-card.mode-primary { border-top: 5px solid var(--forest); background: linear-gradient(180deg, #fff 0%, #fbfcf8 100%); }
-      #mode-screen .mode-card.mode-primary::before { content: "01 · OWNER INPUT"; display: block; margin-bottom: 18px; color: var(--amber); font-size: 10px; font-weight: 800; letter-spacing: .14em; }
+      #mode-screen .mode-card.mode-primary::before { content: "01 · YOUR INPUT"; display: block; margin-bottom: 18px; color: var(--amber); font-size: 10px; font-weight: 800; letter-spacing: .14em; }
       #mode-screen .mode-card.mode-secondary { border: 1px solid var(--brass); border-top: 5px solid var(--brass); background: var(--surface-2); opacity: 1; }
       #mode-screen .mode-card.mode-secondary::before { content: "02 · GUIDED CASE"; display: block; margin-bottom: 14px; color: var(--brass); font-size: 10px; font-weight: 800; letter-spacing: .14em; }
       #mode-screen .mode-card.mode-secondary .mode-badge { margin-bottom: 10px; border: 0; border-radius: 0; padding: 0; background: transparent; color: var(--brass); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
@@ -1307,43 +1308,43 @@
         <div class="mode-orientation">
           <p class="mode-kicker" data-i18n="mode.kicker">COMMERCIAL DECISION DESK</p>
           <h2 data-i18n="mode.heading">先選擇你要怎麼開始</h2>
-          <p data-i18n="mode.orientation">CDD 先把商機中的已知、缺口與承諾風險整理清楚，再把下一步交回人的判斷。</p>
+          <p data-i18n="mode.orientation">工作台讓收款風險在談之前就看得見，把商機中的已知、缺口與承諾條件整理清楚，再把下一步交回人的判斷。</p>
         </div>
-        <div class="mode-row" aria-label="CDD entry paths">
+        <div class="mode-row" aria-label="Decision desk entry paths">
           <button type="button" class="mode-card mode-primary" id="mode-blank" aria-describedby="mode-blank-description">
             <h3 data-i18n="mode.blank.title">評估我的商機</h3>
             <p id="mode-blank-description" data-i18n="mode.blank.description">用你目前知道的資訊開始。未知就保留為「未知」，不會被推測。</p>
             <span class="cta" data-i18n="mode.blank.cta">建立評估 →</span>
           </button>
           <button type="button" class="mode-card mode-secondary" id="mode-sample" aria-describedby="mode-sample-description">
-            <span class="mode-badge" data-i18n="mode.sample.badge">合成 · 僅供導覽</span>
+            <span class="mode-badge" data-i18n="mode.sample.badge">示範 · 僅供導覽</span>
             <h3 data-i18n="mode.sample.title">看看完整案例</h3>
-            <p id="mode-sample-description" data-i18n="mode.sample.description">先看一筆完整案例，理解 CDD 如何從證據走到下一個商業問題。</p>
+            <p id="mode-sample-description" data-i18n="mode.sample.description">先看一筆完整案例，理解工作台如何從證據走到可以談的首單條件。</p>
             <span class="cta" data-i18n="mode.sample.cta">查看範例 →</span>
           </button>
         </div>
         <div class="scenario-intro">
-          <p class="scenario-kicker" data-i18n="scenario.eyebrow">SYNTHETIC DEAL SCENARIO</p>
+          <p class="scenario-kicker" data-i18n="scenario.eyebrow">示範交易情境</p>
           <h2 data-i18n="scenario.title">看似可接的訂單，真正還卡在哪裡？</h2>
-          <p class="scenario-lead" data-i18n="scenario.lead">這筆合成飯店窗簾商機有明確品類與採購路徑，卻仍不能直接承諾。</p>
+          <p class="scenario-lead" data-i18n="scenario.lead">這筆示範商機有明確品類與採購路徑；還差的是把付款與交付條件談到雙方都敢簽。</p>
           <div class="scenario-facts">
-            <div class="scenario-fact"><strong data-i18n="scenario.fact.value">USD 144,000 合成詢價</strong><span data-i18n="scenario.fact.valueNote">12,000 公尺成品窗寬 · 規劃基準</span></div>
+            <div class="scenario-fact"><strong data-i18n="scenario.fact.value">USD 144,000 示範詢價</strong><span data-i18n="scenario.fact.valueNote">12,000 公尺成品窗寬 · 規劃基準</span></div>
             <div class="scenario-fact"><strong data-i18n="scenario.fact.payment">90 天帳期 vs 30% 預付款</strong><span data-i18n="scenario.fact.paymentNote">付款來源互相矛盾</span></div>
             <div class="scenario-fact"><strong data-i18n="scenario.fact.delivery">CIF Khalifa Port</strong><span data-i18n="scenario.fact.deliveryNote">進口與安裝責任待確認</span></div>
             <div class="scenario-fact"><strong data-i18n="scenario.fact.authority">最終核准人：UNKNOWN</strong><span data-i18n="scenario.fact.authorityNote">不可假定誰能拍板</span></div>
           </div>
-          <div class="scenario-flow" data-i18n-aria-label="scenario.flowAria" aria-label="CDD 決策流程">
+          <div class="scenario-flow" data-i18n-aria-label="scenario.flowAria" aria-label="工作台決策流程">
             <div><strong data-i18n="scenario.flow.raw">已知交易資訊</strong><span data-i18n="scenario.flow.rawNote">報價、付款、交付、聯絡人</span></div><span class="arrow" aria-hidden="true">→</span>
-            <div><strong data-i18n="scenario.flow.cdd">CDD 整理交易結構</strong><span data-i18n="scenario.flow.cddNote">KNOWN、UNKNOWN、矛盾與控制項目</span></div><span class="arrow" aria-hidden="true">→</span>
+            <div><strong data-i18n="scenario.flow.cdd">工作台整理交易結構</strong><span data-i18n="scenario.flow.cddNote">KNOWN、UNKNOWN、矛盾與控制項目</span></div><span class="arrow" aria-hidden="true">→</span>
             <div><strong data-i18n="scenario.flow.output">承諾前的下一步</strong><span data-i18n="scenario.flow.outputNote">補證據，再由 owner 決定</span></div>
           </div>
-          <p class="scenario-boundary" data-i18n="scenario.boundary">CDD 不會替你補完缺失資料。它保留 UNKNOWN，指出控制項目與下一個需要確認的事實。</p>
-          <a class="scenario-sample-link" href="#mode-sample" data-i18n="scenario.sampleLink">查看這筆合成商機如何被整理 →</a>
+          <p class="scenario-boundary" data-i18n="scenario.boundary">工作台不會替你補完缺失資料。它保留 UNKNOWN，指出控制項目與下一個需要確認的事實。</p>
+          <a class="scenario-sample-link" href="#mode-sample" data-i18n="scenario.sampleLink">查看這筆示範商機如何被整理 →</a>
         </div>
         <section class="product-flow" aria-labelledby="product-flow-title">
           <div class="product-flow-head">
             <div>
-              <p class="product-flow-eyebrow" data-i18n="productFlow.eyebrow">CDD WORKFLOW</p>
+              <p class="product-flow-eyebrow" data-i18n="productFlow.eyebrow">決策流程</p>
               <h2 id="product-flow-title" data-i18n="productFlow.title">從一筆商機，到能帶進會議的判斷。</h2>
             </div>
             <p class="product-flow-intro" data-i18n="productFlow.intro">不需要先完成所有資料。先建立評估，把缺口保留為 UNKNOWN，再以已確認的證據重新判斷。</p>
@@ -1353,14 +1354,14 @@
             <li class="product-step"><span class="product-step-number">02</span><h3 data-i18n="productFlow.step2.title">補足證據</h3><p data-i18n="productFlow.step2.body">查看控制因素、矛盾與 UNKNOWN，帶著具體問題回到買方、報價或內部會議。</p></li>
             <li class="product-step"><span class="product-step-number">03</span><h3 data-i18n="productFlow.step3.title">帶走 Decision Brief</h3><p data-i18n="productFlow.step3.body">整理目前建議、下一步與人的決定，匯出成可交接的交易工作底稿。</p></li>
           </ol>
-          <p class="product-flow-note" data-i18n="productFlow.note">CDD 提供可重跑的決策支援；最終承諾仍由 owner 與相應專業人士確認。</p>
+          <p class="product-flow-note" data-i18n="productFlow.note">工作台提供可重跑的決策支援；最終承諾仍由負責人與相應專業人士確認。</p>
         </section>
 
         <div class="capability-note">
-          <p class="capability-eyebrow" data-i18n="capability.eyebrow">手動優先 · AI 可擴充 · 人類治理</p>
+          <p class="capability-eyebrow" data-i18n="capability.eyebrow">手動優先 · 可擴充 · 由人把關</p>
           <h2 class="capability-title" data-i18n="capability.title">手動即可使用，也能持續擴充能力</h2>
-          <p class="capability-body" data-i18n="capability.body">CDD 不依賴人工智慧、API 金鑰或後端即可完成核心評估。系統以可追溯的商業規則、證據與人工判斷為基礎；未來亦可透過 AI API 與外部資料，進一步輔助資訊結構化、證據豐富、情境分析與更深入的決策支援。</p>
-          <p class="capability-line" data-i18n="capability.line">今日手動使用 → 需要時由 AI 輔助</p>
+          <p class="capability-body" data-i18n="capability.body">核心評估不需要登入、API 金鑰或後端即可完成。系統以可追溯的商業規則、證據與人工判斷為基礎；之後也能接上外部資料，協助整理資訊、補充證據、分析情境，支援更深入的決策。</p>
+          <p class="capability-line" data-i18n="capability.line">今日手動使用 → 需要時再接上外部資料</p>
           <div class="badges-row" aria-label="驗證徽章">
             <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.verify">自動檢查</span> <span class="mono-num" data-i18n="badge.verifyNum">50/50</span></a>
             <a class="badge" href="https://github.com/apchen1978/commercial-decision-desk/tree/main/scenario-test" target="_blank" rel="noopener"><span class="dot"></span><span data-i18n="badge.scenarios">情境回歸</span> <span class="mono-num">21</span></a>
@@ -1373,7 +1374,7 @@
         <div class="import-entry">
           <p class="import-eyebrow" data-i18n="import.eyebrow">來源提案</p>
           <h2 class="import-title" data-i18n="import.title">從海外客戶開發提案開始</h2>
-          <p class="import-body" data-i18n="import.body">匯入一份來源提案，先檢視它提供的訊號與未知，再由你逐項確認是否帶入 CDD。</p>
+          <p class="import-body" data-i18n="import.body">匯入一份來源提案，先檢視它提供的訊號與未知，再由你逐項確認是否帶入工作台。</p>
           <input id="intake-proposal-file" type="file" accept="application/json,.json" hidden />
           <button id="choose-intake-proposal" class="secondary" type="button" data-i18n="import.button">選擇 Intake Proposal JSON</button>
           <p class="import-boundary" data-i18n="import.boundary">只會建立預覽，不會自動產生建議、矛盾或人的決定。</p>
@@ -1387,7 +1388,7 @@
             <span class="preview-tag" data-i18n="preview.tag">SAMPLE PREVIEW</span>
           </div>
           <div class="preview-grid" id="preview-grid"></div>
-          <p class="preview-note" data-i18n="preview.note">以上為合成範例的真實輸出預覽——點任何一張即進入完整範例。你建立的評估會得到同樣的深度。</p>
+          <p class="preview-note" data-i18n="preview.note">以上為示範案例的真實輸出預覽——點任何一張即進入完整範例。你建立的評估會得到同樣的深度。</p>
         </div>
       </section>
 
@@ -1416,7 +1417,7 @@
             </details>
             <datalist id="quantity-unit-suggestions"><option value="metres"></option><option value="pieces"></option><option value="sets"></option><option value="rolls"></option><option value="m²"></option><option value="pairs"></option></datalist>
             <datalist id="source-suggestions"><option value="Inbound enquiry"></option><option value="Referral"></option><option value="Trade show"></option><option value="Existing buyer"></option><option value="RFQ / tender"></option><option value="Website enquiry"></option></datalist>
-            <datalist id="contact-role-suggestions"><option value="Owner / founder"></option><option value="Purchasing manager"></option><option value="Technical lead"></option><option value="Project manager"></option><option value="Finance"></option><option value="Sales contact"></option></datalist>
+            <datalist id="contact-role-suggestions"><option value="Business owner / founder"></option><option value="Purchasing manager"></option><option value="Technical lead"></option><option value="Project manager"></option><option value="Finance"></option><option value="Sales contact"></option></datalist>
             <label class="field"><span data-i18n="input.opportunityName">商機名稱</span></label>
             <input type="text" id="in-name" data-i18n-placeholder="input.opportunityNamePlaceholder" placeholder="例如：杜拜飯店集團 — 窗簾供應" />
             <details class="card intake-section" open>
@@ -1482,7 +1483,7 @@
                 <label class="field"><span data-i18n="economics.dealSpecificCost">Deal-specific 商務成本</span><input type="number" id="in-deal-cost" min="0" /></label>
                 <label class="field"><span data-i18n="economics.contingency">Risk／Contingency</span><input type="number" id="in-contingency" min="0" /></label>
               </div>
-              <label class="field"><span data-i18n="economics.minimum">Owner 最低可接受 Net Contribution</span><input type="number" id="in-min-net" min="0" /></label>
+              <label class="field"><span data-i18n="economics.minimum">負責人最低可接受 Net Contribution</span><input type="number" id="in-min-net" min="0" /></label>
             </details>
             <div class="field-row">
               <label class="field"><span data-i18n="input.buyerFit">買方契合度</span>
@@ -1905,7 +1906,7 @@
             <section id="final-decision-summary" class="final-decision-summary" hidden aria-live="polite">
               <div class="final-decision-heading">
                 <p class="eyebrow" data-i18n="result.finalDecisionSummary">最終決策</p>
-                <p class="final-decision-boundary" data-i18n="result.finalDecisionSummaryBoundary">這是你的最終商業判斷。CDD 提供證據與決策支援，最終承諾仍由你決定。</p>
+                <p class="final-decision-boundary" data-i18n="result.finalDecisionSummaryBoundary">這是你的最終商業判斷。工作台提供證據與決策支援，最終承諾仍由你決定。</p>
               </div>
               <div class="final-decision-grid">
                 <div class="final-decision-card">
@@ -1930,6 +1931,7 @@
 
       <footer class="foot">
         <span data-i18n="result.footer">本機規則引擎 · 無需登入或後端 · 範例為示意資料。</span>
+        <span class="foot-line" data-i18n="result.footerFx">「今日參考匯率」只讀取公開匯率，不傳送案例資料。</span>
       </footer>
     </div>
     <script type="module" src="./app.js"></script>

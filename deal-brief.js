@@ -238,7 +238,7 @@ export function serializeDealBriefMarkdown(brief, language = "zh-TW") {
   const pathBlocks = brief.decisionPath.available ? brief.decisionPath.paths.map((path) => bullet(`${path.id}: ${clean(path.proposition)} — ${stateLabel(path.current, language)} → ${stateLabel(path.hypothetical, language)}${path.decisionChanged ? ` (${label("decisionMayChange", language)})` : ""}`)) : [bullet(label("noDecisionPath", language))];
   const generated = new Date(brief.generatedAt).toLocaleString(language === "zh-TW" ? "zh-TW" : "en-US", { dateStyle: "medium", timeStyle: "short" });
   return [
-    "# CDD DEAL BRIEF",
+    "# COMMERCIAL DECISION DESK · DEAL BRIEF",
     `## ${clean(s.name)}`,
     "",
     line(label("market", language), s.market),

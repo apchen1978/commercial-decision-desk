@@ -145,7 +145,7 @@ function localizeOwnerFact(text) {
   return v
     .replace(/First shipment target:/gi, "首批出貨目標：")
     .replace(/installation window:/gi, "安裝期：")
-    .replace(/\(synthetic\)/gi, "")
+    .replace(/\((?:synthetic|demo)\)/gi, "")
     .replace(/metres?/gi, "公尺")
     .replace(/;/g, "；")
     .trim();

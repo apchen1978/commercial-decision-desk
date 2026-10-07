@@ -6,14 +6,14 @@
 // business-facing input -> adapter -> engine -> result view -> human decision.
 import { opportunity, dimensions, SYNTHETIC_LABEL } from "./fixtures.js";
 import { DECISION_STATES, dedupePreserveOrder, evaluateDecision, buildBrief, paymentExposure } from "./decision-engine.js";
-import { blankAssessmentDefaults, buildOpportunityFromInput, summarizeInput } from "./workbench-adapter.js";
+import { blankAssessmentDefaults, summarizeInput } from "./workbench-adapter.js";
 import { localizeEvidenceText, presentReason as localizeReason, stateLabels, t } from "./i18n.js";
 import { createDecisionPathExperiment } from "./decision-path.js";
 import { buildFlipMap } from "./flip-map.js";
 import { assessPaymentSecurity } from "./payment-security.js";
 import { assessFx } from "./fx-exposure.js";
 import { fetchReferenceRateGuarded } from "./fx-rate-source.js";
-import { withDerivedUnknowns } from "./derived-unknowns.js";
+import { opportunityForAssessment } from "./assessment-source.js";
 import { buildCommercialViewModel } from "./commercial-action-layer.js";
 import { buildTradeDealViewModel } from "./trade-deal-structure.js";
 import { buildEconomicsBridge, economicsEvidenceTrace, economicsReading } from "./economics-bridge.js";
@@ -425,9 +425,10 @@ function renderCommitmentReview({ economics, exposure }) {
   const context = current.commercialContext || {};
   const quantity = context.quantity ? `${Number(context.quantity).toLocaleString("en-US")} ${localizeOwnerFact(context.quantityUnit || "")}`.trim() : tx("context.unknown");
   const timing = context.timing ? localizeOwnerFact(context.timing) : tx("context.unknown");
-  const delivery = current.trade?.deliveryTerm
-    ? localizeOwnerFact(`${current.trade.deliveryTerm}${current.trade.namedPlace ? ` ${current.trade.namedPlace}` : ""}`)
-    : tx("context.unknown");
+  const deliveryTerm = current.trade?.deliveryTerm;
+  const delivery = deliveryTerm && deliveryTerm !== "UNKNOWN" && deliveryTerm !== "notAssessed"
+    ? localizeOwnerFact(`${deliveryTerm}${current.trade.namedPlace ? ` ${current.trade.namedPlace}` : ""}`)
+    : tx("trade.notConfirmed");
   const currency = current.economics?.currency || "CNY";
   const revenue = economics.revenue == null ? tx("economics.unknown") : economicsValue(economics.revenue, currency);
   const net = economics.expectedNetContribution == null ? tx("economics.unknown") : economicsValue(economics.expectedNetContribution, currency);
@@ -1197,12 +1198,8 @@ function esc(s) {
 
 // --- run ---------------------------------------------------------------------
 $("btn-run").addEventListener("click", () => {
-  const input = collectBlankInput();
-  current = buildOpportunityFromInput(input);
-  current.trade = { deliveryTerm: input.deliveryTerm };
-  current.commercialContext = input.commercialContext;
-  current.economics = input.economics;
-  current = withDerivedUnknowns(current); // registers payment-security / FX unknowns the engine reads
+  const input = mode === "sample" ? null : collectBlankInput();
+  current = opportunityForAssessment(mode, current, input);
   fxReference = null;
   fxFetchMessage = "";
   window.__lastInput = input;
